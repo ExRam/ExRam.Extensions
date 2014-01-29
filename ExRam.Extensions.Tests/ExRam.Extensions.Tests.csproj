@@ -72,6 +72,14 @@
     <Compile Include="AsyncEnumerable_SelectAsync_Test.cs" />
     <Compile Include="AsyncEnumerable_ToStream_Test.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="TaskCompletionSource_SetFromTask_Test.cs" />
+    <Compile Include="TaskCompletionSource_TrySetFromTask_Test.cs" />
+    <Compile Include="TaskCompletionSource_TryWithCancellation_Test.cs" />
+    <Compile Include="Task_Select_Test.cs" />
+    <Compile Include="Task_TryWithCancellation_Test.cs" />
+    <Compile Include="Task_TryWithTimeout_Test.cs" />
+    <Compile Include="Task_WithCancellation_Test.cs" />
+    <Compile Include="Task_WithTimeout_Test.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ExRam.Extensions\ExRam.Extensions.csproj">
