@@ -1,4 +1,10 @@
-﻿using System.Threading;
+﻿// (c) Copyright 2013 ExRam GmbH & Co. KG http://www.exram.de
+//
+// Licensed using Microsoft Public License (Ms-PL)
+// Full License description can be found in the LICENSE
+// file.
+
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace System.Collections.Generic
