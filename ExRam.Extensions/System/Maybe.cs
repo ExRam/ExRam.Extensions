@@ -32,14 +32,14 @@ namespace System
             return maybe.Value;
         }
 
-        public static bool operator ==(Maybe<T> counting1, Maybe<T> counting2)
+        public static bool operator ==(Maybe<T> maybe1, Maybe<T> maybe2)
         {
-            return counting1.Equals(counting2);
+            return maybe1.Equals(maybe2);
         }
 
-        public static bool operator !=(Maybe<T> counting1, Maybe<T> counting2)
+        public static bool operator !=(Maybe<T> maybe1, Maybe<T> maybe2)
         {
-            return !(counting1 == counting2);
+            return !(maybe1 == maybe2);
         }
 
         public Maybe<TResult> Cast<TResult>()
