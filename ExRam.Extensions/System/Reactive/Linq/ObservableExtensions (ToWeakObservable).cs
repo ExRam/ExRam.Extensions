@@ -36,14 +36,6 @@ namespace System.Reactive.Linq
                 this._innerDisposable.Dispose();
                 this._reference = null;
             }
-
-            #if (CONTRACTS_FULL)
-            [ContractInvariantMethod]
-            private void ContractInvariants()
-            {
-                Contract.Invariant(this._innerDisposable != null);
-            }
-            #endif
         }
         #endregion
 
@@ -90,14 +82,6 @@ namespace System.Reactive.Linq
                 else
                     this._baseSubscription.Dispose();
             }
-
-            #if (CONTRACTS_FULL)
-            [ContractInvariantMethod]
-            private void ContractInvariants()
-            {
-                Contract.Invariant(this._weakReference != null);
-            }
-            #endif
 
             public IDisposable BaseSubscription
             {
