@@ -50,20 +50,20 @@ namespace System.Reactive.Linq
         #region WeakObserver
         private class WeakObserver<T> : IObserver<T>
         {
-            private readonly WeakReference _weakReference;
             private readonly IDisposable _baseSubscription;
+            private readonly WeakReference _weakObserverReference;
 
             public WeakObserver(IObservable<T> observable, IObserver<T> observer)
             {
                 Contract.Requires(observable != null);
 
-                this._weakReference = new WeakReference(observer);
+                this._weakObserverReference = new WeakReference(observer);
                 this._baseSubscription = observable.Subscribe(this);
             }
 
             public void OnCompleted()
             {
-                var observer = this._weakReference.Target as IObserver<T>;
+                var observer = this._weakObserverReference.Target as IObserver<T>;
 
                 if (observer != null)
                     observer.OnCompleted();
@@ -73,7 +73,7 @@ namespace System.Reactive.Linq
 
             public void OnError(Exception error)
             {
-                var observer = this._weakReference.Target as IObserver<T>;
+                var observer = this._weakObserverReference.Target as IObserver<T>;
 
                 if (observer != null)
                     observer.OnError(error);
@@ -83,7 +83,7 @@ namespace System.Reactive.Linq
 
             public void OnNext(T value)
             {
-                var observer = this._weakReference.Target as IObserver<T>;
+                var observer = this._weakObserverReference.Target as IObserver<T>;
 
                 if (observer != null) 
                     observer.OnNext(value);
