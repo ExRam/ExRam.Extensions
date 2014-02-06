@@ -41,6 +41,7 @@
     <AssemblyOriginatorKeyFile>ExRam.Extensions.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="System\Linq\AsyncEnumerableExtensions %28StateScan%29.cs" />
     <Compile Include="System\MaybeExtensions.cs" />
     <Compile Include="System\Threading\Tasks\TaskFactoryExtensions.cs" />
     <Reference Include="System.Interactive.Async">
