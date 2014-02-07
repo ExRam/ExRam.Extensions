@@ -17,13 +17,11 @@ namespace System.Reactive.Subjects
         #endregion
 
         #region Constructors
-        public NullableBehaviorSubject()
-            : this(Maybe<T>.Null)
+        public NullableBehaviorSubject() : this(Maybe<T>.Null)
         {
         }
 
-        public NullableBehaviorSubject(T value)
-            : this((Maybe<T>)value)
+        public NullableBehaviorSubject(T value) : this((Maybe<T>)value)
         {
         }
 
