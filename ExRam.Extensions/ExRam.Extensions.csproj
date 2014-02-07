@@ -43,7 +43,11 @@
   <ItemGroup>
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28StateScan%29.cs" />
     <Compile Include="System\MaybeExtensions.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28CatchOnCancellation%29.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28ThrowOnCancellation%29.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeUntil%29.cs" />
     <Compile Include="System\Reactive\Subjects\NullableBehaviorSubject.cs" />
+    <Compile Include="System\Threading\CancellationTokenExtensions.cs" />
     <Compile Include="System\Threading\Tasks\TaskFactoryExtensions.cs" />
     <Reference Include="System.Interactive.Async">
       <HintPath>..\packages\Ix-Async.1.2.2\lib\portable-windows8+net45+wp8\System.Interactive.Async.dll</HintPath>
