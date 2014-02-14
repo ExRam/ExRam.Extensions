@@ -44,6 +44,7 @@
     <Compile Include="System\Collections\Generic\DictionaryExtensions.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28StateScan%29.cs" />
     <Compile Include="System\MaybeExtensions.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28ToConnectableObservable%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28CatchOnCancellation%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ThrowOnCancellation%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeUntil%29.cs" />
