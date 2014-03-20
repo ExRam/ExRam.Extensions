@@ -15,7 +15,7 @@ namespace ExRam.Extensions.Tests
         public void SubscribeAtMostTest()
         {
             var obs = Observable.Return(36)
-                .SubscribeAtMost(3);
+                .SubscribeTotallyAtMost(3);
 
             for (var i = 0; i < 4; i++)
             {

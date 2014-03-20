@@ -11,10 +11,11 @@ namespace System.Reactive.Linq
 {
     public static partial class ObservableExtensions
     {
-        public static IObservable<T> SubscribeAtMost<T>(this IObservable<T> source, int count)
+        public static IObservable<T> SubscribeConcurrentlyAtMost<T>(this IObservable<T> source, int count, IObservable<T> continuation)
         {
             Contract.Requires(source != null);
             Contract.Requires(count >= 0);
+            Contract.Requires(continuation != null);
 
             var subscriptionCount = 0;
 
@@ -24,10 +25,18 @@ namespace System.Reactive.Linq
                 {
                     var localSubscriptionCount = subscriptionCount;
                     if (localSubscriptionCount >= count)
-                        return Disposables.Disposable.Empty;
+                        return continuation.Subscribe(observer);
 
                     if (Interlocked.CompareExchange(ref subscriptionCount, localSubscriptionCount + 1, localSubscriptionCount) == localSubscriptionCount)
-                        return source.Subscribe(observer);
+                    {
+                        var subscription = source.Subscribe(observer);
+
+                        return Disposables.Disposable.Create(() =>
+                        {
+                            Interlocked.Decrement(ref subscriptionCount);
+                            subscription.Dispose();
+                        });
+                    }
                 }
             });
         }
