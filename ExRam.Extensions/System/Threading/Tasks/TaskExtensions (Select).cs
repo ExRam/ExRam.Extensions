@@ -15,6 +15,7 @@ namespace System.Threading.Tasks
         {
             Contract.Requires(task != null);
             Contract.Requires(selector != null);
+            Contract.Ensures(Contract.Result<Task<TResult>>() != null);
 
             if (task.IsCompleted)
             {
@@ -92,6 +93,7 @@ namespace System.Threading.Tasks
         {
             Contract.Requires(task != null);
             Contract.Requires(selector != null);
+            Contract.Ensures(Contract.Result<Task<TResult>>() != null);
 
             if (task.IsCompleted)
             {

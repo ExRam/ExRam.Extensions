@@ -16,6 +16,7 @@ namespace System.Threading.Tasks
             Contract.Requires(task != null);
 
             var projectedTask = task.Select(() => true);
+            
             if (projectedTask.IsCompleted)
                 return projectedTask;
 
@@ -34,6 +35,7 @@ namespace System.Threading.Tasks
             Contract.Requires(task != null);
 
             var projectedTask = task.Select(x => (Maybe<TResult>)x);
+            
             if (projectedTask.IsCompleted)
                 return projectedTask;
 

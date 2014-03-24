@@ -39,6 +39,7 @@ namespace System.Reactive.Linq
         public static IConnectableObservable<T> ToConnectableObservable<T>(this IObservable<T> source, Func<IDisposable> connectFunction)
         {
             Contract.Requires(source != null);
+            Contract.Requires(connectFunction != null);
 
             return new ConnectableObservableImpl<T>(source, connectFunction);
         }

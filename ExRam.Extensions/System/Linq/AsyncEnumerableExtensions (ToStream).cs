@@ -29,23 +29,6 @@ namespace System.Linq
             }
 
             #region Read
-            //public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
-            //{
-            //    return this.ReadAsync(buffer, offset, count, CancellationToken.None).WithAsyncCallback(callback, state);
-            //}
-
-            //public override int EndRead(IAsyncResult asyncResult)
-            //{
-            //    try
-            //    {
-            //        return ((Task<int>)asyncResult).Result;
-            //    }
-            //    catch (AggregateException ex)
-            //    {
-            //        throw ex.GetBaseException();
-            //    }
-            //}
-
             public override int Read(byte[] buffer, int offset, int count)
             {
                 return this.ReadAsync(buffer, offset, count, CancellationToken.None).Result;

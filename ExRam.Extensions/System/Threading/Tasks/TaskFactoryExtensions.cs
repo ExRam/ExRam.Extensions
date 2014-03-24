@@ -28,6 +28,9 @@ namespace System.Threading.Tasks
         #region CreateCompletedTask
         public static Task GetCompleted(this TaskFactory factory)
         {
+            Contract.Requires(factory != null);
+            Contract.Ensures(Contract.Result<Task>() != null);
+
             return TaskFactoryExtensions.CompletedTask;
         }
         #endregion
@@ -35,11 +38,17 @@ namespace System.Threading.Tasks
         #region CreateUncompletedTask
         public static Task GetUncompleted(this TaskFactory factory)
         {
+            Contract.Requires(factory != null);
+            Contract.Ensures(Contract.Result<Task>() != null);
+
             return TaskFactoryExtensions.UncompletedTask;
         }
 
         public static Task<TResult> GetUncompleted<TResult>(this TaskFactory factory)
         {
+            Contract.Requires(factory != null);
+            Contract.Ensures(Contract.Result<Task>() != null);
+
             return new TaskCompletionSource<TResult>().Task;
         }
         #endregion
@@ -47,6 +56,10 @@ namespace System.Threading.Tasks
         #region CreateFaultedTask
         public static Task GetFaulted(this TaskFactory factory, Exception exception)
         {
+            Contract.Requires(factory != null);
+            Contract.Requires(exception != null);
+            Contract.Ensures(Contract.Result<Task>() != null);
+
             var completionSource = new TaskCompletionSource<object>();
             completionSource.SetException(exception);
 
@@ -55,6 +68,10 @@ namespace System.Threading.Tasks
 
         public static Task GetFaulted(this TaskFactory factory, IEnumerable<Exception> exceptions)
         {
+            Contract.Requires(factory != null);
+            Contract.Requires(exceptions != null);
+            Contract.Ensures(Contract.Result<Task>() != null);
+
             var completionSource = new TaskCompletionSource<object>();
             completionSource.SetException(exceptions);
 
@@ -63,6 +80,10 @@ namespace System.Threading.Tasks
 
         public static Task<TResult> GetFaulted<TResult>(this TaskFactory factory, Exception exception)
         {
+            Contract.Requires(factory != null);
+            Contract.Requires(exception != null);
+            Contract.Ensures(Contract.Result<Task<TResult>>() != null);
+
             var completionSource = new TaskCompletionSource<TResult>();
             completionSource.SetException(exception);
 
@@ -71,6 +92,10 @@ namespace System.Threading.Tasks
 
         public static Task<TResult> GetFaulted<TResult>(this TaskFactory factory, IEnumerable<Exception> exceptions)
         {
+            Contract.Requires(factory != null);
+            Contract.Requires(exceptions != null);
+            Contract.Ensures(Contract.Result<Task<TResult>>() != null);
+
             var completionSource = new TaskCompletionSource<TResult>();
             completionSource.SetException(exceptions);
 
@@ -81,6 +106,9 @@ namespace System.Threading.Tasks
         #region CreateCanceledTask
         public static Task GetCanceled(this TaskFactory factory)
         {
+            Contract.Requires(factory != null);
+            Contract.Ensures(Contract.Result<Task>() != null);
+
             var completionSource = new TaskCompletionSource<object>();
             completionSource.SetCanceled();
 
@@ -89,6 +117,9 @@ namespace System.Threading.Tasks
 
         public static Task<TResult> GetCanceled<TResult>(this TaskFactory factory)
         {
+            Contract.Requires(factory != null);
+            Contract.Ensures(Contract.Result<Task<TResult>>() != null);
+
             var completionSource = new TaskCompletionSource<TResult>();
             completionSource.SetCanceled();
 
