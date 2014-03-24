@@ -113,6 +113,8 @@
     <Compile Include="System\Collections\Generic\DictionaryExtensions.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28StateScan%29.cs" />
     <Compile Include="System\MaybeExtensions.cs" />
+    <Compile Include="System\Reactive\Subjects\ConnectableObservable.cs" />
+    <Compile Include="System\Reactive\Subjects\ConnectableObservableExtensions %28ConnectTotallyAtMost%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28SubscribeConcurrentlyAtMost%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28SubscribeTotallyAtMost%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ScanWithLeadingSeed%29.cs" />
@@ -120,6 +122,7 @@
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28CatchOnCancellation%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ThrowOnCancellation%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeUntil%29.cs" />
+    <Compile Include="System\Reactive\Subjects\ConnectableObservableExtensions %28DisconnectTotallyAtMost%29.cs" />
     <Compile Include="System\Reactive\Subjects\NullableBehaviorSubject.cs" />
     <Compile Include="System\Threading\CancellationTokenExtensions.cs" />
     <Compile Include="System\Threading\Tasks\TaskFactoryExtensions.cs" />
