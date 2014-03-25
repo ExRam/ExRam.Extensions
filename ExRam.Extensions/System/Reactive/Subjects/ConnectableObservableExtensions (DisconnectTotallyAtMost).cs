@@ -5,6 +5,7 @@
 // file.
 
 using System.Diagnostics.Contracts;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading;
 
@@ -12,11 +13,10 @@ namespace System.Reactive.Subjects
 {
     public static partial class ConnectableObservableExtensions
     {
-        public static IConnectableObservable<T> DisconnectTotallyAtMost<T>(this IConnectableObservable<T> source, int count, IObservable<T> continuation)
+        public static IConnectableObservable<T> DisconnectTotallyAtMost<T>(this IConnectableObservable<T> source, int count)
         {
             Contract.Requires(source != null);
             Contract.Requires(count >= 0);
-            Contract.Requires(continuation != null);
 
             var disconnectionCount = 0;
 
@@ -24,7 +24,7 @@ namespace System.Reactive.Subjects
             {
                 var connection = source.Connect();
 
-                return Disposables.Disposable.Create(() =>
+                return Disposable.Create(() =>
                 {
                     while (true)
                     {
