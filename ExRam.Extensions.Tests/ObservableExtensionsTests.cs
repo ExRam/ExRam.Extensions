@@ -2,6 +2,8 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Threading;
+using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 
@@ -58,6 +60,33 @@ namespace ExRam.Extensions.Tests
 
             observableMock.Verify(x => x.Connect(), Times.Exactly(6));
             disposableMock.Verify(x => x.Dispose(), Times.Exactly(3));
+        }
+
+        [TestMethod]
+        public async Task Observable_Current_Test()
+        {
+            var subject = new BehaviorSubject<int>(1);
+            var asyncEnumerable = subject.Current();
+
+            using (var asyncEnumerator = asyncEnumerable.GetEnumerator())
+            {
+                await asyncEnumerator.MoveNext(CancellationToken.None);
+                Assert.AreEqual(1, asyncEnumerator.Current);
+
+                await asyncEnumerator.MoveNext(CancellationToken.None);
+                Assert.AreEqual(1, asyncEnumerator.Current);
+
+                subject.OnNext(2);
+
+                await asyncEnumerator.MoveNext(CancellationToken.None);
+                Assert.AreEqual(2, asyncEnumerator.Current);
+
+                subject.OnNext(3);
+                subject.OnNext(4);
+
+                await asyncEnumerator.MoveNext(CancellationToken.None);
+                Assert.AreEqual(4, asyncEnumerator.Current);
+            }
         }
     }
 }
