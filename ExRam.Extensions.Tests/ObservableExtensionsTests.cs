@@ -2,6 +2,7 @@
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -83,6 +84,11 @@ namespace ExRam.Extensions.Tests
 
                 subject.OnNext(3);
                 subject.OnNext(4);
+
+                await asyncEnumerator.MoveNext(CancellationToken.None);
+                Assert.AreEqual(4, asyncEnumerator.Current);
+
+                subject.OnCompleted();
 
                 await asyncEnumerator.MoveNext(CancellationToken.None);
                 Assert.AreEqual(4, asyncEnumerator.Current);
