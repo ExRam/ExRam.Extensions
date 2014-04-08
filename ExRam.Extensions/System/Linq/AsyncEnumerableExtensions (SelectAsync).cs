@@ -5,6 +5,7 @@
 // file.
 
 using System.Collections.Generic;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace System.Linq
@@ -13,7 +14,25 @@ namespace System.Linq
     {
         public static IAsyncEnumerable<TResult> SelectAsync<TSource, TResult>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, Task<TResult>> selector)
         {
-            return enumerable.SelectMany(x => selector(x).ToAsyncEnumerable());
+            return enumerable.SelectAsync((x, ct) => selector(x)); 
+        }
+
+        public static IAsyncEnumerable<TResult> SelectAsync<TSource, TResult>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, CancellationToken, Task<TResult>> selector)
+        {
+            return AsyncEnumerable2.Create(() =>
+            {
+                var baseEnumerator = enumerable.GetEnumerator();
+
+                return AsyncEnumeratorEx.Create(async (ct) =>
+                {
+                    var moved = await baseEnumerator.MoveNext(ct);
+
+                    if (moved)
+                        return await selector(baseEnumerator.Current, ct);
+
+                    return Maybe<TResult>.Null;
+                }, baseEnumerator.Dispose);
+            });
         }
     }
 }
