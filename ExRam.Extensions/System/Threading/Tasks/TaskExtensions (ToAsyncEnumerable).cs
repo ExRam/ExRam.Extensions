@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Reactive;
 
 namespace System.Threading.Tasks
 {
@@ -26,7 +27,30 @@ namespace System.Threading.Tasks
                         return Maybe<T>.Null;
                  
                     called = true;
-                    return await task;
+                    return await task.WithCancellation(ct);
+                });
+            });
+        }
+
+        public static IAsyncEnumerable<Unit> ToAsyncEnumerable(this Task task)
+        {
+            Contract.Requires(task != null);
+
+            return AsyncEnumerable2.Create(() =>
+            {
+                var called = false;
+
+                return AsyncEnumeratorEx.Create(async (ct) =>
+                {
+                    if (!called)
+                    {
+                        called = true;
+
+                        await task.WithCancellation(ct);
+                        return Unit.Default;
+                    }
+
+                    return Maybe<Unit>.Null;
                 });
             });
         }
