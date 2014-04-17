@@ -16,7 +16,7 @@ namespace System.Threading.Tasks
         {
             Contract.Requires(enumerableTask != null);
 
-            enumerableTask
+            return enumerableTask
                 .ToAsyncEnumerable()
                 .SelectMany(x => x.ToAsyncEnumerable());
         }
