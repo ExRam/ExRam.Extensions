@@ -28,6 +28,22 @@ namespace System.Threading.Tasks
         #endregion
 
         #region Swallow<TException>(Task<Result>)
+        public static async Task<Maybe<TResult>> Swallow<TException, TResult>(this Task<Maybe<TResult>> task) where TException : Exception
+        {
+            Contract.Requires(task != null);
+
+            try
+            {
+                return await task.ConfigureAwait(false);
+            }
+            // ReSharper disable EmptyGeneralCatchClause
+            catch (TException)
+            // ReSharper restore EmptyGeneralCatchClause
+            {
+                return Maybe<TResult>.Null;
+            }
+        }
+
         public static async Task<Maybe<TResult>> Swallow<TException, TResult>(this Task<TResult> task) where TException : Exception
         {
             Contract.Requires(task != null);
@@ -46,6 +62,20 @@ namespace System.Threading.Tasks
         #endregion
 
         #region Swallow(Task<TResult>)
+        public static async Task<Maybe<TResult>> Swallow<TResult>(this Task<Maybe<TResult>> task)
+        {
+            Contract.Requires(task != null);
+
+            try
+            {
+                return await task.ConfigureAwait(false);
+            }
+            catch
+            {
+                return Maybe<TResult>.Null;
+            }
+        }
+
         public static async Task<Maybe<TResult>> Swallow<TResult>(this Task<TResult> task)
         {
             Contract.Requires(task != null);
