@@ -42,16 +42,16 @@ namespace System.Reactive.Linq
                         }
                     });
 
-                return AsyncEnumeratorEx.Create<T>(async (ct) =>
+                return AsyncEnumeratorEx.Create((ct) =>
                 {
-                    TaskCompletionSource<Maybe<T>> localTcs = null;
+                    TaskCompletionSource<Maybe<T>> localTcs;
 
                     lock (syncRoot)
                     {
                         localTcs = tcs;
                     }
 
-                    return await localTcs.Task;
+                    return localTcs.Task;
                 }, subscription.Dispose);
             });
 
