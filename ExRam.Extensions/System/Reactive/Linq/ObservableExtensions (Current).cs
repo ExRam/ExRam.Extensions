@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 
 namespace System.Reactive.Linq
@@ -17,13 +18,14 @@ namespace System.Reactive.Linq
         {
             Contract.Requires(source != null);
 
-            var replayedSource = source.Replay(1);
-
             return AsyncEnumerable.Using(
-                replayedSource.Connect,
-                connection => AsyncEnumerable
-                    .Repeat(Unit.Default)
-                    .SelectAsync(x => replayedSource.FirstAsync().ToTask()));
+                () => new BehaviorSubject<Notification<T>>(null),
+                subject => AsyncEnumerable.Using(
+                    source.Materialize().KeepOpen().Multicast(subject).Connect,
+                    connection => AsyncEnumerable
+                        .Repeat(Unit.Default)
+                        .SelectAsync(x => subject.WhereNotNull().FirstAsync().ToTask())
+                        .Dematerialize()));
         }
     }
 }
