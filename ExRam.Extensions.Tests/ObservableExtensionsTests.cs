@@ -90,8 +90,7 @@ namespace ExRam.Extensions.Tests
 
                 subject.OnCompleted();
 
-                await asyncEnumerator.MoveNext(CancellationToken.None);
-                Assert.AreEqual(4, asyncEnumerator.Current);
+                Assert.IsFalse(await asyncEnumerator.MoveNext(CancellationToken.None));
             }
         }
     }

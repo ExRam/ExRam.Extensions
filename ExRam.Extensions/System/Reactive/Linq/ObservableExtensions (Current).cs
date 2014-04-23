@@ -9,6 +9,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
+using System.Threading.Tasks;
 
 namespace System.Reactive.Linq
 {
@@ -18,14 +19,52 @@ namespace System.Reactive.Linq
         {
             Contract.Requires(source != null);
 
-            return AsyncEnumerable.Using(
-                () => new BehaviorSubject<Notification<T>>(null),
-                subject => AsyncEnumerable.Using(
-                    source.Materialize().KeepOpen().Multicast(subject).Connect,
-                    connection => AsyncEnumerable
-                        .Repeat(Unit.Default)
-                        .SelectAsync(x => subject.WhereNotNull().FirstAsync().ToTask())
-                        .Dematerialize()));
+            return AsyncEnumerable2.Create(() =>
+            {
+                var syncRoot = new object();
+                var tcs = new TaskCompletionSource<Maybe<T>>();
+
+                var subscription = source
+                    .Materialize()
+                    .Subscribe((notification) =>
+                    {
+                        lock (syncRoot)
+                        {
+                            if (tcs.Task.IsCompleted)
+                                tcs = new TaskCompletionSource<Maybe<T>>();
+
+                            if (notification.HasValue)
+                                tcs.SetResult(notification.Value);
+                            else if (notification.Exception != null)
+                                tcs.SetException(notification.Exception);
+                            else
+                                tcs.SetResult(Maybe<T>.Null);
+                        }
+                    });
+
+                return AsyncEnumeratorEx.Create<T>(async (ct) =>
+                {
+                    TaskCompletionSource<Maybe<T>> localTcs = null;
+
+                    lock (syncRoot)
+                    {
+                        localTcs = tcs;
+                    }
+
+                    return await localTcs.Task;
+                }, subscription.Dispose);
+            });
+
+
+            //return AsyncEnumerable.Using(
+            //    () => new BehaviorSubject<Notification<T>>(null),
+            //    subject => AsyncEnumerable.Using(
+            //        source.Materialize().KeepOpen().Subscribe(
+            //            (value) => subject.OnNext(value),
+            //        connection => AsyncEnumerable
+            //            .Repeat(Unit.Default)
+            //            .SelectAsync(x => subject.WhereNotNull().FirstAsync().ToTask())
+            //            .Dematerialize()));
         }
     }
 }

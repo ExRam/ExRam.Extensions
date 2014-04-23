@@ -1,5 +1,7 @@
 ﻿using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 
 namespace System.Threading
@@ -16,11 +18,19 @@ namespace System.Threading
 
         public static IObservable<Unit> ToObservable(this CancellationToken ct)
         {
-            return Observable.Create<Unit>((observer) => ct.Register(() =>
+            return Observable.Defer(() =>
             {
-                observer.OnNext(Unit.Default);
-                observer.OnCompleted();
-            }));
+                var tcs = new TaskCompletionSource<bool>();
+
+                return Observable.Using(
+                    () => new CompositeDisposable(
+                        ct.Register(() => tcs.TrySetResult(true)),
+                        Disposable.Create(() => tcs.TrySetResult(false))),
+                    disposable => tcs.Task
+                        .ToObservable()
+                        .Where(value => value)
+                        .Select(dummy => Unit.Default));
+            });
         }
     }
 }
