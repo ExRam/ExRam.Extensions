@@ -55,5 +55,13 @@ namespace System.Collections.Generic
 
             return new CreateFromNextFunctionAsyncEnumerator<T>(function, disposeAction);
         }
+
+        public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, Task<Maybe<T>>> function, IDisposable disposable)
+        {
+            Contract.Requires(function != null);
+            Contract.Requires(disposable != null);
+
+            return new CreateFromNextFunctionAsyncEnumerator<T>(function, disposable.Dispose);
+        }
     }
 }
