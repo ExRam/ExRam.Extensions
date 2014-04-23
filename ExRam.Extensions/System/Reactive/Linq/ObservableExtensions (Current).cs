@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
+using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
@@ -42,29 +43,24 @@ namespace System.Reactive.Linq
                         }
                     });
 
-                return AsyncEnumeratorEx.Create((ct) =>
-                {
-                    TaskCompletionSource<Maybe<T>> localTcs;
-
-                    lock (syncRoot)
+                return AsyncEnumeratorEx.Create(
+                    (ct) =>
                     {
-                        localTcs = tcs;
-                    }
-
-                    return localTcs.Task;
-                }, subscription.Dispose);
+                        lock (syncRoot)
+                        {
+                            return tcs.Task.WithCancellation(ct);
+                        }
+                    },
+                    new CompositeDisposable(
+                        subscription,
+                        Disposable.Create(() =>
+                        {
+                            lock (syncRoot)
+                            {
+                                tcs.TrySetCanceled();
+                            }
+                        })));
             });
-
-
-            //return AsyncEnumerable.Using(
-            //    () => new BehaviorSubject<Notification<T>>(null),
-            //    subject => AsyncEnumerable.Using(
-            //        source.Materialize().KeepOpen().Subscribe(
-            //            (value) => subject.OnNext(value),
-            //        connection => AsyncEnumerable
-            //            .Repeat(Unit.Default)
-            //            .SelectAsync(x => subject.WhereNotNull().FirstAsync().ToTask())
-            //            .Dematerialize()));
         }
     }
 }
