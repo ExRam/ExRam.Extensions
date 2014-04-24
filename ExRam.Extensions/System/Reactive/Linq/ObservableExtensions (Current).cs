@@ -8,8 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reactive.Disposables;
-using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 
 namespace System.Reactive.Linq
@@ -29,18 +27,25 @@ namespace System.Reactive.Linq
                     .Materialize()
                     .Subscribe((notification) =>
                     {
+                        TaskCompletionSource<Maybe<T>> localTcs;
+
                         lock (syncRoot)
                         {
+                            if ((tcs.Task.IsFaulted) || (tcs.Task.IsCanceled))
+                                return;
+
                             if (tcs.Task.IsCompleted)
                                 tcs = new TaskCompletionSource<Maybe<T>>();
 
-                            if (notification.HasValue)
-                                tcs.SetResult(notification.Value);
-                            else if (notification.Exception != null)
-                                tcs.SetException(notification.Exception);
-                            else
-                                tcs.SetResult(Maybe<T>.Null);
+                            localTcs = tcs;
                         }
+
+                        if (notification.HasValue)
+                            localTcs.SetResult(notification.Value);
+                        else if (notification.Exception != null)
+                            localTcs.SetException(notification.Exception);
+                        else
+                            localTcs.SetResult(Maybe<T>.Null);
                     });
 
                 return AsyncEnumeratorEx.Create(
@@ -55,10 +60,14 @@ namespace System.Reactive.Linq
                         subscription,
                         Disposable.Create(() =>
                         {
+                            TaskCompletionSource<Maybe<T>> localTcs;
+
                             lock (syncRoot)
                             {
-                                tcs.TrySetCanceled();
+                                localTcs = tcs;
                             }
+
+                            localTcs.TrySetCanceled();
                         })));
             });
         }
