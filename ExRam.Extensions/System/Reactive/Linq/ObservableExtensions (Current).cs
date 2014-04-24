@@ -27,8 +27,6 @@ namespace System.Reactive.Linq
                     .Materialize()
                     .Subscribe((notification) =>
                     {
-                        TaskCompletionSource<Maybe<T>> localTcs;
-
                         lock (syncRoot)
                         {
                             if ((tcs.Task.IsFaulted) || (tcs.Task.IsCanceled))
@@ -37,15 +35,13 @@ namespace System.Reactive.Linq
                             if (tcs.Task.IsCompleted)
                                 tcs = new TaskCompletionSource<Maybe<T>>();
 
-                            localTcs = tcs;
+                            if (notification.HasValue)
+                                tcs.SetResult(notification.Value);
+                            else if (notification.Exception != null)
+                                tcs.SetException(notification.Exception);
+                            else
+                                tcs.SetResult(Maybe<T>.Null);
                         }
-
-                        if (notification.HasValue)
-                            localTcs.SetResult(notification.Value);
-                        else if (notification.Exception != null)
-                            localTcs.SetException(notification.Exception);
-                        else
-                            localTcs.SetResult(Maybe<T>.Null);
                     });
 
                 return AsyncEnumeratorEx.Create(
@@ -53,7 +49,10 @@ namespace System.Reactive.Linq
                     {
                         lock (syncRoot)
                         {
-                            return tcs.Task.WithCancellation(ct);
+                            if ((!tcs.Task.IsCompleted) && (!tcs.Task.IsCanceled))
+                                return tcs.Task.WithCancellation(ct);
+
+                            return tcs.Task;
                         }
                     },
                     new CompositeDisposable(
