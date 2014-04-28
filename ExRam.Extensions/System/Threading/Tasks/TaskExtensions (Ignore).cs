@@ -10,11 +10,13 @@ namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
     {
-        public static async void Ignore(this Task task)
+        public static void Ignore(this Task task)
         {
             Contract.Requires(task != null);
 
-            await task.Swallow();
+            // ReSharper disable CSharpWarnings::CS4014
+            task.ContinueWith((t) => t.Exception, TaskContinuationOptions.OnlyOnFaulted);
+            // ReSharper restore CSharpWarnings::CS4014
         }
     }
 }
