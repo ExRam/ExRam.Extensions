@@ -113,6 +113,7 @@
     <Compile Include="System\Collections\Generic\DictionaryExtensions.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28StateScan%29.cs" />
     <Compile Include="System\MaybeExtensions.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28Forever%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TryFirstAsync%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Current%29.cs" />
     <Compile Include="System\Reactive\Subjects\ConnectableObservable.cs" />
