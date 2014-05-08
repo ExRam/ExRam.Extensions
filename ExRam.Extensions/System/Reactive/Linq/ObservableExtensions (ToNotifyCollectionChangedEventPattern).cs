@@ -16,6 +16,7 @@ namespace System.Reactive.Linq
         {
             public EventPatternSource(IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
             {
+                Contract.Requires(source != null);
             }
 
             public event NotifyCollectionChangedEventHandler CollectionChanged
@@ -36,6 +37,7 @@ namespace System.Reactive.Linq
         public static INotifyCollectionChanged ToNotifyCollectionChangedEventPattern(this IObservable<NotifyCollectionChangedEventArgs> source, object sender)
         {
             Contract.Requires(source != null);
+            Contract.Ensures(Contract.Result<INotifyCollectionChanged>() != null);
 
             return new EventPatternSource(source.Select(x => new EventPattern<NotifyCollectionChangedEventArgs>(sender, x)));
         }

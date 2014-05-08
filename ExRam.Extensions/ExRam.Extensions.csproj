@@ -111,6 +111,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System\Collections\Generic\DictionaryExtensions.cs" />
+    <Compile Include="System\IO\StreamExtensions.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28StateScan%29.cs" />
     <Compile Include="System\MaybeExtensions.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Forever%29.cs" />
