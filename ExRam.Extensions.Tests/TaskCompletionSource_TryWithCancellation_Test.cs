@@ -4,10 +4,9 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ExRam.Framework.Tests
 {

@@ -83,41 +83,6 @@ namespace ExRam.Framework.Tests
         }
         #endregion
 
-        #region TaskCompletionSourceOfMaybeOfInt_Can_Be_Set_From_Completed_TaskOfInt
-        //[TestMethod]
-        //public async Task TaskCompletionSourceOfMaybeOfInt_Can_Be_Set_From_Completed_TaskOfInt()
-        //{
-        //    var tcs = new TaskCompletionSource<Maybe<int>>();
-        //    Assert.IsTrue(tcs.TrySetFromTask(Task.FromResult(36)));
-
-        //    Assert.AreEqual(36, await tcs.Task);
-        //}
-        #endregion
-
-        #region TaskCompletionSourceOfMaybeOfInt_Can_Be_Set_From_Canceled_TaskOfInt
-        //[TestMethod]
-        //[ExpectedException(typeof(TaskCanceledException))]
-        //public async Task TaskCompletionSourceOfMaybeOfInt_Can_Be_Set_From_Canceled_TaskOfInt()
-        //{
-        //    var tcs = new TaskCompletionSource<Maybe<int>>();
-        //    Assert.IsTrue(tcs.TrySetFromTask(Task.Factory.CreateCanceledTask<int>()));
-
-        //    await tcs.Task;
-        //}
-        #endregion
-
-        #region TaskCompletionSourceOfMaybeOfInt_Can_Be_Set_From_Faulted_TaskOfInt
-        //[TestMethod]
-        //[ExpectedException(typeof(NotSupportedException))]
-        //public async Task TaskCompletionSourceOfMaybeOfInt_Can_Be_Set_From_Faulted_TaskOfInt()
-        //{
-        //    var tcs = new TaskCompletionSource<Maybe<int>>();
-        //    Assert.IsTrue(tcs.TrySetFromTask(Task.Factory.CreateFaultedTask<int>(new NotSupportedException())));
-
-        //    await tcs.Task;
-        //}
-        #endregion
-
         #region Completed_TaskCompletionSource_Cannot_Be_Set_From_Completed_Task
         [TestMethod]
         public async Task Completed_TaskCompletionSource_Cannot_Be_Set_From_Completed_Task()
@@ -180,36 +145,6 @@ namespace ExRam.Framework.Tests
             tcs.SetResult(36);
             Assert.IsFalse(tcs.TrySetFromTask(Task.Factory.GetFaulted<int>(new NotSupportedException())));
         }
-        #endregion
-
-        #region Completed_TaskCompletionSourceOfMaybeOfInt_Cannot_Be_Set_From_Completed_TaskOfInt
-        //[TestMethod]
-        //public void Completed_TaskCompletionSourceOfMaybeOfInt_Cannot_Be_Set_From_Completed_TaskOfInt()
-        //{
-        //    var tcs = new TaskCompletionSource<Maybe<int>>();
-        //    tcs.SetResult(40);
-        //    Assert.IsFalse(tcs.TrySetFromTask(Task.FromResult(36)));
-        //}
-        #endregion
-
-        #region Completed_TaskCompletionSourceOfMaybeOfInt_Cannot_Be_Set_From_Canceled_TaskOfInt
-        //[TestMethod]
-        //public void Completed_TaskCompletionSourceOfMaybeOfInt_Cannot_Be_Set_From_Canceled_TaskOfInt()
-        //{
-        //    var tcs = new TaskCompletionSource<Maybe<int>>();
-        //    tcs.SetResult(40);
-        //    Assert.IsFalse(tcs.TrySetFromTask(Task.Factory.CreateCanceledTask<int>()));
-        //}
-        #endregion
-
-        #region Completed_TaskCompletionSourceOfMaybeOfInt_Cannot_Be_Set_From_Faulted_TaskOfInt
-        //[TestMethod]
-        //public void Completed_TaskCompletionSourceOfMaybeOfInt_Cannot_Be_Set_From_Faulted_TaskOfInt()
-        //{
-        //    var tcs = new TaskCompletionSource<Maybe<int>>();
-        //    tcs.SetResult(40);
-        //    Assert.IsFalse(tcs.TrySetFromTask(Task.Factory.CreateFaultedTask<int>(new NotSupportedException())));
-        //}
         #endregion
     }
 }

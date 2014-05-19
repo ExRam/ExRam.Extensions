@@ -22,7 +22,7 @@ namespace System.Reactive.Linq
                     (f, value) =>
                     {
                         var ret = accumulator(f(), value);
-                        return () => ret;       //DO NOT INLINE!
+                        return () => ret;       // DO NOT INLINE!
                     })
                 .Select(f => f());
         }

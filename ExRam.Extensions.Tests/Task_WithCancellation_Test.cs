@@ -5,9 +5,9 @@
 // file.
 
 using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace ExRam.Framework.Tests
 {
@@ -174,6 +174,5 @@ namespace ExRam.Framework.Tests
             }
         }
         #endregion
-
     }
 }
