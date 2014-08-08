@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 
 namespace System.IO
 {
-    public static partial class StreamExtensions
+    public static class StreamExtensions
     {
         #region ReadAsync
         public static async Task<byte[]> ReadAsync(this Stream stream, int count)
