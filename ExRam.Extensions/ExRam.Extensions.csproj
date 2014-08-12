@@ -131,6 +131,7 @@
     <Compile Include="System\Reactive\Subjects\ConnectableObservableExtensions %28ConnectAndForget%29.cs" />
     <Compile Include="System\Reactive\Subjects\NullableBehaviorSubject.cs" />
     <Compile Include="System\Threading\CancellationTokenExtensions.cs" />
+    <Compile Include="System\Threading\Tasks\TaskExtensions %28SelectAsync%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28AsAsyncEnumerable%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskFactoryExtensions.cs" />
     <Reference Include="System.Interactive.Async">
