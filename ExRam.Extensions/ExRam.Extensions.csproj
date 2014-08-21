@@ -114,6 +114,8 @@
     <Compile Include="System\IO\StreamExtensions.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28StateScan%29.cs" />
     <Compile Include="System\MaybeExtensions.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28Concat%29.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28DefaultIfEmpty%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28SelectAsync%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Forever%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TryFirstAsync%29.cs" />

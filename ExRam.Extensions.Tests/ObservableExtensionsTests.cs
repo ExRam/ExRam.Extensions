@@ -218,5 +218,61 @@ namespace ExRam.Extensions.Tests
             }
         }
         #endregion
+
+        #region Observable_Concat_produces_correct_sequence_when_first_sequence_has_values
+        [TestMethod]
+        public async Task Observable_Concat_produces_correct_sequence_when_first_sequence_has_values()
+        {
+            var array = await new[] { 1, 2, 3 }
+                .ToObservable()
+                .Concat((maybe) =>
+                {
+                    if (maybe.Value == 3)
+                        return Observable.Return(4);
+
+                    return Observable.Return(-1);
+                })
+                .ToArray()
+                .ToTask();
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, array);
+        }
+        #endregion
+
+        #region Observable_Concat_produces_correct_sequence_when_first_sequence_is_empty
+        [TestMethod]
+        public async Task Observable_Concat_produces_correct_sequence_when_first_sequence_is_empty()
+        {
+            var array = await Observable.Empty<int>()
+                .Concat((maybe) =>
+                {
+                    if (!maybe.HasValue)
+                        return Observable.Return(1);
+
+                    return Observable.Return(2);
+                })
+                .ToArray()
+                .ToTask();
+
+            CollectionAssert.AreEqual(new[] { 1 }, array);
+        }
+        #endregion
+
+        #region Observable_Concat_produces_correct_sequence_when_first_sequence_faults
+        [TestMethod]
+        public async Task Observable_Concat_produces_correct_sequence_when_first_sequence_faults()
+        {
+            var ex = new Exception();
+
+            var array = await Observable.Throw<int>(ex)
+                .Concat((maybe) => Observable.Return(1))
+                .Materialize()
+                .ToArray()
+                .ToTask();
+
+            Assert.AreEqual(1, array.Length);
+            Assert.AreEqual(ex, array[0].Exception);
+        }
+        #endregion
     }
 }
