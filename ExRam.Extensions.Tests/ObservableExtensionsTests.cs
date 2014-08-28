@@ -274,5 +274,24 @@ namespace ExRam.Extensions.Tests
             Assert.AreEqual(ex, array[0].Exception);
         }
         #endregion
+
+        [TestMethod]
+        public async Task UsingWhile_disposes_resource_in_time()
+        {
+            var resource = new SingleAssignmentDisposable();
+
+            var subject = new Subject<int>();
+
+            using (System.Reactive.Linq.ObservableExtensions.UsingWhile(() => resource, _ => subject, (x => x < 3)).Subscribe())
+            {
+                Assert.IsFalse(resource.IsDisposed);
+                subject.OnNext(1);
+                Assert.IsFalse(resource.IsDisposed);
+                subject.OnNext(2);
+                Assert.IsFalse(resource.IsDisposed);
+                subject.OnNext(3);
+                Assert.IsTrue(resource.IsDisposed);
+            }
+        }
     }
 }

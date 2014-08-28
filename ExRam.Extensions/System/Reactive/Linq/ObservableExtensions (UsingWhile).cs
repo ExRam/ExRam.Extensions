@@ -20,21 +20,22 @@ namespace System.Reactive.Linq
             return Observable.Create<TResult>((observer) =>
             {
                 var resource = resourceFactory();
-                var disposable = new SingleAssignmentDisposable
-                {
-                    Disposable = resource
-                };
 
                 return Observable
-                    .Return(Unit.Default)
-                    .SelectMany(unit => Observable.Using(
-                        () => disposable,
-                        _ => observableFactory(resource)))
-                    .Do(value =>
-                    {
-                        if ((!disposable.IsDisposed) && (!predicate(value)))
-                            disposable.Dispose();
-                    })
+                    .Using(
+                        () => new SingleAssignmentDisposable
+                        {
+                            Disposable = resource
+                        },
+                        disposable => Observable
+                            .Using(
+                                () => disposable,
+                                _ => observableFactory(resource))
+                            .Do(value =>
+                            {
+                                if ((!disposable.IsDisposed) && (!predicate(value)))
+                                    disposable.Dispose();
+                            }))
                     .Subscribe(observer);
             });
         }
