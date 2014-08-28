@@ -275,6 +275,7 @@ namespace ExRam.Extensions.Tests
         }
         #endregion
 
+        #region UsingWhile_disposes_resource_in_time
         [TestMethod]
         public async Task UsingWhile_disposes_resource_in_time()
         {
@@ -293,5 +294,6 @@ namespace ExRam.Extensions.Tests
                 Assert.IsTrue(resource.IsDisposed);
             }
         }
+        #endregion
     }
 }
