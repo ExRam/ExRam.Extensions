@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -293,6 +294,40 @@ namespace ExRam.Extensions.Tests
                 subject.OnNext(3);
                 Assert.IsTrue(resource.IsDisposed);
             }
+        }
+        #endregion
+
+        #region RepeatIfEmpty_produces_correct_values
+        [TestMethod]
+        public async Task RepeatIfEmpty_produces_correct_values()
+        {
+            var array = await System.Reactive.Linq.ObservableExtensions
+                .Morph(
+                    Observable.Empty<int>(),
+                    Observable.Empty<int>(),
+                    new[] { 1, 2, 3 }.ToObservable(),
+                    new[] { 4, 5, 6 }.ToObservable())
+                .RepeatIfEmpty()
+                .ToArray()
+                .ToTask();
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, array);
+        }
+        #endregion
+
+        #region RepeatIfEmpty_propagates_exception_correctly
+        [TestMethod]
+        [ExpectedException(typeof(InvalidOperationException))]
+        public async Task RepeatIfEmpty_propagates_exception_correctly()
+        {
+            await System.Reactive.Linq.ObservableExtensions
+                .Morph(
+                    Observable.Empty<int>(),
+                    Observable.Empty<int>(),
+                    Observable.Throw<int>(new InvalidOperationException()))
+                .RepeatIfEmpty()
+                .ToArray()
+                .ToTask();
         }
         #endregion
     }
