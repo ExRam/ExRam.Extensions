@@ -297,9 +297,9 @@ namespace ExRam.Extensions.Tests
         }
         #endregion
 
-        #region RepeatIfEmpty_produces_correct_values
+        #region RepeatWhileEmpty_produces_correct_values
         [TestMethod]
-        public async Task RepeatIfEmpty_produces_correct_values()
+        public async Task RepeatWhileEmpty_produces_correct_values()
         {
             var array = await System.Reactive.Linq.ObservableExtensions
                 .Morph(
@@ -307,7 +307,7 @@ namespace ExRam.Extensions.Tests
                     Observable.Empty<int>(),
                     new[] { 1, 2, 3 }.ToObservable(),
                     new[] { 4, 5, 6 }.ToObservable())
-                .RepeatIfEmpty()
+                .RepeatWhileEmpty()
                 .ToArray()
                 .ToTask();
 
@@ -315,17 +315,17 @@ namespace ExRam.Extensions.Tests
         }
         #endregion
 
-        #region RepeatIfEmpty_propagates_exception_correctly
+        #region RepeatWhileEmpty_propagates_exception_correctly
         [TestMethod]
         [ExpectedException(typeof(InvalidOperationException))]
-        public async Task RepeatIfEmpty_propagates_exception_correctly()
+        public async Task RepeatWhileEmpty_propagates_exception_correctly()
         {
             await System.Reactive.Linq.ObservableExtensions
                 .Morph(
                     Observable.Empty<int>(),
                     Observable.Empty<int>(),
                     Observable.Throw<int>(new InvalidOperationException()))
-                .RepeatIfEmpty()
+                .RepeatWhileEmpty()
                 .ToArray()
                 .ToTask();
         }

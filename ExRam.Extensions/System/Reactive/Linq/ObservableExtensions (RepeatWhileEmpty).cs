@@ -11,14 +11,14 @@ namespace System.Reactive.Linq
 {
     public static partial class ObservableExtensions
     {
-        public static IObservable<T> RepeatIfEmpty<T>(this IObservable<T> source)
+        public static IObservable<T> RepeatWhileEmpty<T>(this IObservable<T> source)
         {
             Contract.Requires(source != null);
 
             return source.Concat(maybe =>
             {
                 if (!maybe.HasValue)
-                    return source.RepeatIfEmpty();
+                    return source.RepeatWhileEmpty();
 
                 return Observable.Empty<T>();
             });
