@@ -5,7 +5,6 @@
 // file.
 
 using System.Diagnostics.Contracts;
-using System.Reactive.Disposables;
 
 namespace System.Reactive.Linq
 {
