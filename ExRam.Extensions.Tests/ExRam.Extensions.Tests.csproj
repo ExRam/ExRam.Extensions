@@ -75,6 +75,7 @@
   </Choose>
   <ItemGroup>
     <Compile Include="AsyncEnumerable_Gate_Test.cs" />
+    <Compile Include="AsyncEnumerable_Concat_Test.cs" />
     <Compile Include="AsyncEnumerable_ReturnAsync_Test.cs" />
     <Compile Include="AsyncEnumerable_SelectAsync_Test.cs" />
     <Compile Include="AsyncEnumerable_ToStream_Test.cs" />
