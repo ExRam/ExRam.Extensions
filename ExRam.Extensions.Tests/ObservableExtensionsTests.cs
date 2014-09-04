@@ -330,5 +330,19 @@ namespace ExRam.Extensions.Tests
                 .ToTask();
         }
         #endregion
+
+        #region TakeWhileInclusive_takes_one_additional_element
+        [TestMethod]
+        public async Task TakeWhileInclusive_takes_one_additional_element()
+        {
+            var array = await new[] { 1, 2, 3, 4, 5, 6 }
+                .ToObservable()
+                .TakeWhileInclusive(x => x < 3)
+                .ToArray()
+                .ToTask();
+
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, array);
+        }
+        #endregion
     }
 }
