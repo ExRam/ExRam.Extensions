@@ -5,7 +5,9 @@
 // file.
 
 using System.Diagnostics.Contracts;
+using System.Reactive.Disposables;
 using System.Reactive.Threading.Tasks;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace System.Reactive.Linq
@@ -21,6 +23,21 @@ namespace System.Reactive.Linq
                 .SelectMany(x => predicate(x)
                     .ToObservable()
                     .Select(b => b ? x : Maybe<T>.Null))
+                .Where(x => x.HasValue)
+                .Select(x => x.Value);
+        }
+
+        public static IObservable<T> Where<T>(this IObservable<T> source, Func<T, CancellationToken, Task<bool>> predicate)
+        {
+            Contract.Requires(source != null);
+            Contract.Requires(predicate != null);
+
+            return source
+                .SelectMany(x => Observable.Using(
+                    () => new CancellationDisposable(),
+                    cts => predicate(x, cts.Token)
+                        .ToObservable()
+                        .Select(b => b ? x : Maybe<T>.Null)))
                 .Where(x => x.HasValue)
                 .Select(x => x.Value);
         }
