@@ -344,5 +344,24 @@ namespace ExRam.Extensions.Tests
             CollectionAssert.AreEqual(new[] { 1, 2, 3 }, array);
         }
         #endregion
+
+        #region Where_with_async_predicate_does_the_job
+        [TestMethod]
+        public async Task Where_with_async_predicate_does_the_job()
+        {
+            var source = new[]{ 8, 2, 6, 5, 0, 1, 9, 7, 3, 4}.ToObservable();
+
+            var filtered = await source
+                .Where(async x =>
+                {
+                    await Task.Delay(x * 10);
+                    return x % 2 == 0;
+                })
+                .ToArray()
+                .ToTask();
+
+            CollectionAssert.AreEquivalent(new[] { 2, 4, 6, 8, 0 }, filtered);
+        }
+        #endregion
     }
 }
