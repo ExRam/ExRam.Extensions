@@ -116,6 +116,7 @@
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28Concat%29.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28DefaultIfEmpty%29.cs" />
     <Compile Include="System\MaybeExtensions.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28Where%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeWhileInclusivel%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28RepeatWhileEmpty%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Morph%29.cs" />
