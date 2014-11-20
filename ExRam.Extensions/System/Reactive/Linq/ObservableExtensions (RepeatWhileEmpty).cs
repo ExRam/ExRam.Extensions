@@ -14,13 +14,32 @@ namespace System.Reactive.Linq
         {
             Contract.Requires(source != null);
 
-            return source.Concat(maybe =>
-            {
-                if (!maybe.HasValue)
-                    return source.RepeatWhileEmpty();
+            return source.RepeatWhileEmpty(null);
+        }
 
+        public static IObservable<T> RepeatWhileEmpty<T>(this IObservable<T> source, int repeatCount)
+        {
+            Contract.Requires(source != null);
+
+            return source.RepeatWhileEmpty((int?)repeatCount);
+        }
+
+        private static IObservable<T> RepeatWhileEmpty<T>(this IObservable<T> source, int? repeatCount)
+        {
+            Contract.Requires(source != null);
+            Contract.Requires(!repeatCount.HasValue || repeatCount.Value >= 0);
+
+            if ((repeatCount.HasValue) && (repeatCount.Value == 0))
                 return Observable.Empty<T>();
-            });
+
+            return source
+                .Concat(maybe =>
+                {
+                    if (!maybe.HasValue)
+                        return source.RepeatWhileEmpty(repeatCount.HasValue ? (int?)(repeatCount.Value - 1) : null);
+
+                    return Observable.Empty<T>();
+                });
         }
     }
 }
