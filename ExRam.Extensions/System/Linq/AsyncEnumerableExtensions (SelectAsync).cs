@@ -14,7 +14,8 @@ namespace System.Linq
     {
         public static IAsyncEnumerable<TResult> SelectAsync<TSource, TResult>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, Task<TResult>> selector)
         {
-            return enumerable.SelectAsync((x, ct) => selector(x)); 
+            return enumerable
+                .SelectAsync((x, ct) => selector(x)); 
         }
 
         public static IAsyncEnumerable<TResult> SelectAsync<TSource, TResult>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, CancellationToken, Task<TResult>> selector)
