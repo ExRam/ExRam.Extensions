@@ -5,16 +5,17 @@
 // file.
 
 using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Diagnostics.Contracts;
 
 namespace System.Reactive.Linq
 {
     public static partial class ObservableExtensions
     {
-        #region EventPatternSource
-        private sealed class EventPatternSource : EventPatternSourceBase<object, NotifyCollectionChangedEventArgs>, INotifyCollectionChanged
+        #region NotifyCollectionChangedEventPatternSource
+        private sealed class NotifyCollectionChangedEventPatternSource : EventPatternSourceBase<object, NotifyCollectionChangedEventArgs>, INotifyCollectionChanged
         {
-            public EventPatternSource(IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
+            public NotifyCollectionChangedEventPatternSource(IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
             {
                 Contract.Requires(source != null);
             }
@@ -34,12 +35,43 @@ namespace System.Reactive.Linq
         }
         #endregion
 
+        #region NotifyPropertyChangedEventPatternSource
+        private sealed class NotifyPropertyChangedEventPatternSource : EventPatternSourceBase<object, PropertyChangedEventArgs>, INotifyPropertyChanged
+        {
+            public NotifyPropertyChangedEventPatternSource(IObservable<EventPattern<object, PropertyChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
+            {
+                Contract.Requires(source != null);
+            }
+            
+            public event PropertyChangedEventHandler PropertyChanged
+            {
+                add
+                {
+                    base.Add(value, (o, e) => value(o, e));
+                }
+
+                remove
+                {
+                    base.Remove(value);
+                }
+            }
+        }
+        #endregion
+
         public static INotifyCollectionChanged ToNotifyCollectionChangedEventPattern(this IObservable<NotifyCollectionChangedEventArgs> source, object sender)
         {
             Contract.Requires(source != null);
             Contract.Ensures(Contract.Result<INotifyCollectionChanged>() != null);
 
-            return new EventPatternSource(source.Select(x => new EventPattern<NotifyCollectionChangedEventArgs>(sender, x)));
+            return new NotifyCollectionChangedEventPatternSource(source.Select(x => new EventPattern<NotifyCollectionChangedEventArgs>(sender, x)));
+        }
+
+        public static INotifyPropertyChanged ToNotifyPropertyChangedEventPattern(this IObservable<PropertyChangedEventArgs> source, object sender)
+        {
+            Contract.Requires(source != null);
+            Contract.Ensures(Contract.Result<INotifyPropertyChanged>() != null);
+
+            return new NotifyPropertyChangedEventPatternSource(source.Select(x => new EventPattern<PropertyChangedEventArgs>(sender, x)));
         }
     }
 }
