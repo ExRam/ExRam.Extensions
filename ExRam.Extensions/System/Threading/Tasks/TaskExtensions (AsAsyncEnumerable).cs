@@ -15,9 +15,9 @@ namespace System.Threading.Tasks
         public static IAsyncEnumerable<T> AsAsyncEnumerable<T>(this Task<IEnumerable<T>> enumerableTask)
         {
             Contract.Requires(enumerableTask != null);
-
+           
             return enumerableTask
-                .ToAsyncEnumerable()
+                .ToAsyncEnumerable<IEnumerable<T>>()
                 .SelectMany(x => x.ToAsyncEnumerable());
         }
     }

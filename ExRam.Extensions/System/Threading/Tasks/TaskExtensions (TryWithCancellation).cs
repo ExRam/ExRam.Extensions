@@ -37,7 +37,7 @@ namespace System.Threading.Tasks
         #endregion
 
         #region TryWithCancellation(Task<TResult>, CancellationToken)
-        public static Task<Maybe<TResult>> TryWithCancellation<TResult>(this Task<TResult> task, CancellationToken token)
+        public static Task<Maybe<TResult>>  TryWithCancellation<TResult>(this Task<TResult> task, CancellationToken token)
         {
             Contract.Requires(task != null);
 
