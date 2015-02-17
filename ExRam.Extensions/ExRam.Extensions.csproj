@@ -184,7 +184,6 @@
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28OnCompletionOrError%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ScanAsync%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28StateScan%29.cs" />
-    <Compile Include="System\Reactive\Linq\ObservableExtensions %28SubscribeUsing%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ToCounting%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ToGroup%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ToNotifyCollectionChangedEventPattern%29.cs" />
