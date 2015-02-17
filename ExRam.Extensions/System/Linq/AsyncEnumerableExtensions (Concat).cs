@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Reactive;
 using System.Reactive.Disposables;
 
 namespace System.Linq
@@ -17,60 +18,32 @@ namespace System.Linq
             Contract.Requires(source != null);
             Contract.Requires(continuationSelector != null);
 
-            return AsyncEnumerable2.Create(() =>
-            {
-                var lastValue = Maybe<T>.Null;
-                IAsyncEnumerator<T> secondEnumerator = null;
-                var firstEnumerator = source.GetEnumerator();
-                var enumeratorDisposables = new SerialDisposable();
-
-                if (firstEnumerator == null)
-                    throw new InvalidOperationException();
-
-                enumeratorDisposables.Disposable = firstEnumerator;
-
-                return AsyncEnumeratorEx.Create(async ct =>
-                {
-                    while (true)
+            return source
+                .Materialize()
+                .Scan(
+                    new
                     {
-                        if (firstEnumerator != null)
-                        {
-                            var hasValue = await firstEnumerator.MoveNext(ct);
+                        Previous = (Notification<T>)null,
+                        Current = (Notification<T>)null
+                    },
+                    (previous, current) => new
+                    {
+                        Previous = previous.Current,
+                        Current = current
+                    })
+                .SelectMany(tuple =>
+                {
+                    if (tuple.Current.HasValue)
+                        return AsyncEnumerable.Return(tuple.Current.Value);
 
-                            if (hasValue)
-                                return lastValue = firstEnumerator.Current;
+                    if (tuple.Current.Exception != null)
+                        return AsyncEnumerable.Throw<T>(tuple.Current.Exception);
 
-                            firstEnumerator = null;
-
-                            var nextEnumerable = continuationSelector(lastValue);
-
-                            if (nextEnumerable == null)
-                                throw new InvalidOperationException();
-
-                            secondEnumerator = nextEnumerable.GetEnumerator();
-
-                            if (secondEnumerator == null)
-                                throw new InvalidOperationException();
-
-                            enumeratorDisposables.Disposable = secondEnumerator;
-                        }
-                        else if (secondEnumerator != null)
-                        {
-                            var hasValue = await secondEnumerator.MoveNext(ct);
-
-                            if (hasValue)
-                                return secondEnumerator.Current;
-
-                            secondEnumerator = null;
-                            enumeratorDisposables.Dispose();
-
-                            return Maybe<T>.Null;
-                        }
-                        else
-                            return Maybe<T>.Null;
-                    }
-                }, enumeratorDisposables.Dispose);
-            });
+                    return tuple.Previous != null
+                        ? continuationSelector(tuple.Previous.Value)
+                        : continuationSelector(Maybe<T>.Null);
+                })
+                .Unwrap();
         }
     }
 }
