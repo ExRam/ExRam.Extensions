@@ -5,9 +5,12 @@
 // file.
 
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reactive.Disposables;
+using System.Reactive.Subjects;
+using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 
 namespace System.Reactive.Linq
@@ -18,57 +21,22 @@ namespace System.Reactive.Linq
         {
             Contract.Requires(source != null);
 
-            return AsyncEnumerable2.Create(() =>
-            {
-                var syncRoot = new object();
-                var tcs = new TaskCompletionSource<Maybe<T>>();
-
-                var subscription = source
-                    .Materialize()
-                    .Subscribe(notification =>
-                    {
-                        lock (syncRoot)
-                        {
-                            if ((tcs.Task.IsFaulted) || (tcs.Task.IsCanceled))
-                                return;
-
-                            if (tcs.Task.IsCompleted)
-                                tcs = new TaskCompletionSource<Maybe<T>>();
-
-                            if (notification.HasValue)
-                                tcs.SetResult(notification.Value);
-                            else if (notification.Exception != null)
-                                tcs.SetException(notification.Exception);
-                            else
-                                tcs.SetResult(Maybe<T>.Null);
-                        }
-                    });
-
-                return AsyncEnumeratorEx.Create(
-                    ct =>
-                    {
-                        lock (syncRoot)
-                        {
-                            if ((!tcs.Task.IsCompleted) && (!tcs.Task.IsCanceled))
-                                return tcs.Task.WithCancellation(ct);
-
-                            return tcs.Task;
-                        }
-                    },
-                    new CompositeDisposable(
-                        subscription,
-                        Disposable.Create(() =>
-                        {
-                            TaskCompletionSource<Maybe<T>> localTcs;
-
-                            lock (syncRoot)
-                            {
-                                localTcs = tcs;
-                            }
-
-                            localTcs.TrySetCanceled();
-                        })));
-            });
+            return AsyncEnumerable
+                .Using(
+                    () => new ReplaySubject<Notification<T>>(1),
+                    subject => AsyncEnumerable
+                        .Using(
+                            () => source
+                                .Materialize()
+                                .Multicast(subject)
+                                .Connect(),
+                            _ => AsyncEnumerable
+                                .Repeat(Unit.Default)
+                                .SelectMany(unit => subject
+                                    .FirstAsync()
+                                    .ToAsyncEnumerable())
+                                .Dematerialize()))
+                .Unwrap();
         }
     }
 }
