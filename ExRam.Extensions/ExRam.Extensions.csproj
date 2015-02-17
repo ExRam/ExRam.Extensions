@@ -123,6 +123,7 @@
     <Compile Include="System\Collections\Generic\ListExtensions.cs" />
     <Compile Include="System\ExceptionExtensions.cs" />
     <Compile Include="System\IO\StreamExtensions.cs" />
+    <Compile Include="System\Linq\AsyncEnumerableExtensions %28Unwrap%29.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28StateScan%29.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28Concat%29.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28DefaultIfEmpty%29.cs" />
