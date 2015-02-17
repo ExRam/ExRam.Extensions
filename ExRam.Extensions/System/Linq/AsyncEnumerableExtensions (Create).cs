@@ -45,33 +45,5 @@ namespace System.Linq
 
             return AsyncEnumerable2.Create(() => AsyncEnumeratorEx.Create(function, disposeAction));
         }
-
-        public static IAsyncEnumerable<TTarget> CreateUsing<TDisposable, TTarget>(TDisposable disposable, Func<TDisposable, IAsyncEnumerator<TTarget>> enumeratorCreationFunction) where TDisposable : IDisposable
-        {
-            Contract.Requires(disposable != null);
-            Contract.Requires(enumeratorCreationFunction != null);
-
-            return AsyncEnumerable2.Create(() =>
-            {
-                var enumerator = enumeratorCreationFunction(disposable);
-
-                if (enumerator == null)
-                    throw new InvalidOperationException();
-
-                return AsyncEnumeratorEx.Create(
-                    enumerator.MoveNextAsMaybe,
-                    () =>
-                    {
-                        try
-                        {
-                            enumerator.Dispose();
-                        }
-                        finally
-                        {
-                            disposable.Dispose();
-                        }
-                    });
-            });
-        }
     }
 }
