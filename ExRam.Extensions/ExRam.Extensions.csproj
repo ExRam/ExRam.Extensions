@@ -134,7 +134,6 @@
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeWhileInclusivel%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28RepeatWhileEmpty%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Morph%29.cs" />
-    <Compile Include="System\Reactive\Linq\ObservableExtensions %28UsingWhile%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Concat%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28DefaultIfEmpty%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28SelectAsync%29.cs" />

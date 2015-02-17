@@ -264,27 +264,6 @@ namespace ExRam.Extensions.Tests
         }
         #endregion
 
-        #region UsingWhile_disposes_resource_in_time
-        [TestMethod]
-        public async Task UsingWhile_disposes_resource_in_time()
-        {
-            var resource = new SingleAssignmentDisposable();
-
-            var subject = new Subject<int>();
-
-            using (ObservableExtensions.UsingWhile(() => resource, _ => subject, (x => x < 3)).Subscribe())
-            {
-                Assert.IsFalse(resource.IsDisposed);
-                subject.OnNext(1);
-                Assert.IsFalse(resource.IsDisposed);
-                subject.OnNext(2);
-                Assert.IsFalse(resource.IsDisposed);
-                subject.OnNext(3);
-                Assert.IsTrue(resource.IsDisposed);
-            }
-        }
-        #endregion
-
         #region RepeatWhileEmpty_produces_correct_values
         [TestMethod]
         public async Task RepeatWhileEmpty_produces_correct_values()
