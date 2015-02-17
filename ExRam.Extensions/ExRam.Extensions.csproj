@@ -145,7 +145,6 @@
     <Compile Include="System\Reactive\Subjects\ConnectableObservableExtensions %28ConnectTotallyAtMost%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28SubscribeConcurrentlyAtMost%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28SubscribeTotallyAtMost%29.cs" />
-    <Compile Include="System\Reactive\Linq\ObservableExtensions %28ScanWithLeadingSeed%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ToConnectableObservable%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ThrowOnCancellation%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeUntil%29.cs" />
