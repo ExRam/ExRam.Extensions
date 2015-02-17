@@ -18,7 +18,7 @@ namespace System.Linq
                 var enumerator = enumerable.GetEnumerator();
 
                 return AsyncEnumeratorEx.Create(
-                    async (ct) =>
+                    async ct =>
                     {
                         var maybe = await enumerator.MoveNextAsMaybe(ct).TryWithTimeout(timeout).ConfigureAwait(false);
                         return ((maybe.HasValue) ? (maybe) : (Maybe<Maybe<T>>.Null));

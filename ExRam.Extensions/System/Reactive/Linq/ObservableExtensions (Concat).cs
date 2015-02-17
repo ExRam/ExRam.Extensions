@@ -16,7 +16,7 @@ namespace System.Reactive.Linq
             Contract.Requires(source != null);
             Contract.Requires(continuationSelector != null);
 
-            return Observable.Create<T>((obs) =>
+            return Observable.Create<T>(obs =>
             {
                 var lastValue = Maybe<T>.Null;
                 var subscription = new SerialDisposable();
@@ -25,12 +25,12 @@ namespace System.Reactive.Linq
                 subscription.Disposable = firstSubscription;
 
                 firstSubscription.Disposable = source.Subscribe(
-                    (value) => 
+                    value => 
                     {
                         lastValue = value;
                         obs.OnNext(value);
                     },
-                    (ex) =>
+                    ex =>
                     {
                         subscription.Dispose();
                         obs.OnError(ex);

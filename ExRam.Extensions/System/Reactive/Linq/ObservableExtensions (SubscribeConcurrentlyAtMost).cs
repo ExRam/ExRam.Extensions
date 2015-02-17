@@ -19,7 +19,7 @@ namespace System.Reactive.Linq
 
             var subscriptionCount = 0;
 
-            return Observable.Create<T>((observer) =>
+            return Observable.Create<T>(observer =>
             {
                 while (true)
                 {

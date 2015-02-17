@@ -22,8 +22,8 @@ namespace System.Threading.Tasks
 
             var tcs = new TaskCompletionSource<bool>();
 
-            projectedTask.ContinueWith((task2) => tcs.TrySetFromTask(task2));
-            Task.Delay(timeout).ContinueWith((task2) => tcs.TrySetResult(false));
+            projectedTask.ContinueWith(task2 => tcs.TrySetFromTask(task2));
+            Task.Delay(timeout).ContinueWith(task2 => tcs.TrySetResult(false));
 
             return tcs.Task;
         }
@@ -41,8 +41,8 @@ namespace System.Threading.Tasks
 
             var tcs = new TaskCompletionSource<Maybe<TResult>>();
 
-            projectedTask.ContinueWith((task2) => tcs.TrySetFromTask(task2));
-            Task.Delay(timeout).ContinueWith((task2) => tcs.TrySetResult(Maybe<TResult>.Null));
+            projectedTask.ContinueWith(task2 => tcs.TrySetFromTask(task2));
+            Task.Delay(timeout).ContinueWith(task2 => tcs.TrySetResult(Maybe<TResult>.Null));
 
             return tcs.Task;
         }
@@ -58,8 +58,8 @@ namespace System.Threading.Tasks
 
             var tcs = new TaskCompletionSource<Maybe<TResult>>();
 
-            task.ContinueWith((task2) => tcs.TrySetFromTask(task2));
-            Task.Delay(timeout).ContinueWith((task2) => tcs.TrySetResult(Maybe<TResult>.Null));
+            task.ContinueWith(task2 => tcs.TrySetFromTask(task2));
+            Task.Delay(timeout).ContinueWith(task2 => tcs.TrySetResult(Maybe<TResult>.Null));
 
             return tcs.Task;
         }

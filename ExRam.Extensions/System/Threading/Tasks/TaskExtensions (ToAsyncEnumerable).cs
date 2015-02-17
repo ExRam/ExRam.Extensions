@@ -21,7 +21,7 @@ namespace System.Threading.Tasks
             {
                 var called = false;
 
-                return AsyncEnumeratorEx.Create(async (ct) =>
+                return AsyncEnumeratorEx.Create(async ct =>
                 {
                     if (!called)
                     {

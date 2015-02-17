@@ -22,7 +22,7 @@ namespace System.Linq
                 var enumerator = enumerable.GetEnumerator();
 
                 return AsyncEnumeratorEx.Create(
-                    async (ct) =>
+                    async ct =>
                         {
                             await gateTaskFunction().ConfigureAwait(false);
                             return await enumerator.MoveNextAsMaybe(ct);
@@ -42,7 +42,7 @@ namespace System.Linq
                 var enumerator = enumerable.GetEnumerator();
 
                 return AsyncEnumeratorEx.Create(
-                    async (ct) =>
+                    async ct =>
                     {
                         await gateTaskFunction(maybeValue).ConfigureAwait(false);
                         return maybeValue = await enumerator.MoveNextAsMaybe(ct);

@@ -15,7 +15,7 @@ namespace System.Reactive.Linq
             Contract.Requires(source != null);
 
             return Observable.Create<Unit>(observer => source.Subscribe(
-                (x) =>
+                x =>
                     {
                     },
                 observer.OnError,

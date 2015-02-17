@@ -15,7 +15,7 @@ namespace System.Threading.Tasks
             Contract.Requires(task != null);
 
             // ReSharper disable CSharpWarnings::CS4014
-            task.ContinueWith((t) => t.Exception, TaskContinuationOptions.OnlyOnFaulted);
+            task.ContinueWith(t => t.Exception, TaskContinuationOptions.OnlyOnFaulted);
             // ReSharper restore CSharpWarnings::CS4014
         }
     }

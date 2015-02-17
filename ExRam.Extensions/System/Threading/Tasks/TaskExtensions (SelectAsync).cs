@@ -49,7 +49,7 @@ namespace System.Threading.Tasks
 
             var tcs = new TaskCompletionSource<TResult>();
 
-            task.ContinueWith((task2) =>
+            task.ContinueWith(task2 =>
             {
                 switch (task2.Status)
                 {
@@ -57,7 +57,7 @@ namespace System.Threading.Tasks
                     {
                         try
                         {
-                            selector(task2.Result).ContinueWith((task3) =>
+                            selector(task2.Result).ContinueWith(task3 =>
                             {
                                 switch (task3.Status)
                                 {
@@ -160,13 +160,13 @@ namespace System.Threading.Tasks
 
             var tcs = new TaskCompletionSource<TResult>();
 
-            task.ContinueWith((task2) =>
+            task.ContinueWith(task2 =>
             {
                 switch (task2.Status)
                 {
                     case (TaskStatus.RanToCompletion):
                     {
-                        selector().ContinueWith((task3) =>
+                        selector().ContinueWith(task3 =>
                         {
                             switch (task3.Status)
                             {

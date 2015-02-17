@@ -19,7 +19,7 @@ namespace System.Threading.Tasks
             else
             {
                 var registration = token.Register(() => tcs.TrySetCanceled());
-                tcs.Task.ContinueWith((task2) => registration.Dispose());
+                tcs.Task.ContinueWith(task2 => registration.Dispose());
             }
 
             return tcs;

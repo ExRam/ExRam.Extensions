@@ -29,7 +29,7 @@ namespace System.Linq
 
                 enumeratorDisposables.Disposable = firstEnumerator;
 
-                return AsyncEnumeratorEx.Create(async (ct) =>
+                return AsyncEnumeratorEx.Create(async ct =>
                 {
                     while (true)
                     {

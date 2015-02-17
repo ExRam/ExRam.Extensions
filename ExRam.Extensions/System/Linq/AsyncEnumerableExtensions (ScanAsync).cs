@@ -23,7 +23,7 @@ namespace System.Linq
                 var e = source.GetEnumerator();
 
                 return AsyncEnumeratorEx.Create(
-                    async (ct) =>
+                    async ct =>
                     {
                         var maybeItem = await e.MoveNextAsMaybe(ct);
 

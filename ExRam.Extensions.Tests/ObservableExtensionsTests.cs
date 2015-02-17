@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
@@ -8,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
+using ObservableExtensions = System.Reactive.Linq.ObservableExtensions;
 
 namespace ExRam.Extensions.Tests
 {
@@ -226,13 +226,7 @@ namespace ExRam.Extensions.Tests
         {
             var array = await new[] { 1, 2, 3 }
                 .ToObservable()
-                .Concat((maybe) =>
-                {
-                    if (maybe.Value == 3)
-                        return Observable.Return(4);
-
-                    return Observable.Return(-1);
-                })
+                .Concat(maybe => maybe.Value == 3 ? Observable.Return(4) : Observable.Return(-1))
                 .ToArray()
                 .ToTask();
 
@@ -245,13 +239,7 @@ namespace ExRam.Extensions.Tests
         public async Task Observable_Concat_produces_correct_sequence_when_first_sequence_is_empty()
         {
             var array = await Observable.Empty<int>()
-                .Concat((maybe) =>
-                {
-                    if (!maybe.HasValue)
-                        return Observable.Return(1);
-
-                    return Observable.Return(2);
-                })
+                .Concat(maybe => Observable.Return(!maybe.HasValue ? 1 : 2))
                 .ToArray()
                 .ToTask();
 
@@ -266,7 +254,7 @@ namespace ExRam.Extensions.Tests
             var ex = new Exception();
 
             var array = await Observable.Throw<int>(ex)
-                .Concat((maybe) => Observable.Return(1))
+                .Concat(maybe => Observable.Return(1))
                 .Materialize()
                 .ToArray()
                 .ToTask();
@@ -284,7 +272,7 @@ namespace ExRam.Extensions.Tests
 
             var subject = new Subject<int>();
 
-            using (System.Reactive.Linq.ObservableExtensions.UsingWhile(() => resource, _ => subject, (x => x < 3)).Subscribe())
+            using (ObservableExtensions.UsingWhile(() => resource, _ => subject, (x => x < 3)).Subscribe())
             {
                 Assert.IsFalse(resource.IsDisposed);
                 subject.OnNext(1);
@@ -301,7 +289,7 @@ namespace ExRam.Extensions.Tests
         [TestMethod]
         public async Task RepeatWhileEmpty_produces_correct_values()
         {
-            var array = await System.Reactive.Linq.ObservableExtensions
+            var array = await ObservableExtensions
                 .Morph(
                     Observable.Empty<int>(),
                     Observable.Empty<int>(),
@@ -320,7 +308,7 @@ namespace ExRam.Extensions.Tests
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task RepeatWhileEmpty_propagates_exception_correctly()
         {
-            await System.Reactive.Linq.ObservableExtensions
+            await ObservableExtensions
                 .Morph(
                     Observable.Empty<int>(),
                     Observable.Empty<int>(),

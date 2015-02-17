@@ -26,7 +26,7 @@ namespace System.Threading.Tasks
             var tcs = new TaskCompletionSource<bool>();
             var registration = token.Register(() => tcs.TrySetResult(false));
 
-            projectedTask.ContinueWith((task2) =>
+            projectedTask.ContinueWith(task2 =>
             {
                 registration.Dispose();
                 tcs.TrySetFromTask(task2);
@@ -41,7 +41,7 @@ namespace System.Threading.Tasks
         {
             Contract.Requires(task != null);
 
-            var projectedTask = task.Select((x) => (Maybe<TResult>)x);
+            var projectedTask = task.Select(x => (Maybe<TResult>)x);
             
             if (projectedTask.IsCompleted)
                 return projectedTask;
@@ -52,7 +52,7 @@ namespace System.Threading.Tasks
             var tcs = new TaskCompletionSource<Maybe<TResult>>();
             var registration = token.Register(() => tcs.TrySetResult(Maybe<TResult>.Null));
 
-            projectedTask.ContinueWith((task2) =>
+            projectedTask.ContinueWith(task2 =>
             {
                 registration.Dispose();
                 tcs.TrySetFromTask(task2);

@@ -35,15 +35,6 @@ namespace System.Reactive.Linq
             {
                 return this._hashCodeProvider(obj);
             }
-
-            #if (CONTRACTS_FULL)
-            [ContractInvariantMethod]
-            private void ObjectInvariant()
-            {
-                Contract.Invariant(this._comparer != null);
-                Contract.Invariant(this._hashCodeProvider != null);
-            }
-            #endif
         }
         #endregion
 

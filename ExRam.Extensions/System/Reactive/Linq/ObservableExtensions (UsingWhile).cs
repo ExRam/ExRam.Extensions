@@ -17,7 +17,7 @@ namespace System.Reactive.Linq
             Contract.Requires(resourceFactory != null);
             Contract.Requires(observableFactory != null);
 
-            return Observable.Create<TResult>((observer) =>
+            return Observable.Create<TResult>(observer =>
             {
                 var resource = resourceFactory();
 

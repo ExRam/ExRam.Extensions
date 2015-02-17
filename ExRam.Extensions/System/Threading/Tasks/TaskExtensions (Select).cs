@@ -49,7 +49,7 @@ namespace System.Threading.Tasks
 
             var tcs = new TaskCompletionSource<TResult>();
 
-            task.ContinueWith((task2) =>
+            task.ContinueWith(task2 =>
             {
                 switch (task2.Status)
                 {
@@ -127,7 +127,7 @@ namespace System.Threading.Tasks
 
             var tcs = new TaskCompletionSource<TResult>();
 
-            task.ContinueWith((task2) =>
+            task.ContinueWith(task2 =>
             {
                 switch (task2.Status)
                 {

@@ -30,10 +30,9 @@ namespace System.Reactive.Linq
 
                 var index = Interlocked.Increment(ref this._currentIndex);
 
-                if (index < this._observables.Length)
-                    return this._observables[index].Subscribe(observer);
-
-                return Observable.Throw<T>(new IndexOutOfRangeException()).Subscribe(observer);
+                return index < this._observables.Length 
+                    ? this._observables[index].Subscribe(observer) 
+                    : Observable.Throw<T>(new IndexOutOfRangeException()).Subscribe(observer);
             }
         }
 

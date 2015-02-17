@@ -20,12 +20,12 @@ namespace System.Threading.Tasks
 
             var tcs = new TaskCompletionSource<object>();
 
-            task.ContinueWith((task2) =>
+            task.ContinueWith(task2 =>
             {
                 tcs.TrySetFromTask(task2);
             });
 
-            Task.Delay(timeout).ContinueWith((task2) =>
+            Task.Delay(timeout).ContinueWith(task2 =>
             {
                 tcs.TrySetException(new TimeoutException());
             });
@@ -44,12 +44,12 @@ namespace System.Threading.Tasks
 
             var tcs = new TaskCompletionSource<TResult>();
 
-            task.ContinueWith((task2) =>
+            task.ContinueWith(task2 =>
             {
                 tcs.TrySetFromTask(task2);
             });
 
-            Task.Delay(timeout).ContinueWith((task2) =>
+            Task.Delay(timeout).ContinueWith(task2 =>
             {
                 tcs.TrySetException(new TimeoutException());
             });

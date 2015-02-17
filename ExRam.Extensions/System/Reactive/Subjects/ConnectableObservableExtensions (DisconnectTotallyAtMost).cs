@@ -6,7 +6,6 @@
 
 using System.Diagnostics.Contracts;
 using System.Reactive.Disposables;
-using System.Reactive.Linq;
 using System.Threading;
 
 namespace System.Reactive.Subjects

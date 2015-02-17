@@ -25,7 +25,7 @@ namespace System.Reactive.Linq
 
                 var subscription = source
                     .Materialize()
-                    .Subscribe((notification) =>
+                    .Subscribe(notification =>
                     {
                         lock (syncRoot)
                         {
@@ -45,7 +45,7 @@ namespace System.Reactive.Linq
                     });
 
                 return AsyncEnumeratorEx.Create(
-                    (ct) =>
+                    ct =>
                     {
                         lock (syncRoot)
                         {

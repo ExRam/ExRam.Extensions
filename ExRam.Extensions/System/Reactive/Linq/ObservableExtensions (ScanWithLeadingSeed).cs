@@ -5,8 +5,6 @@
 // file.
 
 using System.Diagnostics.Contracts;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 
 namespace System.Reactive.Linq
 {

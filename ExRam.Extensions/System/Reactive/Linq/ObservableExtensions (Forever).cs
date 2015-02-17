@@ -4,7 +4,7 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
+using System.Reactive.Disposables;
 
 namespace System.Reactive.Linq
 {
@@ -12,10 +12,10 @@ namespace System.Reactive.Linq
     {
         public static IObservable<T> Forever<T>(T value)
         {
-            return Observable.Create<T>((observer) =>
+            return Observable.Create<T>(observer =>
             {
                 observer.OnNext(value);
-                return Disposables.Disposable.Empty;
+                return Disposable.Empty;
             });
         }
     }

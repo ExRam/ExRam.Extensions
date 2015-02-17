@@ -24,7 +24,7 @@ namespace System.Linq
             {
                 var baseEnumerator = enumerable.GetEnumerator();
 
-                return AsyncEnumeratorEx.Create(async (ct) =>
+                return AsyncEnumeratorEx.Create(async ct =>
                 {
                     var moved = await baseEnumerator.MoveNext(ct);
 

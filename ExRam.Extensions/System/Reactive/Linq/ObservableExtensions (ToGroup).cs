@@ -29,14 +29,6 @@ namespace System.Reactive.Linq
                 return this._baseObservable.Subscribe(observer);
             }
 
-            #if (CONTRACTS_FULL)
-            [ContractInvariantMethod]
-            private void ObjectInvariant()
-            {
-                Contract.Invariant(this._baseObservable != null);
-            }
-            #endif
-
             public TKey Key
             {
                 get

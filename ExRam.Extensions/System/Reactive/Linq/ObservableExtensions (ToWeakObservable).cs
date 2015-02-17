@@ -5,7 +5,6 @@
 // file.
 
 using System.Diagnostics.Contracts;
-using System.Reactive.Disposables;
 using System.Runtime.CompilerServices;
 
 namespace System.Reactive.Linq

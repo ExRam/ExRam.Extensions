@@ -4,7 +4,6 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
 using System.Reactive.Linq;
 
 namespace System.Reactive.Subjects

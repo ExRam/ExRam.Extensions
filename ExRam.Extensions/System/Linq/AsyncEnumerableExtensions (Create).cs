@@ -29,14 +29,6 @@ namespace System.Linq
             {
                 return this._enumeratorCreationFunction();
             }
-
-            #if (CONTRACTS_FULL)
-            [ContractInvariantMethod]
-            private void ObjectInvariant()
-            {
-                Contract.Invariant(this._enumeratorCreationFunction != null);
-            }
-            #endif
         }
         #endregion
 
@@ -51,12 +43,12 @@ namespace System.Linq
         {
             Contract.Requires(function != null);
 
-            return Create(() => AsyncEnumeratorEx.Create(function, disposeAction));
+            return AsyncEnumerable2.Create(() => AsyncEnumeratorEx.Create(function, disposeAction));
         }
 
         public static IAsyncEnumerable<TTarget> CreateUsing<TDisposable, TTarget>(TDisposable disposable, Func<TDisposable, IAsyncEnumerator<TTarget>> enumeratorCreationFunction) where TDisposable : IDisposable
         {
-            Contract.Requires(((object)disposable) != null);
+            Contract.Requires(disposable != null);
             Contract.Requires(enumeratorCreationFunction != null);
 
             return AsyncEnumerable2.Create(() =>

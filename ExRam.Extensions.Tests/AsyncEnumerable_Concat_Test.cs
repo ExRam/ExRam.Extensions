@@ -20,13 +20,9 @@ namespace ExRam.Extensions.Tests
         {
             var array = await new[] { 1, 2, 3 }
                 .ToAsyncEnumerable()
-                .Concat((maybe) =>
-                {
-                    if (maybe.Value == 3)
-                        return AsyncEnumerable.Return(4);
-
-                    return AsyncEnumerable.Return(-1);
-                })
+                .Concat(maybe => maybe.Value == 3
+                    ? AsyncEnumerable.Return(4) 
+                    : AsyncEnumerable.Return(-1))
                 .ToArray();
 
             CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, array);
@@ -38,13 +34,7 @@ namespace ExRam.Extensions.Tests
         public async Task AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_is_empty()
         {
             var array = await AsyncEnumerable.Empty<int>()
-                .Concat((maybe) =>
-                {
-                    if (!maybe.HasValue)
-                        return AsyncEnumerable.Return(1);
-
-                    return AsyncEnumerable.Return(2);
-                })
+                .Concat(maybe => AsyncEnumerable.Return(!maybe.HasValue ? 1 : 2))
                 .ToArray();
 
             CollectionAssert.AreEqual(new[] { 1 }, array);
@@ -58,7 +48,7 @@ namespace ExRam.Extensions.Tests
             var ex = new Exception();
 
             var array = await AsyncEnumerable.Throw<int>(ex)
-                .Concat((maybe) => AsyncEnumerable.Return(1))
+                .Concat(maybe => AsyncEnumerable.Return(1))
                 .Materialize()
                 .ToArray();
 
