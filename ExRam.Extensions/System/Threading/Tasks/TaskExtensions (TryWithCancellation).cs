@@ -11,28 +11,22 @@ namespace System.Threading.Tasks
     public static partial class TaskExtensions
     {
         #region TryWithCancellation(Task, CancellationToken)
-        public static Task<bool> TryWithCancellation(this Task task, CancellationToken token)
+        public static async Task<bool> TryWithCancellation(this Task task, CancellationToken ct)
         {
             Contract.Requires(task != null);
 
-            var projectedTask = task.Select(() => true);
-            
-            if (projectedTask.IsCompleted)
-                return projectedTask;
-
-            if (token.IsCancellationRequested)
-                return Task.FromResult(false);
-            
+            bool ret;
             var tcs = new TaskCompletionSource<bool>();
-            var registration = token.Register(() => tcs.TrySetResult(false));
 
-            projectedTask.ContinueWith(task2 =>
+            using (ct.Register(state => ((TaskCompletionSource<bool>)state).TrySetResult(true), tcs))
             {
-                registration.Dispose();
-                tcs.TrySetFromTask(task2);
-            });
+                ret = (task == await Task.WhenAny(task, tcs.Task));
+            }
 
-            return tcs.Task;
+            if (ret)
+                await task;
+
+            return ret;
         }
         #endregion
 
