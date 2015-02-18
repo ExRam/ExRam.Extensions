@@ -84,6 +84,7 @@
     <Compile Include="TaskCompletionSource_SetFromTask_Test.cs" />
     <Compile Include="TaskCompletionSource_TrySetFromTask_Test.cs" />
     <Compile Include="TaskCompletionSource_TryWithCancellation_Test.cs" />
+    <Compile Include="Task_ToAsyncEnumerable_Test.cs" />
     <Compile Include="Task_Select_Test.cs" />
     <Compile Include="Task_TryWithCancellation_Test.cs" />
     <Compile Include="Task_TryWithTimeout_Test.cs" />

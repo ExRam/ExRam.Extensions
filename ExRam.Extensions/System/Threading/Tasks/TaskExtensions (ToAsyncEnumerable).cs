@@ -17,23 +17,10 @@ namespace System.Threading.Tasks
         {
             Contract.Requires(task != null);
 
-            return AsyncEnumerable2.Create(() =>
-            {
-                var called = false;
-
-                return AsyncEnumeratorEx.Create(async ct =>
-                {
-                    if (!called)
-                    {
-                        called = true;
-
-                        await task.WithCancellation(ct);
-                        return Unit.Default;
-                    }
-
-                    return Maybe<Unit>.Null;
-                });
-            });
+            return AsyncEnumerable
+                .ToAsyncEnumerable(task
+                    .Select(() => Unit.Default));
+                
         }
     }
 }
