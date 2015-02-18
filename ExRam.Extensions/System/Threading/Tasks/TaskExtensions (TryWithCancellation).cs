@@ -31,28 +31,21 @@ namespace System.Threading.Tasks
         #endregion
 
         #region TryWithCancellation(Task<TResult>, CancellationToken)
-        public static Task<Maybe<TResult>>  TryWithCancellation<TResult>(this Task<TResult> task, CancellationToken token)
+        public static async Task<Maybe<TResult>> TryWithCancellation<TResult>(this Task<TResult> task, CancellationToken ct)
         {
             Contract.Requires(task != null);
 
-            var projectedTask = task.Select(x => (Maybe<TResult>)x);
-            
-            if (projectedTask.IsCompleted)
-                return projectedTask;
+            bool ret;
+            var tcs = new TaskCompletionSource<bool>();
 
-            if (token.IsCancellationRequested)
-                return Task.FromResult(Maybe<TResult>.Null);
-            
-            var tcs = new TaskCompletionSource<Maybe<TResult>>();
-            var registration = token.Register(() => tcs.TrySetResult(Maybe<TResult>.Null));
-
-            projectedTask.ContinueWith(task2 =>
+            using (ct.Register(state => ((TaskCompletionSource<bool>)state).TrySetResult(true), tcs))
             {
-                registration.Dispose();
-                tcs.TrySetFromTask(task2);
-            });
+                ret = (task == await Task.WhenAny(task, tcs.Task));
+            }
 
-            return tcs.Task;
+            return ret
+                ? await task
+                : Maybe<TResult>.Null;
         }
         #endregion
 
