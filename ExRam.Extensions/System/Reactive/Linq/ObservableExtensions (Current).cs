@@ -5,13 +5,9 @@
 // file.
 
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Diagnostics.Contracts;
 using System.Linq;
-using System.Reactive.Disposables;
 using System.Reactive.Subjects;
-using System.Reactive.Threading.Tasks;
-using System.Threading.Tasks;
 
 namespace System.Reactive.Linq
 {

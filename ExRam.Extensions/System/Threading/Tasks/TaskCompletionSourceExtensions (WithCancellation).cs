@@ -19,6 +19,8 @@ namespace System.Threading.Tasks
             else
             {
                 var registration = token.Register(() => tcs.TrySetCanceled());
+                
+                // ReSharper disable once MethodSupportsCancellation
                 tcs.Task.ContinueWith(task2 => registration.Dispose());
             }
 

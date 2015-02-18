@@ -7,7 +7,6 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reactive;
-using System.Reactive.Disposables;
 
 namespace System.Linq
 {
