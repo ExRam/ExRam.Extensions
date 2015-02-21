@@ -6,34 +6,41 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Reactive;
+using System.Reactive.Disposables;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace System.Linq
 {
     public static partial class AsyncEnumerableExtensions
     {
-        public static IAsyncEnumerable<TAccumulate> ScanAsync<TSource, TAccumulate>(this IAsyncEnumerable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, Task<TAccumulate>> accumulator)
+        public static IAsyncEnumerable<TAccumulate> ScanAsync<TSource, TAccumulate>(this IAsyncEnumerable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, CancellationToken, Task<TAccumulate>> accumulator)
         {
             Contract.Requires(source != null);
             Contract.Requires(accumulator != null);
 
-            return AsyncEnumerable2.Create(() =>
-            {
-                var acc = seed;
-                var e = source.GetEnumerator();
-
-                return AsyncEnumeratorEx.Create(
-                    async ct =>
+            return AsyncEnumerable
+                .Using(
+                    source.GetEnumerator,
+                    e =>
                     {
-                        var maybeItem = await e.MoveNextAsMaybe(ct);
+                        var acc = seed;
 
-                        if (maybeItem.HasValue)
-                            return acc = await accumulator(acc, maybeItem.Value);
+                        return AsyncEnumerable
+                            .Repeat(Unit.Default)
+                            .SelectMany(async (_, ct) =>
+                            {
+                                var maybeItem = await e.MoveNextAsMaybe(ct);
 
-                        return Maybe<TAccumulate>.Null;
-                    },
-                    e.Dispose);
-            });
+                                if (maybeItem.HasValue)
+                                    return acc = await accumulator(acc, maybeItem.Value, ct);
+
+                                return Maybe<TAccumulate>.Null;
+                            })
+                            .TakeWhile(x => x.HasValue)
+                            .Select(x => x.Value);
+                    });
         }
     }
 }
