@@ -25,11 +25,7 @@ namespace System.Linq
                     enumerable.GetEnumerator,
                     e => AsyncEnumerable
                         .Repeat(Unit.Default)
-                        .SelectMany(_ => AsyncEnumerable
-                            .Using(
-                                () => new CancellationDisposable(),
-                                cts => gateTaskFunction(cts.Token)
-                                    .ToAsyncEnumerable()))
+                        .SelectMany((_, ct) => gateTaskFunction(ct))
                         .SelectMany((_, ct) => e.MoveNextAsMaybe(ct))
                         .TakeWhile(x => x.HasValue)
                         .Select(x => x.Value));
