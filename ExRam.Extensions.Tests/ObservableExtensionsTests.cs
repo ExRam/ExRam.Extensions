@@ -154,7 +154,16 @@ namespace ExRam.Extensions.Tests
 
                 subject.OnError(new InvalidOperationException());
 
-                await asyncEnumerator.MoveNext(CancellationToken.None);
+                try
+                {
+                    await asyncEnumerator.MoveNext(CancellationToken.None);
+                }
+                catch(AggregateException ex)
+                {
+                    throw ex.GetBaseException();
+                }
+
+                Assert.Fail();
             }
         }
         #endregion

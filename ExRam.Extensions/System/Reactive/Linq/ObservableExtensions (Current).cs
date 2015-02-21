@@ -27,12 +27,11 @@ namespace System.Reactive.Linq
                                 .Multicast(subject)
                                 .Connect(),
                             _ => AsyncEnumerable
-                                .Repeat(Unit.Default)
-                                .SelectMany(unit => subject
-                                    .FirstAsync()
-                                    .ToAsyncEnumerable())
-                                .Dematerialize()))
-                .Unwrap();
+                                    .Repeat(Unit.Default)
+                                    .SelectMany(unit => subject
+                                        .FirstAsync()
+                                        .ToAsyncEnumerable())
+                                    .Dematerialize()));
         }
     }
 }
