@@ -12,14 +12,14 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace ExRam.Extensions.Tests
 {
     [TestClass]
-    public class AsyncEnumerable_SelectAsync_Test
+    public class AsyncEnumerable_SelectMany_Test
     {
-        #region AsyncEnumerable_SelectAsync_Works
+        #region AsyncEnumerable_SelectMany_Works
         [TestMethod]
-        public async Task AsyncEnumerable_SelectAsync_Works()
+        public async Task AsyncEnumerable_SelectMany_Works()
         {
             var array = await new[] { 1, 2, 3 }.ToAsyncEnumerable()
-                .SelectAsync(async x =>
+                .SelectMany(async x =>
                 {
                     await Task.Delay(50);
                     return x.ToString();
@@ -32,14 +32,14 @@ namespace ExRam.Extensions.Tests
         }
         #endregion
 
-        #region AsyncEnumerable_SelectAsync_Calls_Selector_InOrder
+        #region AsyncEnumerable_SelectMany_Calls_Selector_InOrder
         [TestMethod]
-        public async Task AsyncEnumerable_SelectAsync_Calls_Selector_InOrder()
+        public async Task AsyncEnumerable_SelectMany_Calls_Selector_InOrder()
         {
             var counter = 0;
 
             var array = await new[] { 1, 2, 3 }.ToAsyncEnumerable()
-                .SelectAsync(async x =>
+                .SelectMany(async x =>
                 {
                     await Task.Delay(50);
                     Assert.AreEqual(x, Interlocked.Increment(ref counter));

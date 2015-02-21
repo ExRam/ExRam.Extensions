@@ -152,7 +152,7 @@
     <Compile Include="System\Reflection\AssemblyExtensions.cs" />
     <Compile Include="System\Text\EncodingExtensions.cs" />
     <Compile Include="System\Threading\CancellationTokenExtensions.cs" />
-    <Compile Include="System\Threading\Tasks\TaskExtensions %28SelectAsync%29.cs" />
+    <Compile Include="System\Threading\Tasks\TaskExtensions %28SelectMany%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28AsAsyncEnumerable%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskFactoryExtensions.cs" />
     <Compile Include="System\Maybe %28Of T%29.cs" />
@@ -164,7 +164,7 @@
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28KeepOpen%29.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28Materialize%29.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28ScanAsync%29.cs" />
-    <Compile Include="System\Linq\AsyncEnumerableExtensions %28SelectAsync%29.cs" />
+    <Compile Include="System\Linq\AsyncEnumerableExtensions %28SelectMany%29.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28SelectValueWhereAvailable%29.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28ToStream%29.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28TryFirst%29.cs" />

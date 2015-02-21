@@ -11,38 +11,38 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace ExRam.Framework.Tests
 {
     [TestClass]
-    public class Task_SelectAsync_Test
+    public class Task_SelectMany_Test
     {
-        #region SelectAsync_on_completed_TaskOfInt_succeeds
+        #region SelectMany_on_completed_TaskOfInt_succeeds
         [TestMethod]
-        public async Task SelectAsync_on_completed_TaskOfInt_succeeds()
+        public async Task SelectMany_on_completed_TaskOfInt_succeeds()
         {
             var task1 = Task.FromResult(1);
-            var task2 = task1.SelectAsync(async x => x + 1);
+            var task2 = task1.SelectMany(async x => x + 1);
 
             Assert.AreEqual(2, await task2);
         }
         #endregion
 
-        #region SelectAsync_on_faulted_TaskOfInt_throws
+        #region SelectMany_on_faulted_TaskOfInt_throws
         [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
         public async Task Select_on_faulted_TaskOfInt_throws()
         {
             var task1 = Task.Factory.GetFaulted<int>(new NotSupportedException());
-            var task2 = task1.SelectAsync(async x => x + 1);
+            var task2 = task1.SelectMany(async x => x + 1);
 
             await task2;
         }
         #endregion
 
-        #region SelectAsync_on_canceled_TaskOfInt_throws
+        #region SelectMany_on_canceled_TaskOfInt_throws
         [TestMethod]
         [ExpectedException(typeof(TaskCanceledException))]
         public async Task Select_on_canceled_TaskOfInt_throws()
         {
             var task1 = Task.Factory.GetCanceled<int>();
-            var task2 = task1.SelectAsync(async x => x + 1);
+            var task2 = task1.SelectMany(async x => x + 1);
 
             await task2;
         }
@@ -54,7 +54,7 @@ namespace ExRam.Framework.Tests
         public async Task Throwing_Selector_throws_on_projected_completed_TaskOfInt()
         {
             var task1 = Task.FromResult(1);
-            var task2 = task1.SelectAsync<int, int>(async x =>
+            var task2 = task1.SelectMany<int, int>(async x =>
             {
                 throw new NotSupportedException();
             });
@@ -69,7 +69,7 @@ namespace ExRam.Framework.Tests
         public async Task Throwing_Selector_throws_on_projected_faulted_TaskOfInt()
         {
             var task1 = Task.Factory.GetFaulted<int>(new InvalidCastException());
-            var task2 = task1.SelectAsync<int, int>(async x =>
+            var task2 = task1.SelectMany<int, int>(async x =>
             {
                 throw new NotSupportedException();
             });
@@ -84,7 +84,7 @@ namespace ExRam.Framework.Tests
         public async Task Throwing_Selector_throws_on_projected_canceled_TaskOfInt()
         {
             var task1 = Task.Factory.GetCanceled<int>();
-            var task2 = task1.SelectAsync<int, int>(async x =>
+            var task2 = task1.SelectMany<int, int>(async x =>
             {
                 throw new NotSupportedException();
             });
@@ -93,36 +93,36 @@ namespace ExRam.Framework.Tests
         }
         #endregion
 
-        #region SelectAsync_on_completed_Task_succeeds
+        #region SelectMany_on_completed_Task_succeeds
         [TestMethod]
-        public async Task SelectAsync_on_completed_Task_succeeds()
+        public async Task SelectMany_on_completed_Task_succeeds()
         {
             var task1 = Task.Factory.GetCompleted();
-            var task2 = task1.SelectAsync(async () => 1);
+            var task2 = task1.SelectMany(async () => 1);
 
             Assert.AreEqual(1, await task2);
         }
         #endregion
 
-        #region SelectAsync_on_faulted_Task_throws
+        #region SelectMany_on_faulted_Task_throws
         [TestMethod]
         [ExpectedException(typeof(NotSupportedException))]
-        public async Task SelectAsync_on_faulted_Task_throws()
+        public async Task SelectMany_on_faulted_Task_throws()
         {
             var task1 = Task.Factory.GetFaulted(new NotSupportedException());
-            var task2 = task1.SelectAsync(async () => 1);
+            var task2 = task1.SelectMany(async () => 1);
 
             await task2;
         }
         #endregion
 
-        #region SelectAsync_on_canceled_Task_throws
+        #region SelectMany_on_canceled_Task_throws
         [TestMethod]
         [ExpectedException(typeof(TaskCanceledException))]
-        public async Task SelectAsync_on_canceled_Task_throws()
+        public async Task SelectMany_on_canceled_Task_throws()
         {
             var task1 = Task.Factory.GetCanceled();
-            var task2 = task1.SelectAsync(async () => 1);
+            var task2 = task1.SelectMany(async () => 1);
 
             await task2;
         }
@@ -134,7 +134,7 @@ namespace ExRam.Framework.Tests
         public async Task Throwing_Selector_throws_on_projected_completed_task()
         {
             var task1 = Task.Factory.GetCompleted();
-            var task2 = task1.SelectAsync<int>(async () =>
+            var task2 = task1.SelectMany<int>(async () =>
             {
                 throw new NotSupportedException();
             });
@@ -149,7 +149,7 @@ namespace ExRam.Framework.Tests
         public async Task Throwing_Selector_throws_on_projected_faulted_task()
         {
             var task1 = Task.Factory.GetFaulted(new InvalidCastException());
-            var task2 = task1.SelectAsync<int>(async () =>
+            var task2 = task1.SelectMany<int>(async () =>
             {
                 throw new NotSupportedException();
             });
@@ -164,7 +164,7 @@ namespace ExRam.Framework.Tests
         public async Task Throwing_Selector_throws_on_projected_canceled_task()
         {
             var task1 = Task.Factory.GetCanceled();
-            var task2 = task1.SelectAsync<int>(async () =>
+            var task2 = task1.SelectMany<int>(async () =>
             {
                 throw new NotSupportedException();
             });

@@ -10,8 +10,8 @@ namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
     {
-        #region SelectAsync (Task<TSource>)
-        public static Task<TResult> SelectAsync<TSource, TResult>(this Task<TSource> task, Func<TSource, Task<TResult>> selector)
+        #region SelectMany (Task<TSource>)
+        public static Task<TResult> SelectMany<TSource, TResult>(this Task<TSource> task, Func<TSource, Task<TResult>> selector)
         {
             Contract.Requires(task != null);
             Contract.Requires(selector != null);
@@ -121,8 +121,8 @@ namespace System.Threading.Tasks
         }
         #endregion
 
-        #region SelectAsync (Task)
-        public static Task<TResult> SelectAsync<TResult>(this Task task, Func<Task<TResult>> selector)
+        #region SelectMany (Task)
+        public static Task<TResult> SelectMany<TResult>(this Task task, Func<Task<TResult>> selector)
         {
             Contract.Requires(task != null);
             Contract.Requires(selector != null);
