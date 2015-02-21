@@ -6,49 +6,33 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Reactive;
+using System.Reactive.Disposables;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace System.Linq
 {
     public static partial class AsyncEnumerableExtensions
     {
-        public static IAsyncEnumerable<T> Gate<T>(this IAsyncEnumerable<T> enumerable, Func<Task> gateTaskFunction)
+        public static IAsyncEnumerable<T> Gate<T>(this IAsyncEnumerable<T> enumerable, Func<CancellationToken, Task> gateTaskFunction)
         {
             Contract.Requires(enumerable != null);
             Contract.Requires(gateTaskFunction != null);
 
-            return AsyncEnumerable2.Create(() =>
-            {
-                var enumerator = enumerable.GetEnumerator();
-
-                return AsyncEnumeratorEx.Create(
-                    async ct =>
-                        {
-                            await gateTaskFunction().ConfigureAwait(false);
-                            return await enumerator.MoveNextAsMaybe(ct);
-                        },
-                    enumerator.Dispose);
-            });
-        }
-
-        public static IAsyncEnumerable<T> Gate<T>(this IAsyncEnumerable<T> enumerable, Func<Maybe<T>, Task> gateTaskFunction)
-        {
-            Contract.Requires(enumerable != null);
-            Contract.Requires(gateTaskFunction != null);
-
-            return AsyncEnumerable2.Create(() =>
-            {
-                var maybeValue = Maybe<T>.Null;
-                var enumerator = enumerable.GetEnumerator();
-
-                return AsyncEnumeratorEx.Create(
-                    async ct =>
-                    {
-                        await gateTaskFunction(maybeValue).ConfigureAwait(false);
-                        return maybeValue = await enumerator.MoveNextAsMaybe(ct);
-                    },
-                    enumerator.Dispose);
-            });
+            return AsyncEnumerable
+                .Using(
+                    enumerable.GetEnumerator,
+                    e => AsyncEnumerable
+                        .Repeat(Unit.Default)
+                        .SelectMany(_ => AsyncEnumerable
+                            .Using(
+                                () => new CancellationDisposable(),
+                                cts => gateTaskFunction(cts.Token)
+                                    .ToAsyncEnumerable()))
+                        .SelectMany((_, ct) => e.MoveNextAsMaybe(ct))
+                        .TakeWhile(x => x.HasValue)
+                        .Select(x => x.Value));
         }
     }
 }

@@ -23,7 +23,7 @@ namespace ExRam.Extensions.Tests
             var tcs = Enumerable.Range(1, 10).Select(x => new TaskCompletionSource<object>()).ToArray();
             var ae = (new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }).ToAsyncEnumerable();
 
-            var only = ae.Gate(() => tcs[i++].Task);
+            var only = ae.Gate((ct) => tcs[i++].Task);
 
             var enumerator = only.GetEnumerator();
 
