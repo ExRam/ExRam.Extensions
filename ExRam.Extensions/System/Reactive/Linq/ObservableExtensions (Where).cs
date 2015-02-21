@@ -33,11 +33,11 @@ namespace System.Reactive.Linq
             Contract.Requires(predicate != null);
 
             return source
-                .SelectMany(x => Observable.Using(
-                    () => new CancellationDisposable(),
-                    cts => predicate(x, cts.Token)
-                        .ToObservable()
-                        .Select(b => b ? x : Maybe<T>.Null)))
+                .SelectMany(x => ObservableExtensions
+                    .WithCancellation(
+                        ct => predicate(x, ct)
+                            .ToObservable()
+                            .Select(b => b ? x : Maybe<T>.Null)))
                 .Where(x => x.HasValue)
                 .Select(x => x.Value);
         }
