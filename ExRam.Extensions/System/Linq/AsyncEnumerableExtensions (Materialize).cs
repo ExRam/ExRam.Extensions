@@ -16,45 +16,33 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return AsyncEnumerable2.Create(() =>
-            {
-                var syncRoot = new object();
-                var completedOrError = false;
-                var e = enumerable.GetEnumerator();
-
-                return AsyncEnumeratorEx.Create(
-                    async ct =>
+            return AsyncEnumerable
+                .Using(
+                    enumerable.GetEnumerator,
+                    e =>
                     {
-                        lock (syncRoot)
-                        {
-                            if (completedOrError)
-                                return Maybe<Notification<TSource>>.Null;
-                        }
+                        var completed = false;
 
-                        try
-                        {
-                            if (await e.MoveNext(ct))
-                                return Notification.CreateOnNext(e.Current);
-
-                            lock (syncRoot)
+                        return AsyncEnumerable
+                            .Repeat(Unit.Default)
+                            .TakeWhile(_ => !completed)
+                            .SelectMany(async (_, ct) =>
                             {
-                                completedOrError = true;
-                            }
+                                try
+                                {
+                                    var maybe = await e.MoveNextAsMaybe(ct);
 
-                            return Notification.CreateOnCompleted<TSource>();
-                        }
-                        catch (Exception ex)
-                        {
-                            lock (syncRoot)
-                            {
-                                completedOrError = true;
-                            }
-
-                            return Notification.CreateOnError<TSource>(ex);
-                        }
-                    },
-                    e.Dispose);
-            });
+                                    return maybe.HasValue 
+                                        ? Notification.CreateOnNext(maybe.Value) 
+                                        : Notification.CreateOnCompleted<TSource>();
+                                }
+                                catch (AggregateException ex)
+                                {
+                                    return Notification.CreateOnError<TSource>(ex.GetBaseException());
+                                }
+                            })
+                            .Do(notification => completed |= !notification.HasValue);
+                    });
         }
     }
 }
