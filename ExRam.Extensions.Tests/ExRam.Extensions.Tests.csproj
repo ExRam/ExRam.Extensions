@@ -72,6 +72,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="AsyncEnumerable_Dematerialize_Test.cs" />
     <Compile Include="AsyncEnumerable_Materialize_Test.cs" />
     <Compile Include="AsyncEnumerable_Gate_Test.cs" />
     <Compile Include="AsyncEnumerable_Concat_Test.cs" />

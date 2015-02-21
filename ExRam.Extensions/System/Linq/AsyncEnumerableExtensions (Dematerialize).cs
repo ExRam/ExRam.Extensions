@@ -16,28 +16,46 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return AsyncEnumerable2.Create(() =>
-            {
-                var e = enumerable.GetEnumerator();
-
-                return AsyncEnumeratorEx.Create(
-                    async ct =>
+            return AsyncEnumerable
+                .Using(
+                    enumerable.GetEnumerator,
+                    e =>
                     {
-                        if (await e.MoveNext(ct))
-                        {
-                            var current = e.Current;
+                        var completed = false;
 
-                            if (current.HasValue)
-                                return current.Value;
+                        return AsyncEnumerable
+                            .Repeat(Unit.Default)
+                            .TakeWhile(_ => !completed)
+                            .SelectMany(async (_, ct) =>
+                            {
+                                var maybeNotification = await e.MoveNextAsMaybe(ct);
 
-                            if (current.Exception != null)
-                                throw current.Exception;
-                        }
+                                if (maybeNotification.HasValue)
+                                {
+                                    var notification = maybeNotification.Value;
 
-                        return Maybe<TSource>.Null;
-                    },
-                    e.Dispose);
-            });
+                                    switch (notification.Kind)
+                                    {
+                                        case (NotificationKind.OnNext):
+                                            return Maybe.Create(notification.Value);
+                                        case (NotificationKind.OnError):
+                                        {
+                                            completed = true;
+                                            throw notification.Exception;
+                                        }
+                                        default:
+                                        {
+                                            completed = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                return Maybe<TSource>.Null;
+                            })
+                            .Where(x => x.HasValue)
+                            .Select(x => x.Value);
+                });
         }
     }
 }
