@@ -5,6 +5,8 @@
 // file.
 
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
+using System.Reactive;
 using System.Threading.Tasks;
 
 namespace System.Linq
@@ -13,18 +15,15 @@ namespace System.Linq
     {
         public static IAsyncEnumerable<Maybe<T>> TryWithTimeout<T>(this IAsyncEnumerable<T> enumerable, TimeSpan timeout)
         {
-            return AsyncEnumerable2.Create(() =>
-            {
-                var enumerator = enumerable.GetEnumerator();
+            Contract.Requires(enumerable != null);
 
-                return AsyncEnumeratorEx.Create(
-                    async ct =>
-                    {
-                        var maybe = await enumerator.MoveNextAsMaybe(ct).TryWithTimeout(timeout).ConfigureAwait(false);
-                        return ((maybe.HasValue) ? (maybe) : (Maybe<Maybe<T>>.Null));
-                    },
-                    enumerator.Dispose);
-            });
+            return AsyncEnumerable
+                .Using(
+                    enumerable.GetEnumerator,
+                    e => AsyncEnumerable
+                        .Repeat(Unit.Default)
+                        .SelectMany((_, ct) => e.MoveNextAsMaybe(ct).TryWithTimeout(timeout))
+                        .TakeWhile(maybe => maybe.HasValue));
         }
     }
 }
