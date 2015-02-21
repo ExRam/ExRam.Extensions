@@ -41,8 +41,7 @@ namespace System.Linq
                     return tuple.Previous != null
                         ? continuationSelector(tuple.Previous.Value)
                         : continuationSelector(Maybe<T>.Null);
-                })
-                .Unwrap();
+                });
         }
     }
 }
