@@ -6,8 +6,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace System.Linq
 {
@@ -37,13 +35,6 @@ namespace System.Linq
             Contract.Requires(enumeratorCreationFunction != null);
 
             return new CreateFromEnumeratorFunctionAsyncEnumerable<T>(enumeratorCreationFunction);
-        }
-
-        public static IAsyncEnumerable<T> Create<T>(Func<CancellationToken, Task<Maybe<T>>> function, Action disposeAction = null)
-        {
-            Contract.Requires(function != null);
-
-            return AsyncEnumerable2.Create(() => AsyncEnumeratorEx.Create(function, disposeAction));
         }
     }
 }
