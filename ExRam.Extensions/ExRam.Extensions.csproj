@@ -131,7 +131,7 @@
     <Compile Include="System\MaybeExtensions.cs" />
     <Compile Include="System\Maybe.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Where%29.cs" />
-    <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeWhileInclusivel%29.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeWhileInclusive%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28RepeatWhileEmpty%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Morph%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Concat%29.cs" />
