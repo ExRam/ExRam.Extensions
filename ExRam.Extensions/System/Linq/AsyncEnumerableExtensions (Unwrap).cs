@@ -54,7 +54,7 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return AsyncEnumerable2.Create(() => new UnwrappingAsyncEnumerator<T>(enumerable.GetEnumerator()));
+            return AsyncEnumerableExtensions.Create(() => new UnwrappingAsyncEnumerator<T>(enumerable.GetEnumerator()));
         }
     }
 }

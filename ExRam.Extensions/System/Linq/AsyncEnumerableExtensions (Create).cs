@@ -9,7 +9,7 @@ using System.Diagnostics.Contracts;
 
 namespace System.Linq
 {
-    public static class AsyncEnumerable2
+    public static partial class AsyncEnumerableExtensions
     {
         #region CreateFromEnumeratorFunctionAsyncEnumerable<T>
         private sealed class CreateFromEnumeratorFunctionAsyncEnumerable<T> : IAsyncEnumerable<T>
