@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Generic
 {
-    public static partial class AsyncEnumeratorEx
+    public static class AsyncEnumeratorEx
     {
         public static async Task<Maybe<T>> MoveNextAsMaybe<T>(this IAsyncEnumerator<T> enumerator, CancellationToken ct)
         {
