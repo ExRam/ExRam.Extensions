@@ -13,7 +13,7 @@ namespace System.Linq
 {
     public static partial class AsyncEnumerableExtensions
     {
-        public static IAsyncEnumerable<Maybe<T>> TryWithTimeout<T>(this IAsyncEnumerable<T> enumerable, TimeSpan timeout)
+        public static IAsyncEnumerable<T> TryWithTimeout<T>(this IAsyncEnumerable<T> enumerable, TimeSpan timeout)
         {
             Contract.Requires(enumerable != null);
 
@@ -23,7 +23,8 @@ namespace System.Linq
                     e => AsyncEnumerable
                         .Repeat(Unit.Default)
                         .SelectMany((_, ct) => e.MoveNextAsMaybe(ct).TryWithTimeout(timeout))
-                        .TakeWhile(maybe => maybe.HasValue));
+                        .TakeWhile(maybe => maybe.HasValue)
+                        .Select(maybe => maybe.Value));
         }
     }
 }
