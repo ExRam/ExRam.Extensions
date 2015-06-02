@@ -1,0 +1,9 @@
+/ExRam.Extensions.Tests/bin/
+/ExRam.Extensions.Tests/obj/
+/ExRam.Extensions/bin/Debug
+/ExRam.Extensions/bin/Release
+/ExRam.Extensions/obj/
+/packages
+/.vs/ExRam.Extensions/v14/.suo
+/ExRam.Extensions.v12.suo
+/ExRam.Extensions/ExRam.Extensions.csproj.user
