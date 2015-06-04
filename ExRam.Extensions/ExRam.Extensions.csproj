@@ -174,7 +174,6 @@
     <Compile Include="System\Linq\AsyncEnumerator.cs" />
     <Compile Include="System\Reactive\Counting.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Box%29.cs" />
-    <Compile Include="System\Reactive\Linq\ObservableExtensions %28Catch%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28CombineLatest%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28GroupByUntil%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28KeepOpen%29.cs" />
