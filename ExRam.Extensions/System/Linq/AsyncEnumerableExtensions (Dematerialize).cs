@@ -43,14 +43,10 @@ namespace System.Linq
                                             completed = true;
                                             throw notification.Exception;
                                         }
-                                        default:
-                                        {
-                                            completed = true;
-                                            break;
-                                        }
                                     }
                                 }
 
+                                completed = true;
                                 return Maybe<TSource>.Null;
                             })
                             .Where(x => x.HasValue)

@@ -6,6 +6,7 @@
 
 using System;
 using System.Linq;
+using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -64,6 +65,19 @@ namespace ExRam.Extensions.Tests
                     
                 }
             }
+        }
+        #endregion
+
+        #region AsyncEnumerable_Dematerialize_handles_empty_enumerable_correctly
+        [TestMethod]
+        public async Task AsyncEnumerable_Dematerialize_handles_empty_enumerable_correctly()
+        {
+            var enumerator = AsyncEnumerable
+                .Empty<Notification<int>>()
+                .Dematerialize()
+                .GetEnumerator();
+                
+            Assert.IsFalse(await enumerator.MoveNext(CancellationToken.None));
         }
         #endregion
     }
