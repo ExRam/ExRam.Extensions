@@ -19,39 +19,28 @@ namespace System.Linq
             return AsyncEnumerable
                 .Using(
                     enumerable.GetEnumerator,
-                    e =>
-                    {
-                        var completed = false;
-
-                        return AsyncEnumerable
-                            .Repeat(Unit.Default)
-                            .TakeWhile(_ => !completed)
-                            .SelectMany(async (_, ct) =>
+                    e => AsyncEnumerable
+                        .Repeat(Unit.Default)
+                        .SelectMany((_, ct) => e.MoveNextAsMaybe(ct))
+                        .Select(maybeNotification =>
+                        {
+                            if (maybeNotification.HasValue)
                             {
-                                var maybeNotification = await e.MoveNextAsMaybe(ct);
+                                var notification = maybeNotification.Value;
 
-                                if (maybeNotification.HasValue)
+                                switch (notification.Kind)
                                 {
-                                    var notification = maybeNotification.Value;
-
-                                    switch (notification.Kind)
-                                    {
-                                        case (NotificationKind.OnNext):
-                                            return Maybe.Create(notification.Value);
-                                        case (NotificationKind.OnError):
-                                        {
-                                            completed = true;
-                                            throw notification.Exception;
-                                        }
-                                    }
+                                    case (NotificationKind.OnNext):
+                                        return Maybe.Create(notification.Value);
+                                    case (NotificationKind.OnError):
+                                        throw notification.Exception;
                                 }
+                            }
 
-                                completed = true;
-                                return Maybe<TSource>.Null;
-                            })
-                            .Where(x => x.HasValue)
-                            .Select(x => x.Value);
-                });
+                            return Maybe<TSource>.Null;
+                        }))
+                .TakeWhile(x => x.HasValue)
+                .Select(x => x.Value);;
         }
     }
 }
