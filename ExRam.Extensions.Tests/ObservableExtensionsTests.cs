@@ -7,6 +7,7 @@ using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.Reactive.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using ObservableExtensions = System.Reactive.Linq.ObservableExtensions;
@@ -378,6 +379,8 @@ namespace ExRam.Extensions.Tests
         [TestMethod]
         public async Task LazyRefCount_does_not_disconnect_within_lazy_time()
         {
+            var testScheduler = new TestScheduler();
+
             var connectionMock = new Mock<IDisposable>();
             var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
 
@@ -391,22 +394,101 @@ namespace ExRam.Extensions.Tests
 
             var subscription = connectableObservableMock
                 .Object
-                .LazyRefCount(TimeSpan.FromSeconds(2), Scheduler.Default)
+                .LazyRefCount(TimeSpan.FromTicks(2), testScheduler)
                 .Subscribe();
 
             using (subscription)
             {
                 connectableObservableMock
                     .Verify(x => x.Connect(), Times.Once());
+            }
+
+            connectionMock
+                .Verify(x => x.Dispose(), Times.Never());
+
+            testScheduler.AdvanceBy(2);
+
+            connectionMock
+                .Verify(x => x.Dispose(), Times.Once());
+        }
+        #endregion
+
+        #region LazyRefCount_does_not_disconnect_after_lazy_time_when_new_connection_is_made
+        [TestMethod]
+        public async Task LazyRefCount_does_not_disconnect_after_lazy_time_when_new_connection_is_made()
+        {
+            var testScheduler = new TestScheduler();
+
+            var connectionMock = new Mock<IDisposable>();
+            var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
+
+            connectableObservableMock
+                .Setup(x => x.Connect())
+                .Returns(connectionMock.Object);
+
+            connectableObservableMock
+                .Setup(x => x.Subscribe(It.IsAny<IObserver<Unit>>()))
+                .Returns(Disposable.Empty);
+
+            var refCount = connectableObservableMock
+                .Object
+                .LazyRefCount(TimeSpan.FromTicks(20), testScheduler);
+
+            using (refCount.Subscribe())
+            {
+                connectableObservableMock
+                    .Verify(x => x.Connect(), Times.Once());
+            }
+
+            connectionMock
+                .Verify(x => x.Dispose(), Times.Never());
+
+            testScheduler.AdvanceBy(19);
+
+            connectionMock
+                .Verify(x => x.Dispose(), Times.Never());
+
+            using (refCount.Subscribe())
+            {
+                testScheduler.AdvanceBy(2);
 
                 connectionMock
                     .Verify(x => x.Dispose(), Times.Never());
             }
+        }
+        #endregion
 
-            connectionMock
-                    .Verify(x => x.Dispose(), Times.Never());
+        #region LazyRefCount_disconnects_after_all_when_second_subscription_is_disposed
+        [TestMethod]
+        public async Task LazyRefCount_disconnects_after_all_when_second_subscription_is_disposed()
+        {
+            var testScheduler = new TestScheduler();
 
-            await Task.Delay(TimeSpan.FromSeconds(3));
+            var connectionMock = new Mock<IDisposable>();
+            var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
+
+            connectableObservableMock
+                .Setup(x => x.Connect())
+                .Returns(connectionMock.Object);
+
+            connectableObservableMock
+                .Setup(x => x.Subscribe(It.IsAny<IObserver<Unit>>()))
+                .Returns(Disposable.Empty);
+
+            var refCount = connectableObservableMock
+                .Object
+                .LazyRefCount(TimeSpan.FromTicks(20), testScheduler);
+
+            refCount.Subscribe().Dispose();
+
+            testScheduler.AdvanceBy(19);
+
+            using (refCount.Subscribe())
+            {
+                testScheduler.AdvanceBy(2);
+            }
+
+            testScheduler.AdvanceBy(20);
 
             connectionMock
                 .Verify(x => x.Dispose(), Times.Once());

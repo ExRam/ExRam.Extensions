@@ -17,23 +17,44 @@ namespace System.Reactive.Linq
         {
             Contract.Requires(source != null);
 
-            var refCountObservable = source
-                .RefCount();
+            var syncRoot = new object();
+            var serial = new SerialDisposable();
+            IDisposable currentConnection = null;
 
-            var innerObservable = Observable
+            var innerObservable = ConnectableObservable
                 .Create<T>(
-                    obs =>
+                    () =>
                     {
-                        var subscription = refCountObservable.Subscribe(obs);
+                        var schedulerSubscription = new SingleAssignmentDisposable();
 
-                        return Disposable.Create(() =>
+                        lock (syncRoot)
                         {
-                            scheduler.Schedule(Unit.Default, delay, (self, state) =>
+                            if (currentConnection == null)
+                                currentConnection = source.Connect();
+
+                            serial.Disposable = schedulerSubscription;
+                        }
+
+                        return Disposable
+                            .Create(() =>
                             {
-                                subscription.Dispose();
+                                schedulerSubscription.Disposable = scheduler.Schedule(schedulerSubscription, delay, (self, state) =>
+                                {
+                                    lock (syncRoot)
+                                    {
+                                        if (object.ReferenceEquals(serial.Disposable, state))
+                                        {
+                                            currentConnection.Dispose();
+                                            currentConnection = null;
+                                        }
+                                    }
+
+                                    return Disposable.Empty;
+                                });
                             });
-                        });
-                    });
+                    },
+                    source.Subscribe)
+                .RefCount();
 
             return Observable.Create<T>(
                 outerObserver =>
