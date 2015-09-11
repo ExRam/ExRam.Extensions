@@ -97,7 +97,7 @@
     <CodeContractsExtraAnalysisOptions />
     <CodeContractsSQLServerOption />
     <CodeContractsBaseLineFile />
-    <CodeContractsCacheAnalysisResults>True</CodeContractsCacheAnalysisResults>
+    <CodeContractsCacheAnalysisResults>False</CodeContractsCacheAnalysisResults>
     <CodeContractsFailBuildOnWarnings>True</CodeContractsFailBuildOnWarnings>
     <CodeContractsRuntimeCheckingLevel>Preconditions</CodeContractsRuntimeCheckingLevel>
     <CodeContractsReferenceAssembly>Build</CodeContractsReferenceAssembly>
@@ -131,6 +131,7 @@
     <Compile Include="System\Linq\EnumerableExtensions.cs" />
     <Compile Include="System\MaybeExtensions.cs" />
     <Compile Include="System\Maybe.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28LazyRefCount%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28WithCancellation%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Where%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeWhileInclusive%29.cs" />
