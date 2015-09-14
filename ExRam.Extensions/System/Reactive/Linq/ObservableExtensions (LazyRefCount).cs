@@ -13,6 +13,13 @@ namespace System.Reactive.Linq
 {
     public static partial class ObservableExtensions
     {
+        public static IObservable<T> LazyRefCount<T>(this IConnectableObservable<T> source, TimeSpan delay)
+        {
+            Contract.Requires(source != null);
+
+            return source.LazyRefCount(delay, Scheduler.Default);
+        }
+
         public static IObservable<T> LazyRefCount<T>(this IConnectableObservable<T> source, TimeSpan delay, IScheduler scheduler)
         {
             Contract.Requires(source != null);
@@ -25,32 +32,35 @@ namespace System.Reactive.Linq
                 .Create<T>(
                     () =>
                     {
-                        var schedulerSubscription = new SingleAssignmentDisposable();
-
                         lock (syncRoot)
                         {
                             if (currentConnection == null)
                                 currentConnection = source.Connect();
 
-                            serial.Disposable = schedulerSubscription;
+                            serial.Disposable = new SingleAssignmentDisposable();
                         }
 
                         return Disposable
                             .Create(() =>
                             {
-                                schedulerSubscription.Disposable = scheduler.Schedule(schedulerSubscription, delay, (self, state) =>
+                                lock (syncRoot)
                                 {
-                                    lock (syncRoot)
-                                    {
-                                        if (object.ReferenceEquals(serial.Disposable, state))
-                                        {
-                                            currentConnection.Dispose();
-                                            currentConnection = null;
-                                        }
-                                    }
+                                    var cancelable = (SingleAssignmentDisposable)serial.Disposable;
 
-                                    return Disposable.Empty;
-                                });
+                                    cancelable.Disposable = scheduler.Schedule(cancelable, delay, (self, state) =>
+                                    {
+                                        lock (syncRoot)
+                                        {
+                                            if (object.ReferenceEquals(serial.Disposable, state))
+                                            {
+                                                currentConnection.Dispose();
+                                                currentConnection = null;
+                                            }
+                                        }
+
+                                        return Disposable.Empty;
+                                    });
+                                }
                             });
                     },
                     source.Subscribe)
