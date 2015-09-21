@@ -5,28 +5,29 @@
 // file.
 
 using System.Reactive.Linq;
+using Monad;
 
 namespace System.Reactive.Subjects
 {
     public sealed class NullableBehaviorSubject<T> : ISubject<T>, IDisposable
     {
         #region Fields
-        private readonly BehaviorSubject<Maybe<T>> _innerSubject;
+        private readonly BehaviorSubject<OptionStrict<T>> _innerSubject;
         private readonly IObservable<T> _whereAndSelectInnerObservable;
         #endregion
 
         #region Constructors
-        public NullableBehaviorSubject() : this(Maybe<T>.Null)
+        public NullableBehaviorSubject() : this(OptionStrict<T>.Nothing)
         {
         }
 
-        public NullableBehaviorSubject(T value) : this((Maybe<T>)value)
+        public NullableBehaviorSubject(T value) : this((OptionStrict<T>)value)
         {
         }
 
-        private NullableBehaviorSubject(Maybe<T> value)
+        private NullableBehaviorSubject(OptionStrict<T> value)
         {
-            this._innerSubject = new BehaviorSubject<Maybe<T>>(value);
+            this._innerSubject = new BehaviorSubject<OptionStrict<T>>(value);
 
             this._whereAndSelectInnerObservable = this._innerSubject
                 .Where(x => x.HasValue)
@@ -37,7 +38,7 @@ namespace System.Reactive.Subjects
         #region SetNull
         public void SetNull()
         {
-            this._innerSubject.OnNext(Maybe<T>.Null);
+            this._innerSubject.OnNext(OptionStrict<T>.Nothing);
         }
         #endregion
 

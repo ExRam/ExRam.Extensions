@@ -130,7 +130,6 @@
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28DefaultIfEmpty%29.cs" />
     <Compile Include="System\Linq\EnumerableExtensions.cs" />
     <Compile Include="System\MaybeExtensions.cs" />
-    <Compile Include="System\Maybe.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28LazyRefCount%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Prioritize%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28WithCancellation%29.cs" />
@@ -158,7 +157,6 @@
     <Compile Include="System\Threading\Tasks\TaskExtensions %28SelectMany%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28AsAsyncEnumerable%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskFactoryExtensions.cs" />
-    <Compile Include="System\Maybe %28Of T%29.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28Append%29.cs" />
     <Compile Include="System\Linq\AsyncEnumerableExtensions %28Create%29.cs" />
@@ -200,6 +198,10 @@
     <Compile Include="System\Threading\Tasks\TaskExtensions %28WithCancellation%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28WithTimeout%29.cs" />
     <Compile Include="System\TimeSpanExtensions.cs" />
+    <Reference Include="Monad, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\csharp-monad.0.0.4\lib\Monad.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Interactive.Async">
       <HintPath>..\packages\Ix-Async.1.2.3\lib\portable-net45+netcore45+wpa81+wp8+MonoAndroid1+MonoTouch1\System.Interactive.Async.dll</HintPath>
     </Reference>

@@ -7,6 +7,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Monad;
 
 namespace ExRam.Framework.Tests
 {
@@ -87,7 +88,7 @@ namespace ExRam.Framework.Tests
         [TestMethod]
         public async Task TaskCompletionSourceOfMaybeOfInt_Can_Be_Set_From_Completed_TaskOfInt()
         {
-            var tcs = new TaskCompletionSource<Maybe<int>>();
+            var tcs = new TaskCompletionSource<OptionStrict<int>>();
             tcs.SetFromTask(Task.FromResult(36));
 
             Assert.AreEqual(36, await tcs.Task);
@@ -99,7 +100,7 @@ namespace ExRam.Framework.Tests
         [ExpectedException(typeof(TaskCanceledException))]
         public async Task TaskCompletionSourceOfMaybeOfInt_Can_Be_Set_From_Canceled_TaskOfInt()
         {
-            var tcs = new TaskCompletionSource<Maybe<int>>();
+            var tcs = new TaskCompletionSource<OptionStrict<int>>();
             tcs.SetFromTask(Task.Factory.GetCanceled<int>());
 
             await tcs.Task;
@@ -111,7 +112,7 @@ namespace ExRam.Framework.Tests
         [ExpectedException(typeof(NotSupportedException))]
         public async Task TaskCompletionSourceOfMaybeOfInt_Can_Be_Set_From_Faulted_TaskOfInt()
         {
-            var tcs = new TaskCompletionSource<Maybe<int>>();
+            var tcs = new TaskCompletionSource<OptionStrict<int>>();
             tcs.SetFromTask(Task.Factory.GetFaulted<int>(new NotSupportedException()));
 
             await tcs.Task;

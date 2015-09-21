@@ -10,6 +10,7 @@ using System.Reactive;
 using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
+using Monad;
 
 namespace System.Linq
 {
@@ -36,7 +37,7 @@ namespace System.Linq
                                 if (maybeItem.HasValue)
                                     return acc = await accumulator(acc, maybeItem.Value, ct);
 
-                                return Maybe<TAccumulate>.Null;
+                                return OptionStrict<TAccumulate>.Nothing;
                             })
                             .TakeWhile(x => x.HasValue)
                             .Select(x => x.Value);

@@ -5,6 +5,7 @@
 // file.
 
 using System.Diagnostics.Contracts;
+using Monad;
 
 namespace System.Threading.Tasks
 {
@@ -28,7 +29,7 @@ namespace System.Threading.Tasks
         #endregion
 
         #region Swallow<TException>(Task<Result>)
-        public static async Task<Maybe<TResult>> Swallow<TException, TResult>(this Task<Maybe<TResult>> task) where TException : Exception
+        public static async Task<OptionStrict<TResult>> Swallow<TException, TResult>(this Task<OptionStrict<TResult>> task) where TException : Exception
         {
             Contract.Requires(task != null);
 
@@ -40,29 +41,29 @@ namespace System.Threading.Tasks
             catch (TException)
             // ReSharper restore EmptyGeneralCatchClause
             {
-                return Maybe<TResult>.Null;
+                return OptionStrict<TResult>.Nothing;
             }
         }
 
-        public static async Task<Maybe<TResult>> Swallow<TException, TResult>(this Task<TResult> task) where TException : Exception
+        public static async Task<OptionStrict<TResult>> Swallow<TException, TResult>(this Task<TResult> task) where TException : Exception
         {
             Contract.Requires(task != null);
 
             try
             {
-                return (Maybe<TResult>)(await task.ConfigureAwait(false));
+                return await task.ConfigureAwait(false);
             }
             // ReSharper disable EmptyGeneralCatchClause
             catch (TException)
             // ReSharper restore EmptyGeneralCatchClause
             {
-                return Maybe<TResult>.Null;
+                return OptionStrict<TResult>.Nothing;
             }
         }
         #endregion
 
         #region Swallow(Task<TResult>)
-        public static async Task<Maybe<TResult>> Swallow<TResult>(this Task<Maybe<TResult>> task)
+        public static async Task<OptionStrict<TResult>> Swallow<TResult>(this Task<OptionStrict<TResult>> task)
         {
             Contract.Requires(task != null);
 
@@ -72,21 +73,21 @@ namespace System.Threading.Tasks
             }
             catch
             {
-                return Maybe<TResult>.Null;
+                return OptionStrict<TResult>.Nothing;
             }
         }
 
-        public static async Task<Maybe<TResult>> Swallow<TResult>(this Task<TResult> task)
+        public static async Task<OptionStrict<TResult>> Swallow<TResult>(this Task<TResult> task)
         {
             Contract.Requires(task != null);
 
             try
             {
-                return (Maybe<TResult>)(await task.ConfigureAwait(false));
+                return await task.ConfigureAwait(false);
             }
             catch
             {
-                return Maybe<TResult>.Null;
+                return OptionStrict<TResult>.Nothing;
             }
         }
         #endregion

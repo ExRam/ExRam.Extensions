@@ -5,12 +5,13 @@
 // file.
 
 using System.Collections.Generic;
+using Monad;
 
 namespace System.Linq
 {
     public static partial class AsyncEnumerableExtensions
     {
-        public static IAsyncEnumerable<T> SelectValueWhereAvailable<T>(this IAsyncEnumerable<Maybe<T>> enumerable)
+        public static IAsyncEnumerable<T> SelectValueWhereAvailable<T>(this IAsyncEnumerable<OptionStrict<T>> enumerable)
         {
             return enumerable
                 .Where(x => x.HasValue)

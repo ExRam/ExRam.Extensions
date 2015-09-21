@@ -9,6 +9,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using Monad;
 
 namespace System.Reactive.Linq
 {
@@ -22,7 +23,7 @@ namespace System.Reactive.Linq
             return source
                 .SelectMany(x => predicate(x)
                     .ToObservable()
-                    .Select(b => b ? x : Maybe<T>.Null))
+                    .Select(b => b ? x : OptionStrict<T>.Nothing))
                 .Where(x => x.HasValue)
                 .Select(x => x.Value);
         }
@@ -37,7 +38,7 @@ namespace System.Reactive.Linq
                     .WithCancellation(
                         ct => predicate(x, ct)
                             .ToObservable()
-                            .Select(b => b ? x : Maybe<T>.Null)))
+                            .Select(b => b ? x : OptionStrict<T>.Nothing)))
                 .Where(x => x.HasValue)
                 .Select(x => x.Value);
         }

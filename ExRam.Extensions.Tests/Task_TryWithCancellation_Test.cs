@@ -8,6 +8,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Monad;
 
 namespace ExRam.Framework.Tests
 {
@@ -108,7 +109,7 @@ namespace ExRam.Framework.Tests
         public async Task TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_cancelled_after_call()
         {
             var cts = new CancellationTokenSource();
-            var longRunningTask = Task.Factory.GetUncompleted<Maybe<int>>();
+            var longRunningTask = Task.Factory.GetUncompleted<OptionStrict<int>>();
             var cancellationTask = longRunningTask.TryWithCancellation(cts.Token);
 
             cts.Cancel();
@@ -122,7 +123,7 @@ namespace ExRam.Framework.Tests
         public async Task TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_cancelled_before_call()
         {
             var cts = new CancellationTokenSource();
-            var longRunningTask = Task.Factory.GetUncompleted<Maybe<int>>();
+            var longRunningTask = Task.Factory.GetUncompleted<OptionStrict<int>>();
 
             cts.Cancel();
 
@@ -139,7 +140,7 @@ namespace ExRam.Framework.Tests
             var task = Task.Factory.StartNew(() =>
             {
                 Thread.Sleep(100);
-                return (Maybe<int>)36;
+                return (OptionStrict<int>)36;
             });
 
             var cts = new CancellationTokenSource();

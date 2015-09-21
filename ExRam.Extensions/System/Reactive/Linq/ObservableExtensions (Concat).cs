@@ -6,19 +6,20 @@
 
 using System.Diagnostics.Contracts;
 using System.Reactive.Disposables;
+using Monad;
 
 namespace System.Reactive.Linq
 {
     public static partial class ObservableExtensions
     {
-        public static IObservable<T> Concat<T>(this IObservable<T> source, Func<Maybe<T>, IObservable<T>> continuationSelector)
+        public static IObservable<T> Concat<T>(this IObservable<T> source, Func<OptionStrict<T>, IObservable<T>> continuationSelector)
         {
             Contract.Requires(source != null);
             Contract.Requires(continuationSelector != null);
 
             return Observable.Create<T>(obs =>
             {
-                var lastValue = Maybe<T>.Null;
+                var lastValue = OptionStrict<T>.Nothing;
                 var subscription = new SerialDisposable();
                 var firstSubscription = new SingleAssignmentDisposable();
 

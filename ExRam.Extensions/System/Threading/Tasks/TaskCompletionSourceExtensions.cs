@@ -5,6 +5,7 @@
 // file.
 
 using System.Diagnostics.Contracts;
+using Monad;
 
 namespace System.Threading.Tasks
 {
@@ -75,7 +76,7 @@ namespace System.Threading.Tasks
             }
         }
 
-        public static void SetFromTask<TResult>(this TaskCompletionSource<Maybe<TResult>> tcs, Task<TResult> task)
+        public static void SetFromTask<TResult>(this TaskCompletionSource<OptionStrict<TResult>> tcs, Task<TResult> task)
         {
             Contract.Requires(tcs != null);
             Contract.Requires(task != null);

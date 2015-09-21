@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reactive;
+using Monad;
 
 namespace System.Linq
 {
@@ -31,13 +32,13 @@ namespace System.Linq
                                 switch (notification.Kind)
                                 {
                                     case (NotificationKind.OnNext):
-                                        return Maybe.Create(notification.Value);
+                                        return notification.Value;
                                     case (NotificationKind.OnError):
                                         throw notification.Exception;
                                 }
                             }
 
-                            return Maybe<TSource>.Null;
+                            return OptionStrict<TSource>.Nothing;
                         }))
                 .TakeWhile(x => x.HasValue)
                 .Select(x => x.Value);;

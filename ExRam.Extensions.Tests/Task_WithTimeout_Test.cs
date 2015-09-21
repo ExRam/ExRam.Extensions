@@ -104,7 +104,7 @@ namespace ExRam.Framework.Tests
             }
             catch (TimeoutException)
             {
-                tcs.SetResult(null);
+                tcs.SetResult(new object());
             }
 
             await tcs.Task.WithTimeout(TimeSpan.FromMilliseconds(500));

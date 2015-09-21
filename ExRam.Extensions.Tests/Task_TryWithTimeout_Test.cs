@@ -7,6 +7,7 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Monad;
 
 namespace ExRam.Framework.Tests
 {
@@ -35,7 +36,7 @@ namespace ExRam.Framework.Tests
         [TestMethod]
         public async Task Completed_TaskOfMaybeOfInt_TryWithTimeout_Completes()
         {
-            var completedTask = Task.FromResult<Maybe<int>>(36);
+            var completedTask = Task.FromResult<OptionStrict<int>>(36);
             Assert.AreEqual(36, (await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).Value);
         }
         #endregion
@@ -65,7 +66,7 @@ namespace ExRam.Framework.Tests
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task Faulted_TaskOfMaybeOfInt_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<Maybe<int>>(new InvalidOperationException());
+            var completedTask = Task.Factory.GetFaulted<OptionStrict<int>>(new InvalidOperationException());
             await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
         }
         #endregion
@@ -95,7 +96,7 @@ namespace ExRam.Framework.Tests
         [ExpectedException(typeof(TaskCanceledException))]
         public async Task Canceled_TaskOfMaybeOfInt_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetCanceled<Maybe<int>>();
+            var completedTask = Task.Factory.GetCanceled<OptionStrict<int>>();
             await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
         }
         #endregion
@@ -122,7 +123,7 @@ namespace ExRam.Framework.Tests
         [TestMethod]
         public async Task Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_returns_unset_Maybe()
         {
-            var uncompletedTask = Task.Factory.GetUncompleted<Maybe<int>>();
+            var uncompletedTask = Task.Factory.GetUncompleted<OptionStrict<int>>();
             Assert.IsFalse((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
         }
         #endregion
@@ -134,7 +135,9 @@ namespace ExRam.Framework.Tests
             var tcs = new TaskCompletionSource<object>();
 
             Assert.IsFalse((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
-            tcs.SetResult(null);
+            tcs.SetResult(new object());
+
+            var next = await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
             Assert.IsTrue((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
         }
         #endregion
@@ -181,7 +184,7 @@ namespace ExRam.Framework.Tests
         [TestMethod]
         public async Task Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_can_complete_afterwards()
         {
-            var tcs = new TaskCompletionSource<Maybe<int>>();
+            var tcs = new TaskCompletionSource<OptionStrict<int>>();
 
             Assert.IsFalse((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
             tcs.SetResult(36);
@@ -207,7 +210,7 @@ namespace ExRam.Framework.Tests
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_can_fault_afterwards()
         {
-            var tcs = new TaskCompletionSource<Maybe<int>>();
+            var tcs = new TaskCompletionSource<OptionStrict<int>>();
 
             await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
             tcs.SetException(new InvalidOperationException());
@@ -233,7 +236,7 @@ namespace ExRam.Framework.Tests
         [ExpectedException(typeof(TaskCanceledException))]
         public async Task Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_can_be_canceled_afterwards()
         {
-            var tcs = new TaskCompletionSource<Maybe<int>>();
+            var tcs = new TaskCompletionSource<OptionStrict<int>>();
 
             Assert.IsFalse((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
             tcs.SetCanceled();

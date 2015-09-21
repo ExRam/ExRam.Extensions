@@ -1,4 +1,5 @@
 ﻿using System.Diagnostics.Contracts;
+using Monad;
 
 namespace System.Collections.Generic
 {
@@ -21,13 +22,13 @@ namespace System.Collections.Generic
             return ((dictionary.TryGetValue(key, out ret)) ? (ret) : (defaultValue));
         }
 
-        public static Maybe<TValue> TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
+        public static OptionStrict<TValue> TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
         {
             Contract.Requires(dictionary != null);
             Contract.Requires(!object.ReferenceEquals(key, null));
 
             TValue item;
-            return ((dictionary.TryGetValue(key, out item)) ? (item) : (Maybe<TValue>.Null));
+            return ((dictionary.TryGetValue(key, out item)) ? (item) : (OptionStrict<TValue>.Nothing));
         }
     }
 }

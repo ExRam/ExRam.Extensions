@@ -6,17 +6,18 @@
 
 using System.Threading;
 using System.Threading.Tasks;
+using Monad;
 
 namespace System.Collections.Generic
 {
     public static class AsyncEnumeratorEx
     {
-        public static async Task<Maybe<T>> MoveNextAsMaybe<T>(this IAsyncEnumerator<T> enumerator, CancellationToken ct)
+        public static async Task<OptionStrict<T>> MoveNextAsMaybe<T>(this IAsyncEnumerator<T> enumerator, CancellationToken ct)
         {
             if (await enumerator.MoveNext(ct))
                 return enumerator.Current;
 
-            return Maybe<T>.Null;
+            return OptionStrict<T>.Nothing;
         }
     }
 }
