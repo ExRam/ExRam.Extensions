@@ -116,7 +116,8 @@
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
   <PropertyGroup>
-    <AssemblyOriginatorKeyFile>ExRam.Extensions.snk</AssemblyOriginatorKeyFile>
+    <AssemblyOriginatorKeyFile>
+    </AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="System\Collections\Generic\DictionaryExtensions.cs" />
@@ -218,7 +219,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
-    <None Include="ExRam.Extensions.snk" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
