@@ -132,6 +132,7 @@
     <Compile Include="System\MaybeExtensions.cs" />
     <Compile Include="System\Maybe.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28LazyRefCount%29.cs" />
+    <Compile Include="System\Reactive\Linq\ObservableExtensions %28Prioritize%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28WithCancellation%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Where%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeWhileInclusive%29.cs" />
