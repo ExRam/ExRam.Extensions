@@ -19,9 +19,9 @@ namespace ExRam.Extensions.Tests
         public async Task AsyncEnumerable_SelectMany_Works()
         {
             var array = await new[] { 1, 2, 3 }.ToAsyncEnumerable()
-                .SelectMany(async x =>
+                .SelectMany(async (x, ct) =>
                 {
-                    await Task.Delay(50);
+                    await Task.Delay(50, ct);
                     return x.ToString();
                 })
                 .ToArray(CancellationToken.None);
@@ -39,9 +39,9 @@ namespace ExRam.Extensions.Tests
             var counter = 0;
 
             var array = await new[] { 1, 2, 3 }.ToAsyncEnumerable()
-                .SelectMany(async x =>
+                .SelectMany(async (x, ct) =>
                 {
-                    await Task.Delay(50);
+                    await Task.Delay(50, ct);
                     Assert.AreEqual(x, Interlocked.Increment(ref counter));
 
                     return x.ToString();
