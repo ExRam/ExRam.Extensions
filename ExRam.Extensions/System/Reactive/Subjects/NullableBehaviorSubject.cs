@@ -4,6 +4,7 @@
 // Full License description can be found in the LICENSE
 // file.
 
+using System.Diagnostics.Contracts;
 using System.Reactive.Linq;
 using Monad;
 
@@ -21,12 +22,14 @@ namespace System.Reactive.Subjects
         {
         }
 
-        public NullableBehaviorSubject(T value) : this((OptionStrict<T>)value)
+        public NullableBehaviorSubject(T value) : this(value.ToOptionStrict())
         {
         }
 
         private NullableBehaviorSubject(OptionStrict<T> value)
         {
+            Contract.Requires(value != null);
+
             this._innerSubject = new BehaviorSubject<OptionStrict<T>>(value);
 
             this._whereAndSelectInnerObservable = this._innerSubject
