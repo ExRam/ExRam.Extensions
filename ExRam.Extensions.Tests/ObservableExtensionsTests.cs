@@ -520,5 +520,108 @@ namespace ExRam.Extensions.Tests
             Assert.AreEqual(1, value);
         }
         #endregion
+
+
+        [TestMethod]
+        public void Debounce_lets_first_value_pass()
+        {
+            var testScheduler = new TestScheduler();
+
+            var xs = testScheduler.CreateHotObservable<int>(
+                new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
+                new Recorded<Notification<int>>(3, Notification.CreateOnCompleted<int>()));
+
+            var latestValue = 0;
+
+            xs
+                .Debounce(TimeSpan.FromTicks(200), false, testScheduler)
+                .Subscribe(value => latestValue = value);
+
+            testScheduler.AdvanceBy(1);
+            Assert.AreEqual(0, latestValue);
+
+            testScheduler.AdvanceBy(1);
+            Assert.AreEqual(1, latestValue);
+        }
+
+        [TestMethod]
+        public void Debounce_blocks_value_within_debounce_interval_does_not_emit_value_after_debounce_interval_if_configured()
+        {
+            var testScheduler = new TestScheduler();
+
+            var xs = testScheduler.CreateHotObservable<int>(
+                new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
+                new Recorded<Notification<int>>(3, Notification.CreateOnNext(2)),
+                new Recorded<Notification<int>>(4, Notification.CreateOnCompleted<int>()));
+
+            var latestValue = 0;
+
+            xs
+                .Debounce(TimeSpan.FromTicks(200), false, testScheduler)
+                .Subscribe(value => latestValue = value);
+
+            testScheduler.AdvanceBy(1);
+            Assert.AreEqual(0, latestValue);
+
+            testScheduler.AdvanceBy(1);
+            Assert.AreEqual(1, latestValue);
+
+            testScheduler.AdvanceBy(200);
+            Assert.AreEqual(1, latestValue);
+        }
+
+        [TestMethod]
+        public void Debounce_blocks_value_within_debounce_interval_and_emits_value_after_debounce_interval_if_configured()
+        {
+            var testScheduler = new TestScheduler();
+
+            var xs = testScheduler.CreateHotObservable<int>(
+                new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
+                new Recorded<Notification<int>>(3, Notification.CreateOnNext(2)),
+                new Recorded<Notification<int>>(4, Notification.CreateOnNext(3)),
+                new Recorded<Notification<int>>(400, Notification.CreateOnCompleted<int>()));
+
+            var latestValue = 0;
+
+            xs
+                .Debounce(TimeSpan.FromTicks(200), true, testScheduler)
+                .Subscribe(value => latestValue = value);
+
+            testScheduler.AdvanceBy(1);
+            Assert.AreEqual(0, latestValue);
+
+            testScheduler.AdvanceBy(1);
+            Assert.AreEqual(1, latestValue);
+
+            testScheduler.AdvanceBy(200);
+            Assert.AreEqual(3, latestValue);
+        }
+
+        [TestMethod]
+        public void Debounce_blocks_value_within_debounce_interval_and_emits_nothing_if_completed_meanwhile()
+        {
+            var testScheduler = new TestScheduler();
+
+            var xs = testScheduler.CreateHotObservable<int>(
+                new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
+                new Recorded<Notification<int>>(3, Notification.CreateOnNext(2)),
+                new Recorded<Notification<int>>(4, Notification.CreateOnNext(3)),
+                new Recorded<Notification<int>>(5, Notification.CreateOnCompleted<int>()));
+
+            var latestValue = 0;
+
+            xs
+                .Debounce(TimeSpan.FromTicks(200), true, testScheduler)
+                .Subscribe(value => latestValue = value);
+
+            testScheduler.AdvanceBy(1);
+            Assert.AreEqual(0, latestValue);
+
+            testScheduler.AdvanceBy(1);
+            Assert.AreEqual(1, latestValue);
+
+            testScheduler.AdvanceBy(200);
+            Assert.AreEqual(1, latestValue);
+        }
     }
 }
