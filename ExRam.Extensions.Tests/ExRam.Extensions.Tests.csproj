@@ -89,7 +89,6 @@
     <Compile Include="AsyncEnumerable_Gate_Test.cs" />
     <Compile Include="AsyncEnumerable_Concat_Test.cs" />
     <Compile Include="AsyncEnumerable_ScanAsync_Test.cs" />
-    <Compile Include="AsyncEnumerable_ReturnAsync_Test.cs" />
     <Compile Include="AsyncEnumerable_SelectMany_Test.cs" />
     <Compile Include="AsyncEnumerable_ToStream_Test.cs" />
     <Compile Include="CancellationTokenExtensions_Test.cs" />
