@@ -23,10 +23,8 @@ namespace System.Linq
 
         public static IAsyncEnumerable<Unit> SelectMany<TSource>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, CancellationToken, Task> selector)
         {
-            return AsyncEnumerableExtensions
-                .WithCancellation(ct => enumerable
-                    .SelectMany(x => selector(x, ct)
-                    .ToAsyncEnumerable()));
+            return enumerable
+                .SelectMany((x, ct) => selector(x, ct).AsUnitTask());
         }
     }
 }
