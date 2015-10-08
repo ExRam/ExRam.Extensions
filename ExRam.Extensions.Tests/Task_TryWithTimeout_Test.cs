@@ -5,6 +5,7 @@
 // file.
 
 using System;
+using System.Reactive;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Monad;
@@ -18,7 +19,7 @@ namespace ExRam.Framework.Tests
         [TestMethod]
         public async Task Completed_Task_TryWithTimeout_Completes()
         {
-            var completedTask = Task.Factory.GetCompleted();
+            var completedTask = Task.FromResult(0);
             await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
         }
         #endregion
@@ -46,7 +47,7 @@ namespace ExRam.Framework.Tests
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task Faulted_Task_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted(new InvalidOperationException());
+            var completedTask = Task.Factory.GetFaulted<Unit>(new InvalidOperationException());
             await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
         }
         #endregion
@@ -76,7 +77,7 @@ namespace ExRam.Framework.Tests
         [ExpectedException(typeof(TaskCanceledException))]
         public async Task Canceled_Task_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetCanceled();
+            var completedTask = Task.Factory.GetCanceled<Unit>();
             await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
         }
         #endregion
@@ -105,8 +106,8 @@ namespace ExRam.Framework.Tests
         [TestMethod]
         public async Task Uncompleted_Task_TryWithTimeout_returns_unset_Maybe()
         {
-            var uncompletedTask = Task.Factory.GetUncompleted();
-            Assert.IsFalse(await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500)));
+            var uncompletedTask = Task.Factory.GetUncompleted<Unit>();
+            Assert.IsFalse((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
         }
         #endregion
 

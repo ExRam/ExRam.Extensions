@@ -5,6 +5,7 @@
 // file.
 
 using System;
+using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,12 +21,12 @@ namespace ExRam.Framework.Tests
         public async Task TryWithCancellation_asynchronously_returns_false_if_cancelled_after_call()
         {
             var cts = new CancellationTokenSource();
-            var longRunningTask = Task.Factory.GetUncompleted();
+            var longRunningTask = Task.Factory.GetUncompleted<Unit>();
             var cancellationTask = longRunningTask.TryWithCancellation(cts.Token);
 
             cts.Cancel();
 
-            Assert.AreEqual(false, await cancellationTask);
+            Assert.IsFalse((await cancellationTask).HasValue);
         }
         #endregion
 
@@ -34,13 +35,13 @@ namespace ExRam.Framework.Tests
         public async Task TryWithCancellation_asynchronously_returns_false_if_cancelled_before_call()
         {
             var cts = new CancellationTokenSource();
-            var longRunningTask = Task.Factory.GetUncompleted();
+            var longRunningTask = Task.Factory.GetUncompleted<Unit>();
 
             cts.Cancel();
 
             var cancellationTask = longRunningTask.TryWithCancellation(cts.Token);
 
-            Assert.AreEqual(false, await cancellationTask);
+            Assert.IsFalse((await cancellationTask).HasValue);
         }
         #endregion
 
@@ -158,7 +159,7 @@ namespace ExRam.Framework.Tests
         public async Task TryWithCancellation_throws_if_called_on_cancelled_task()
         {
             var cts = new CancellationTokenSource();
-            var longRunningTask = Task.Factory.GetCanceled();
+            var longRunningTask = Task.Factory.GetCanceled<Unit>();
             var cancellationTask = longRunningTask.TryWithCancellation(cts.Token);
 
             await cancellationTask;

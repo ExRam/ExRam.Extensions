@@ -5,6 +5,7 @@
 // file.
 
 using System;
+using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -20,7 +21,7 @@ namespace ExRam.Framework.Tests
         public async Task WithCancellation_throws_if_cancelled_after_call()
         {
             var cts = new CancellationTokenSource();
-            var longRunningTask = Task.Factory.GetUncompleted();
+            var longRunningTask = Task.Factory.GetUncompleted<Unit>();
             var cancellationTask = longRunningTask.WithCancellation(cts.Token);
 
             cts.Cancel();
@@ -35,7 +36,7 @@ namespace ExRam.Framework.Tests
         public async Task WithCancellation_throws_if_cancelled_before_call()
         {
             var cts = new CancellationTokenSource();
-            var longRunningTask = Task.Factory.GetUncompleted();
+            var longRunningTask = Task.Factory.GetUncompleted<Unit>();
 
             cts.Cancel();
 
