@@ -4,21 +4,19 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Linq;
 using System.Reactive;
 
 namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
     {
-        public static IAsyncEnumerable<Unit> ToAsyncEnumerable(this Task task)
+        public static async Task<Unit> AsUnitTask(this Task task)
         {
             Contract.Requires(task != null);
 
-            return AsyncEnumerable
-                .ToAsyncEnumerable(task.AsUnitTask());
+            await task;
+            return Unit.Default;
         }
     }
 }
