@@ -188,7 +188,6 @@
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ToNotifyCollectionChangedEventPattern%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ToWeakObservable%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28WhereNotNull%29.cs" />
-    <Compile Include="System\Threading\Tasks\TaskCompletionSourceExtensions %28WithCancellation%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28Ignore%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28Select%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28Swallow%29.cs" />
