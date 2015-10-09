@@ -35,44 +35,6 @@ namespace ExRam.Extensions.Tests
         }
         #endregion
 
-        #region ConnectTotallyAtMostTest
-        [TestMethod]
-        public void ConnectTotallyAtMostTest()
-        {
-            var observableMock = new Mock<IConnectableObservable<object>>();
-            observableMock.Setup(x => x.Connect()).Returns(Disposable.Empty);
-
-            var connectAtMostObservable = observableMock.Object.ConnectTotallyAtMost(3);
-
-            for (var i = 0; i < 6; i++)
-            {
-                connectAtMostObservable.Connect();
-            }
-
-            observableMock.Verify(x => x.Connect(), Times.Exactly(3));
-        }
-        #endregion
-
-        #region DisconnectTotallyAtMostTest
-        [TestMethod]
-        public void DisconnectTotallyAtMostTest()
-        {
-            var disposableMock = new Mock<IDisposable>();
-            var observableMock = new Mock<IConnectableObservable<object>>();
-            observableMock.Setup(x => x.Connect()).Returns(disposableMock.Object);
-
-            var connectAtMostObservable = observableMock.Object.DisconnectTotallyAtMost(3);
-
-            for (var i = 0; i < 6; i++)
-            {
-                connectAtMostObservable.Connect().Dispose();
-            }
-
-            observableMock.Verify(x => x.Connect(), Times.Exactly(6));
-            disposableMock.Verify(x => x.Dispose(), Times.Exactly(3));
-        }
-        #endregion
-
         #region Observable_Current_blocks_if_no_current_element_is_present
         [TestMethod]
         public async Task Observable_Current_blocks_if_no_current_element_is_present()

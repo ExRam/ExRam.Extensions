@@ -145,12 +145,10 @@
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TryFirstAsync%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28Current%29.cs" />
     <Compile Include="System\Reactive\Subjects\ConnectableObservable.cs" />
-    <Compile Include="System\Reactive\Subjects\ConnectableObservableExtensions %28ConnectTotallyAtMost%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28SubscribeConcurrentlyAtMost%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28SubscribeTotallyAtMost%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28ThrowOnCancellation%29.cs" />
     <Compile Include="System\Reactive\Linq\ObservableExtensions %28TakeUntil%29.cs" />
-    <Compile Include="System\Reactive\Subjects\ConnectableObservableExtensions %28DisconnectTotallyAtMost%29.cs" />
     <Compile Include="System\Reflection\AssemblyExtensions.cs" />
     <Compile Include="System\Text\EncodingExtensions.cs" />
     <Compile Include="System\Threading\CancellationTokenExtensions.cs" />
