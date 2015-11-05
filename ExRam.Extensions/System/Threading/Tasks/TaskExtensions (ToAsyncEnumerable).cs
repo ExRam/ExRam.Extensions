@@ -17,8 +17,28 @@ namespace System.Threading.Tasks
         {
             Contract.Requires(task != null);
 
-            return AsyncEnumerable
-                .ToAsyncEnumerable(task.AsUnitTask());
+            return AsyncEnumerableExtensions.Create(
+               () =>
+               {
+                   var completed = false;
+
+                   return AsyncEnumerableExtensions.Create(
+                       ct =>
+                       {
+                           if (completed)
+                               return Task.FromResult(false);
+
+                           return task
+                               .Then(() =>
+                               {
+                                   completed = true;
+
+                                   return true;
+                               });
+                       },
+                       () => Unit.Default,
+                       () => {});
+               });
         }
     }
 }
