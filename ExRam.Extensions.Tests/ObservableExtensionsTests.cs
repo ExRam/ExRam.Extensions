@@ -242,12 +242,21 @@ namespace ExRam.Extensions.Tests
         [TestMethod]
         public async Task RepeatWhileEmpty_produces_correct_values()
         {
-            var array = await ObservableExtensions
-                .Morph(
-                    Observable.Empty<int>(),
-                    Observable.Empty<int>(),
-                    new[] { 1, 2, 3 }.ToObservable(),
-                    new[] { 4, 5, 6 }.ToObservable())
+            var count = 0;
+
+            var array = await Observable
+                .Defer(() =>
+                {
+                    count++;
+
+                    if (count <= 2)
+                        return Observable.Empty<int>();
+
+                    if (count == 3)
+                        return new[] { 1, 2, 3 }.ToObservable();
+
+                    return new[] { 4, 5, 6 }.ToObservable();
+                })
                 .RepeatWhileEmpty()
                 .ToArray()
                 .ToTask();
@@ -261,11 +270,18 @@ namespace ExRam.Extensions.Tests
         [ExpectedException(typeof(InvalidOperationException))]
         public async Task RepeatWhileEmpty_propagates_exception_correctly()
         {
-            await ObservableExtensions
-                .Morph(
-                    Observable.Empty<int>(),
-                    Observable.Empty<int>(),
-                    Observable.Throw<int>(new InvalidOperationException()))
+            var count = 0;
+
+            await Observable
+                .Defer(() =>
+                {
+                    count++;
+
+                    if (count <= 2)
+                        return Observable.Empty<int>();
+
+                    return Observable.Throw<int>(new InvalidOperationException());
+                })
                 .RepeatWhileEmpty()
                 .ToArray()
                 .ToTask();
@@ -278,6 +294,7 @@ namespace ExRam.Extensions.Tests
         {
             var array = await new[] { 1, 2, 3, 4, 5, 6 }
                 .ToObservable()
+                .RepeatWhileEmpty()
                 .TakeWhileInclusive(x => x < 3)
                 .ToArray()
                 .ToTask();
