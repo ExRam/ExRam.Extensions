@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -35,10 +36,10 @@ namespace System.Linq
         #region FunctionAsyncEnumerator<T>
         private sealed class FunctionAsyncEnumerator<T> : IAsyncEnumerator<T>
         {
-            private bool _isDisposed;
             private readonly Action _disposeFunction;
             private readonly Func<T> _currentFunction;
             private readonly Func<CancellationToken, Task<bool>> _moveNextFunction;
+            private readonly CancellationDisposable _cts = new CancellationDisposable();
 
             private static readonly Task<bool> FalseTask = Task.FromResult(false);
 
@@ -53,20 +54,20 @@ namespace System.Linq
                 this._moveNextFunction = moveNextFunction;
             }
 
-            public Task<bool> MoveNext(CancellationToken cancellationToken)
+            public Task<bool> MoveNext(CancellationToken ct)
             {
-                return this._isDisposed 
+                return this._cts.IsDisposed 
                     ? FunctionAsyncEnumerator<T>.FalseTask 
-                    : this._moveNextFunction(cancellationToken);
+                    : this._moveNextFunction(CancellationTokenSource.CreateLinkedTokenSource(ct, this._cts.Token).Token);
             }
 
             public T Current => this._currentFunction();
 
             public void Dispose()
             {
-                if (!this._isDisposed)
+                if (!this._cts.IsDisposed)
                 {
-                    this._isDisposed = true;
+                    this._cts.Dispose();
                     this._disposeFunction();
                 }
             }
