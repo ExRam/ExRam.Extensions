@@ -29,14 +29,15 @@ namespace ExRam.Extensions.Tests
 
             for (var j = 1; j <= 10; j++)
             {
-                var task = enumerator.MoveNextAsMaybe(CancellationToken.None);
+                var task = enumerator.MoveNext(CancellationToken.None);
                 await Task.Delay(50);
 
                 Assert.IsFalse(task.IsCompleted);
 
                 tcs[(j - 1)].SetResult(null);
 
-                Assert.AreEqual(j, (await task).Value);
+                Assert.IsTrue(await task);
+                Assert.AreEqual(j, enumerator.Current);
             }
         }
         #endregion

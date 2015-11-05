@@ -22,7 +22,10 @@ namespace System.Linq
         {
             using (var enumerator = enumerable.GetEnumerator())
             {
-                return await enumerator.MoveNextAsMaybe(token);
+                if (await enumerator.MoveNext(token))
+                    return enumerator.Current;
+
+                return OptionStrict<T>.Nothing;
             }
         }
     }
