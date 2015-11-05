@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reactive;
+using System.Threading.Tasks;
 using Monad;
 
 namespace System.Linq
@@ -17,31 +18,40 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return AsyncEnumerable
-                .Using(
-                    enumerable.GetEnumerator,
-                    e => AsyncEnumerable
-                        .Repeat(Unit.Default)
-                        .SelectMany((_, ct) => e.MoveNextAsMaybe(ct))
-                        .Select(maybeNotification =>
+            return AsyncEnumerableExtensions.Create(
+                () =>
+                {
+                    var e = enumerable.GetEnumerator();
+                    var current = default(TSource);
+
+                    return AsyncEnumerableExtensions.Create(
+                        ct =>
                         {
-                            if (maybeNotification.HasValue)
-                            {
-                                var notification = maybeNotification.Value;
-
-                                switch (notification.Kind)
+                            return e
+                                .MoveNext(ct)
+                                .ContinueWith(task =>
                                 {
-                                    case (NotificationKind.OnNext):
-                                        return notification.Value;
-                                    case (NotificationKind.OnError):
-                                        throw notification.Exception;
-                                }
-                            }
+                                    if (task.IsFaulted)
+                                        throw task.Exception.InnerException;
 
-                            return OptionStrict<TSource>.Nothing;
-                        }))
-                .TakeWhile(x => x.HasValue)
-                .Select(x => x.Value);;
+                                    if (task.Result)
+                                    {
+                                        if (e.Current.HasValue)
+                                        {
+                                            current = e.Current.Value;
+                                            return true;
+                                        }
+
+                                        if (e.Current.Exception != null)
+                                            throw e.Current.Exception;
+                                    }
+                                    
+                                    return false;
+                                }, TaskContinuationOptions.NotOnCanceled);
+                        },
+                        () => current,
+                        e.Dispose);
+                });
         }
     }
 }

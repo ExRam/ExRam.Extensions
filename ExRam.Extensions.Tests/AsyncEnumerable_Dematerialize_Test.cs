@@ -36,15 +36,15 @@ namespace ExRam.Extensions.Tests
 
         #region AsyncEnumerable_Materialize_handles_OnError_correctly
         [TestMethod]
+        [ExpectedException(typeof(DivideByZeroException))]
         public async Task AsyncEnumerable_Materialize_handles_OnError_correctly()
         {
-            var ex = new DivideByZeroException();
             var enumerable = AsyncEnumerable.Range(0, 3)
-                .Concat(AsyncEnumerable.Throw<int>(ex))
+                .Concat(AsyncEnumerable.Throw<int>(new DivideByZeroException()))
                 .Materialize()
                 .Dematerialize();
 
-            using(var e = enumerable.GetEnumerator())
+            using (var e = enumerable.GetEnumerator())
             {
                 Assert.IsTrue(await e.MoveNext(CancellationToken.None));
                 Assert.AreEqual(0, e.Current);
@@ -54,16 +54,8 @@ namespace ExRam.Extensions.Tests
 
                 Assert.IsTrue(await e.MoveNext(CancellationToken.None));
                 Assert.AreEqual(2, e.Current);
-            
-                try
-                {
-                    await e.MoveNext(CancellationToken.None);
-                    Assert.Fail();
-                }
-                catch(AggregateException)
-                {
-                    
-                }
+
+                await e.MoveNext(CancellationToken.None);
             }
         }
         #endregion
