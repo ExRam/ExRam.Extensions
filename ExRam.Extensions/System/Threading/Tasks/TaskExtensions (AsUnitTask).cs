@@ -11,12 +11,11 @@ namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
     {
-        public static async Task<Unit> AsUnitTask(this Task task)
+        public static Task<Unit> AsUnitTask(this Task task)
         {
             Contract.Requires(task != null);
 
-            await task;
-            return Unit.Default;
+            return task.Then(() => Unit.Default);
         }
     }
 }
