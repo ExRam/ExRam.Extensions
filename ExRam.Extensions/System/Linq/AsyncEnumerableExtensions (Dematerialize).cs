@@ -29,12 +29,9 @@ namespace System.Linq
                         {
                             return e
                                 .MoveNext(ct)
-                                .ContinueWith(task =>
+                                .Then(result =>
                                 {
-                                    if (task.IsFaulted)
-                                        throw task.Exception.InnerException;
-
-                                    if (task.Result)
+                                    if (result)
                                     {
                                         if (e.Current.HasValue)
                                         {
@@ -47,7 +44,7 @@ namespace System.Linq
                                     }
                                     
                                     return false;
-                                }, TaskContinuationOptions.NotOnCanceled);
+                                });
                         },
                         () => current,
                         e.Dispose);

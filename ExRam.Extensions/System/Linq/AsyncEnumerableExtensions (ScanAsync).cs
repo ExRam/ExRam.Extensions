@@ -6,11 +6,8 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Reactive;
-using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;
-using Monad;
 
 namespace System.Linq
 {
@@ -21,27 +18,33 @@ namespace System.Linq
             Contract.Requires(source != null);
             Contract.Requires(accumulator != null);
 
-            return AsyncEnumerable
-                .Using(
-                    source.GetEnumerator,
-                    e =>
-                    {
-                        var acc = seed;
+            return AsyncEnumerableExtensions.Create(
+                () =>
+                {
+                    var acc = seed;
+                    var e = source.GetEnumerator();
 
-                        return AsyncEnumerable
-                            .Repeat(Unit.Default)
-                            .SelectMany(async (_, ct) =>
+                    return AsyncEnumerableExtensions.Create(
+                        ct => e
+                            .MoveNext(ct)
+                            .Then(result =>
                             {
-                                var maybeItem = await e.MoveNextAsMaybe(ct);
+                                if (result)
+                                {
+                                    return accumulator(acc, e.Current, ct)
+                                        .Then(newAcc =>
+                                        {
+                                            acc = newAcc;
 
-                                if (maybeItem.HasValue)
-                                    return acc = await accumulator(acc, maybeItem.Value, ct);
+                                            return true;
+                                        });
+                                }
 
-                                return OptionStrict<TAccumulate>.Nothing;
-                            })
-                            .TakeWhile(x => x.HasValue)
-                            .Select(x => x.Value);
-                    });
+                                return Task.FromResult(false);
+                            }),
+                        () => acc,
+                        e.Dispose);
+                });
         }
     }
 }

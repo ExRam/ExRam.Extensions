@@ -26,11 +26,8 @@ namespace System.Linq
                     var e = enumerable.GetEnumerator();
 
                     return AsyncEnumerableExtensions.Create(
-                        async ct =>
-                        {
-                            await gateTaskFunction(ct);
-                            return await e.MoveNext(ct);
-                        },
+                        ct => gateTaskFunction(ct)
+                            .Then(() => e.MoveNext(ct)),
                         () => e.Current,
                         e.Dispose);
                 });

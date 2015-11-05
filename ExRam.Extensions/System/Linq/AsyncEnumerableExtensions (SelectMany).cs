@@ -15,10 +15,33 @@ namespace System.Linq
     {
         public static IAsyncEnumerable<TResult> SelectMany<TSource, TResult>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, CancellationToken, Task<TResult>> selector)
         {
-            return AsyncEnumerableExtensions
-                .WithCancellation(ct => enumerable
-                    .SelectMany(x => selector(x, ct)
-                    .ToAsyncEnumerable()));
+            return AsyncEnumerableExtensions.Create(
+                () =>
+                {
+                    var current = default(TResult);
+                    var e = enumerable.GetEnumerator();
+
+                    return AsyncEnumerableExtensions.Create(
+                        ct => e
+                            .MoveNext(ct)
+                            .Then(result =>
+                            {
+                                if (result)
+                                {
+                                    return selector(e.Current, ct)
+                                        .Then(newCurrent =>
+                                        {
+                                            current = newCurrent;
+
+                                            return true;
+                                        });
+                                }
+
+                                return Task.FromResult(false);
+                            }),
+                        () => current,
+                        e.Dispose);
+                });
         }
 
         public static IAsyncEnumerable<Unit> SelectMany<TSource>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, CancellationToken, Task> selector)

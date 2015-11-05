@@ -6,7 +6,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Reactive.Disposables;
 using System.Threading.Tasks;
 
 namespace System.Linq
@@ -22,20 +21,11 @@ namespace System.Linq
                 var e = enumerable.GetEnumerator();
 
                 return AsyncEnumerableExtensions.Create(
-                    (ct, tcs) =>
-                    {
-                        e.MoveNext(ct)
-                            .ContinueWith(task =>
-                            {
-                                if (task.IsFaulted)
-                                    tcs.TrySetException(task.Exception.InnerException);
-
-                                if (task.Result)
-                                    tcs.TrySetResult(true);
-                            }, TaskContinuationOptions.NotOnCanceled);
-
-                        return tcs.Task;
-                    },
+                    (ct) => e
+                        .MoveNext(ct)
+                        .Then(result => result 
+                            ? Task.FromResult(true)
+                            : Task.Factory.GetUncompleted<bool>()),
                     () => e.Current,
                     e.Dispose);
             });
