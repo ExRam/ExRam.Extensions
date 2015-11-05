@@ -7,6 +7,8 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reactive;
+using System.Reactive.Disposables;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace System.Linq
@@ -17,14 +19,26 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return AsyncEnumerable
-                .Using(
-                    enumerable.GetEnumerator,
-                    e => AsyncEnumerable
-                        .Repeat(Unit.Default)
-                        .SelectMany((_, ct) => e.MoveNextAsMaybe(ct).TryWithTimeout(timeout))
-                        .TakeWhile(maybe => maybe.HasValue)
-                        .Select(maybe => maybe.Value));
+            return AsyncEnumerableExtensions.Create(
+                () =>
+                {
+                    var e = enumerable.GetEnumerator();
+
+                    return AsyncEnumerableExtensions.Create(
+                        async ct =>
+                        {
+                            using (var cts = new CancellationDisposable())
+                            {
+                                var option = await e
+                                    .MoveNext(CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token).Token)
+                                    .TryWithTimeout(timeout);
+
+                                return option.HasValue && option.Value;
+                            }
+                        },
+                        () => e.Current,
+                        e.Dispose);
+                });
         }
     }
 }
