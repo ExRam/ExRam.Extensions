@@ -37,7 +37,7 @@ namespace System.Linq
                                     if (task.IsFaulted)
                                     {
                                         completed = true;
-                                        current = Notification.CreateOnError<TSource>(task.Exception.GetBaseException());
+                                        current = Notification.CreateOnError<TSource>(task.Exception.InnerException);
                                     }
                                     else if (task.Result)
                                         current = Notification.CreateOnNext(e.Current);
