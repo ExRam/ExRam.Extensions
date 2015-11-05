@@ -37,7 +37,7 @@ namespace System.Linq
                                         });
                                 }
 
-                                return Task.FromResult(false);
+                                return AsyncEnumerableExtensions.FalseTask;
                             }),
                         () => current,
                         e.Dispose);

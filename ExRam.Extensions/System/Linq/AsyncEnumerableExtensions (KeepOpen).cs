@@ -24,7 +24,7 @@ namespace System.Linq
                     (ct) => e
                         .MoveNext(ct)
                         .Then(result => result 
-                            ? Task.FromResult(true)
+                            ? AsyncEnumerableExtensions.TrueTask
                             : Task.Factory.GetUncompleted<bool>()),
                     () => e.Current,
                     e.Dispose);

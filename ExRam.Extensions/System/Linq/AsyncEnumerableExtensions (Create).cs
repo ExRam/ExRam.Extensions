@@ -41,8 +41,6 @@ namespace System.Linq
             private readonly Func<CancellationToken, Task<bool>> _moveNextFunction;
             private readonly CancellationDisposable _cts = new CancellationDisposable();
 
-            private static readonly Task<bool> FalseTask = Task.FromResult(false);
-
             public FunctionAsyncEnumerator(Func<CancellationToken, Task<bool>> moveNextFunction, Func<T> currentFunction, Action disposeFunction)
             {
                 Contract.Requires(moveNextFunction != null);
@@ -57,7 +55,7 @@ namespace System.Linq
             public Task<bool> MoveNext(CancellationToken ct)
             {
                 return this._cts.IsDisposed 
-                    ? FunctionAsyncEnumerator<T>.FalseTask 
+                    ? AsyncEnumerableExtensions.FalseTask 
                     : this._moveNextFunction(CancellationTokenSource.CreateLinkedTokenSource(ct, this._cts.Token).Token);
             }
 
@@ -73,6 +71,9 @@ namespace System.Linq
             }
         }
         #endregion
+
+        private static readonly Task<bool> TrueTask = Task.FromResult(true);
+        private static readonly Task<bool> FalseTask = Task.FromResult(false);
 
         public static IAsyncEnumerable<T> Create<T>(Func<IAsyncEnumerator<T>> enumeratorCreationFunction)
         {
