@@ -20,15 +20,20 @@ namespace System.Linq
             Contract.Requires(enumerable != null);
             Contract.Requires(gateTaskFunction != null);
 
-            return AsyncEnumerable
-                .Using(
-                    enumerable.GetEnumerator,
-                    e => AsyncEnumerable
-                        .Repeat(Unit.Default)
-                        .SelectMany((_, ct) => gateTaskFunction(ct))
-                        .SelectMany((_, ct) => e.MoveNextAsMaybe(ct))
-                        .TakeWhile(x => x.HasValue)
-                        .Select(x => x.Value));
+            return AsyncEnumerableExtensions
+                .Create(() =>
+                {
+                    var e = enumerable.GetEnumerator();
+
+                    return AsyncEnumerableExtensions.Create(
+                        async ct =>
+                        {
+                            await gateTaskFunction(ct);
+                            return await e.MoveNext(ct);
+                        },
+                        () => e.Current,
+                        e.Dispose);
+                });
         }
     }
 }
