@@ -6,6 +6,8 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
+using System.Reactive.Disposables;
+using System.Threading.Tasks;
 
 namespace System.Linq
 {
@@ -15,7 +17,28 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return enumerable.Concat(AsyncEnumerable.Never<T>());
+            return AsyncEnumerableExtensions.Create(() =>
+            {
+                var e = enumerable.GetEnumerator();
+
+                return AsyncEnumerableExtensions.Create(
+                    (ct, tcs) =>
+                    {
+                        e.MoveNext(ct)
+                            .ContinueWith(task =>
+                            {
+                                if (task.IsFaulted)
+                                    tcs.TrySetException(task.Exception.InnerException);
+
+                                if (task.Result)
+                                    tcs.TrySetResult(true);
+                            }, TaskContinuationOptions.NotOnCanceled);
+
+                        return tcs.Task;
+                    },
+                    () => e.Current,
+                    e.Dispose);
+            });
         }
     }
 }

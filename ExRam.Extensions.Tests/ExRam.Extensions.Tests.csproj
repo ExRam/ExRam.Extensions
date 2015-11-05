@@ -88,6 +88,7 @@
     <Compile Include="AsyncEnumerable_Materialize_Test.cs" />
     <Compile Include="AsyncEnumerable_Gate_Test.cs" />
     <Compile Include="AsyncEnumerable_Concat_Test.cs" />
+    <Compile Include="AsyncEnumerable_KeepOpen_Test.cs" />
     <Compile Include="AsyncEnumerable_ScanAsync_Test.cs" />
     <Compile Include="AsyncEnumerable_SelectMany_Test.cs" />
     <Compile Include="AsyncEnumerable_ToStream_Test.cs" />
