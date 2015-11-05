@@ -7,6 +7,7 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reactive;
+using System.Threading.Tasks;
 
 namespace System.Linq
 {
@@ -16,33 +17,42 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return AsyncEnumerable
-                .Using(
-                    enumerable.GetEnumerator,
-                    e =>
-                    {
-                        var completed = false;
+            return AsyncEnumerableExtensions.Create(
+                () =>
+                {
+                    var completed = false;
+                    var e = enumerable.GetEnumerator();
+                    var current = default(Notification<TSource>);
 
-                        return AsyncEnumerable
-                            .Repeat(Unit.Default)
-                            .TakeWhile(_ => !completed)
-                            .SelectMany(async (_, ct) =>
-                            {
-                                try
+                    return AsyncEnumerableExtensions.Create(
+                        ct =>
+                        {
+                            return e
+                                .MoveNext(ct)
+                                .ContinueWith(task =>
                                 {
-                                    var maybe = await e.MoveNextAsMaybe(ct);
+                                    if (completed)
+                                        return false;
 
-                                    return maybe.HasValue 
-                                        ? Notification.CreateOnNext(maybe.Value) 
-                                        : Notification.CreateOnCompleted<TSource>();
-                                }
-                                catch (AggregateException ex)
-                                {
-                                    return Notification.CreateOnError<TSource>(ex.GetBaseException());
-                                }
-                            })
-                            .Do(notification => completed |= !notification.HasValue);
-                    });
+                                    if (task.IsFaulted)
+                                    {
+                                        completed = true;
+                                        current = Notification.CreateOnError<TSource>(task.Exception.GetBaseException());
+                                    }
+                                    else if (task.Result)
+                                        current = Notification.CreateOnNext(e.Current);
+                                    else
+                                    {
+                                        completed = true;
+                                        current = Notification.CreateOnCompleted<TSource>();
+                                    }
+
+                                    return true;
+                                }, TaskContinuationOptions.NotOnCanceled);
+                        },
+                        () => current,
+                        e.Dispose);
+                });
         }
     }
 }
