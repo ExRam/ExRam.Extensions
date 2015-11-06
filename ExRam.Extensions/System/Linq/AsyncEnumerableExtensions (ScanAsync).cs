@@ -27,21 +27,15 @@ namespace System.Linq
                     return AsyncEnumerableExtensions.Create(
                         ct => e
                             .MoveNext(ct)
-                            .Then(result =>
-                            {
-                                if (result)
-                                {
-                                    return accumulator(acc, e.Current, ct)
-                                        .Then(newAcc =>
-                                        {
-                                            acc = newAcc;
+                            .Then(result => result
+                                ? accumulator(acc, e.Current, ct)
+                                    .Then(newAcc =>
+                                    {
+                                        acc = newAcc;
 
-                                            return true;
-                                        });
-                                }
-
-                                return AsyncEnumerableExtensions.FalseTask;
-                            }),
+                                        return true;
+                                    })
+                                : AsyncEnumerableExtensions.FalseTask),
                         () => acc,
                         e);
                 });
