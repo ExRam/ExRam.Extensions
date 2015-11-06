@@ -18,37 +18,38 @@ namespace System.Threading.Tasks
             Contract.Requires(task != null);
 
             return AsyncEnumerableExtensions.Create(
-               () =>
-               {
-                   var completed = false;
+                () =>
+                {
+                    var completed = false;
 
-                   return AsyncEnumerableExtensions.Create(
-                       (ct, tcs) =>
-                       {
-                           if (completed)
-                               tcs.TrySetResult(false);
-                           else
-                           {
-                               task
-                                   .ContinueWith(closureTask =>
-                                   {
-                                       if (closureTask.IsFaulted)
-                                           tcs.TrySetException(closureTask.Exception.InnerExceptions);
-                                       else if (closureTask.IsCanceled)
-                                           tcs.TrySetCanceled();
-                                       else if (closureTask.IsCompleted)
-                                       {
-                                           completed = true;
-                                           tcs.TrySetResult(true);
-                                       }
-                                   }, ct);
-                           }
+                    return AsyncEnumerableExtensions.Create(
+                        (ct, tcs) =>
+                        {
+                            if (completed)
+                                tcs.TrySetResult(false);
+                            else
+                            {
+                                task
+                                    .ContinueWith(
+                                        (closureTask, closureTcs1) =>
+                                        {
+                                            closureTask.HandleTaskCompletionSource(
+                                                (TaskCompletionSource<bool>)closureTcs1,
+                                                closureTcs2 =>
+                                                {
+                                                    completed = true;
+                                                    closureTcs2.TrySetResult(true);
+                                                });
+                                        }, 
+                                        tcs, 
+                                        ct);
+                            }
 
-                           return tcs.Task;
-                       },
-                       () => Unit.Default,
-                       () => {});
-               });
+                            return tcs.Task;
+                        },
+                        () => Unit.Default,
+                        () => { });
+                });
         }
     }
 }
