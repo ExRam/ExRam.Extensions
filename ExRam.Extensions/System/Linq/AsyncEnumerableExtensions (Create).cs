@@ -100,23 +100,23 @@ namespace System.Linq
             return new FunctionAsyncEnumerator<T>(moveNextFunction, currentFunction, disposeFunction);
         }
 
-        public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, TaskCompletionSource<bool>, Task<bool>> moveNextFunction, Func<T> currentFunction, IDisposable disposable)
-        {
-            Contract.Requires(moveNextFunction != null);
-            Contract.Requires(currentFunction != null);
-            Contract.Requires(disposable != null);
-
-            return AsyncEnumerableExtensions.Create(moveNextFunction, currentFunction, disposable.Dispose);
-        }
-
         public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, TaskCompletionSource<bool>, Task<bool>> moveNextFunction, Func<T> currentFunction, Action disposeFunction)
         {
             Contract.Requires(moveNextFunction != null);
             Contract.Requires(currentFunction != null);
             Contract.Requires(disposeFunction != null);
 
+            return AsyncEnumerableExtensions.Create(moveNextFunction, currentFunction, Disposable.Create(disposeFunction));
+        }
+
+        public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, TaskCompletionSource<bool>, Task<bool>> moveNextFunction, Func<T> currentFunction, IDisposable disposable)
+        {
+            Contract.Requires(moveNextFunction != null);
+            Contract.Requires(currentFunction != null);
+            Contract.Requires(disposable != null);
+
             var cts = new CancellationDisposable();
-            var d = new CompositeDisposable(Disposable.Create(disposeFunction), cts);
+            var d = new CompositeDisposable(disposable, cts);
 
             return new FunctionAsyncEnumerator<T>(
                 async ct =>
