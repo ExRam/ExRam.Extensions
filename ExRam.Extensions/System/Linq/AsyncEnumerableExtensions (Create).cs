@@ -39,7 +39,8 @@ namespace System.Linq
             private readonly Action _disposeFunction;
             private readonly Func<T> _currentFunction;
             private readonly Func<CancellationToken, Task<bool>> _moveNextFunction;
-            private readonly CancellationDisposable _cts = new CancellationDisposable();
+
+            private bool _isDisposed;
 
             public FunctionAsyncEnumerator(Func<CancellationToken, Task<bool>> moveNextFunction, Func<T> currentFunction, Action disposeFunction)
             {
@@ -54,18 +55,18 @@ namespace System.Linq
 
             public Task<bool> MoveNext(CancellationToken ct)
             {
-                return this._cts.IsDisposed 
-                    ? AsyncEnumerableExtensions.FalseTask 
-                    : this._moveNextFunction(CancellationTokenSource.CreateLinkedTokenSource(ct, this._cts.Token).Token);
+                return this._isDisposed 
+                    ? AsyncEnumerableExtensions.FalseTask
+                    : this._moveNextFunction(ct);
             }
 
             public T Current => this._currentFunction();
 
             public void Dispose()
             {
-                if (!this._cts.IsDisposed)
+                if (!this._isDisposed)
                 {
-                    this._cts.Dispose();
+                    this._isDisposed = true;
                     this._disposeFunction();
                 }
             }
@@ -97,29 +98,27 @@ namespace System.Linq
             Contract.Requires(currentFunction != null);
             Contract.Requires(disposeFunction != null);
 
-            var ret = default(IAsyncEnumerator<T>);
+            var cts = new CancellationDisposable();
+            var d = new CompositeDisposable(Disposable.Create(disposeFunction), cts);
 
-            ret = new FunctionAsyncEnumerator<T>(
+            return new FunctionAsyncEnumerator<T>(
                 async ct =>
                 {
                     var tcs = new TaskCompletionSource<bool>();
 
                     var registration = ct.Register(() =>
                     {
-                        ret.Dispose();
+                        d.Dispose();
                         tcs.TrySetCanceled();
                     });
 
                     using (registration)
                     {
-                        return await moveNextFunction(ct, tcs);
+                        return await moveNextFunction(cts.Token, tcs);
                     }
                 },
                 currentFunction,
-                disposeFunction
-            );
-
-            return ret;
+                d.Dispose);
         }
     }
 }
