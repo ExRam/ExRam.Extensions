@@ -132,7 +132,7 @@ namespace System.Linq
 
                     using (registration)
                     {
-                        return await moveNextFunction(cts.Token, tcs);
+                        return await moveNextFunction(cts.Token, tcs).ConfigureAwait(false);
                     }
                 },
                 currentFunction,

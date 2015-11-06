@@ -21,7 +21,7 @@ namespace System.Threading.Tasks
 
             using (ct.Register(state => ((TaskCompletionSource<bool>)state).TrySetResult(true), tcs))
             {
-                ret = (task == await Task.WhenAny(task, tcs.Task));
+                ret = (task == await Task.WhenAny(task, tcs.Task).ConfigureAwait(false));
             }
 
             if (ret)
@@ -41,11 +41,11 @@ namespace System.Threading.Tasks
 
             using (ct.Register(state => ((TaskCompletionSource<bool>)state).TrySetResult(true), tcs))
             {
-                ret = (task == await Task.WhenAny(task, tcs.Task));
+                ret = (task == await Task.WhenAny(task, tcs.Task).ConfigureAwait(false));
             }
 
             return ret
-                ? await task
+                ? await task.ConfigureAwait(false)
                 : OptionStrict<TResult>.Nothing;
         }
         #endregion

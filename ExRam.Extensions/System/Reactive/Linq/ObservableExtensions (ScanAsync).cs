@@ -18,7 +18,7 @@ namespace System.Reactive.Linq
             Contract.Requires(accumulator != null);
 
             return source
-                .Scan(Task.FromResult(seed), async (currentTask, value) => await accumulator(await currentTask, value))
+                .Scan(Task.FromResult(seed), async (currentTask, value) => await accumulator(await currentTask.ConfigureAwait(false), value).ConfigureAwait(false))
                 .SelectMany(x => x.ToObservable());
         }
     }

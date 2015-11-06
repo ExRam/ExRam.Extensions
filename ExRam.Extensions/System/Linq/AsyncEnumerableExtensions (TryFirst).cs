@@ -22,7 +22,7 @@ namespace System.Linq
         {
             using (var enumerator = enumerable.GetEnumerator())
             {
-                if (await enumerator.MoveNext(token))
+                if (await enumerator.MoveNext(token).ConfigureAwait(false))
                     return enumerator.Current;
 
                 return OptionStrict<T>.Nothing;

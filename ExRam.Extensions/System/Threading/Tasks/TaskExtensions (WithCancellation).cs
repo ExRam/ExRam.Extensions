@@ -19,7 +19,7 @@ namespace System.Threading.Tasks
         #region WithCancellation(Task<TResult>, CancellationToken)
         public static async Task<TResult> WithCancellation<TResult>(this Task<TResult> task, CancellationToken token)
         {
-            var maybe = await task.TryWithCancellation(token);
+            var maybe = await task.TryWithCancellation(token).ConfigureAwait(false);
 
             if (!maybe.HasValue)
                 throw new TaskCanceledException();

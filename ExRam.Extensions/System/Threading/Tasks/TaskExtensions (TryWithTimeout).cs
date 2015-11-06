@@ -17,7 +17,7 @@ namespace System.Threading.Tasks
             Contract.Requires(task != null);
             Contract.Requires(timeout > TimeSpan.Zero);
 
-            if (task == await Task.WhenAny(task, Task.Delay(timeout)))
+            if (task == await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false))
             {
                 await task;
                 return true;
@@ -33,7 +33,7 @@ namespace System.Threading.Tasks
             Contract.Requires(task != null);
             Contract.Requires(timeout > TimeSpan.Zero);
 
-            if (task == await Task.WhenAny(task, Task.Delay(timeout)))
+            if (task == await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false))
                 return await task;
 
             return OptionStrict<TResult>.Nothing;
@@ -46,7 +46,7 @@ namespace System.Threading.Tasks
             Contract.Requires(task != null);
             Contract.Requires(timeout > TimeSpan.Zero);
 
-            if (task == await Task.WhenAny(task, Task.Delay(timeout)))
+            if (task == await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false))
                 return await task;
 
             return OptionStrict<TResult>.Nothing;

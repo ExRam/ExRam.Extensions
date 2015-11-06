@@ -31,7 +31,8 @@ namespace System.Linq
                             {
                                 var option = await e
                                     .MoveNext(CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token).Token)
-                                    .TryWithTimeout(timeout);
+                                    .TryWithTimeout(timeout)
+                                    .ConfigureAwait(false);
 
                                 return option.HasValue && option.Value;
                             }
