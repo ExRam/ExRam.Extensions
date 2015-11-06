@@ -10,7 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace ExRam.Framework.Tests
+namespace ExRam.Extensions.Tests
 {
     [TestClass]
     public class Task_WithCancellation_Test
