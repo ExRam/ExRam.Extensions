@@ -36,20 +36,20 @@ namespace System.Linq
         #region FunctionAsyncEnumerator<T>
         private sealed class FunctionAsyncEnumerator<T> : IAsyncEnumerator<T>
         {
-            private readonly Action _disposeFunction;
+            private readonly IDisposable _disposable;
             private readonly Func<T> _currentFunction;
             private readonly Func<CancellationToken, Task<bool>> _moveNextFunction;
 
             private bool _isDisposed;
 
-            public FunctionAsyncEnumerator(Func<CancellationToken, Task<bool>> moveNextFunction, Func<T> currentFunction, Action disposeFunction)
+            public FunctionAsyncEnumerator(Func<CancellationToken, Task<bool>> moveNextFunction, Func<T> currentFunction, IDisposable disposable)
             {
                 Contract.Requires(moveNextFunction != null);
                 Contract.Requires(currentFunction != null);
-                Contract.Requires(disposeFunction != null);
+                Contract.Requires(disposable != null);
 
                 this._currentFunction = currentFunction;
-                this._disposeFunction = disposeFunction;
+                this._disposable = disposable;
                 this._moveNextFunction = moveNextFunction;
             }
 
@@ -67,7 +67,7 @@ namespace System.Linq
                 if (!this._isDisposed)
                 {
                     this._isDisposed = true;
-                    this._disposeFunction();
+                    this._disposable.Dispose();
                 }
             }
         }
@@ -82,14 +82,6 @@ namespace System.Linq
 
             return new FunctionAsyncEnumerable<T>(enumeratorCreationFunction);
         }
-        public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, Task<bool>> moveNextFunction, Func<T> currentFunction, IDisposable disposable)
-        {
-            Contract.Requires(moveNextFunction != null);
-            Contract.Requires(currentFunction != null);
-            Contract.Requires(disposable != null);
-
-            return AsyncEnumerableExtensions.Create(moveNextFunction, currentFunction, disposable.Dispose);
-        }
 
         public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, Task<bool>> moveNextFunction, Func<T> currentFunction, Action disposeFunction)
         {
@@ -97,7 +89,16 @@ namespace System.Linq
             Contract.Requires(currentFunction != null);
             Contract.Requires(disposeFunction != null);
 
-            return new FunctionAsyncEnumerator<T>(moveNextFunction, currentFunction, disposeFunction);
+            return AsyncEnumerableExtensions.Create(moveNextFunction, currentFunction, Disposable.Create(disposeFunction));
+        }
+
+        public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, Task<bool>> moveNextFunction, Func<T> currentFunction, IDisposable disposable)
+        {
+            Contract.Requires(moveNextFunction != null);
+            Contract.Requires(currentFunction != null);
+            Contract.Requires(disposable != null);
+
+            return new FunctionAsyncEnumerator<T>(moveNextFunction, currentFunction, disposable );
         }
 
         public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, TaskCompletionSource<bool>, Task<bool>> moveNextFunction, Func<T> currentFunction, Action disposeFunction)
@@ -135,7 +136,7 @@ namespace System.Linq
                     }
                 },
                 currentFunction,
-                d.Dispose);
+                d);
         }
     }
 }
