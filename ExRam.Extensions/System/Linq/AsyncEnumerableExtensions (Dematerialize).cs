@@ -47,7 +47,7 @@ namespace System.Linq
                                 });
                         },
                         () => current,
-                        e.Dispose);
+                        e);
                 });
         }
     }

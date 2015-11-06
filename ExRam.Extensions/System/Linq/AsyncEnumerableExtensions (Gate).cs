@@ -29,7 +29,7 @@ namespace System.Linq
                         ct => gateTaskFunction(ct)
                             .Then(() => e.MoveNext(ct)),
                         () => e.Current,
-                        e.Dispose);
+                        e);
                 });
         }
     }

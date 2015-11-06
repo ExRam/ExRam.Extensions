@@ -31,7 +31,7 @@ namespace System.Linq
                             return tcs.Task;
                         }),
                     () => e.Current,
-                    e.Dispose);
+                    e);
             });
         }
     }

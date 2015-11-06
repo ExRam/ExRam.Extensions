@@ -40,7 +40,7 @@ namespace System.Linq
                                 return AsyncEnumerableExtensions.FalseTask;
                             }),
                         () => current,
-                        e.Dispose);
+                        e);
                 });
         }
 

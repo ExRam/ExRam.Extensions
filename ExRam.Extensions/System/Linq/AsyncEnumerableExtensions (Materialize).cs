@@ -48,7 +48,7 @@ namespace System.Linq
                                 return true;
                             }, TaskContinuationOptions.NotOnCanceled),
                         () => current,
-                        e.Dispose);
+                        e);
                 });
         }
     }

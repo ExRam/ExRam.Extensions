@@ -82,6 +82,14 @@ namespace System.Linq
 
             return new FunctionAsyncEnumerable<T>(enumeratorCreationFunction);
         }
+        public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, Task<bool>> moveNextFunction, Func<T> currentFunction, IDisposable disposable)
+        {
+            Contract.Requires(moveNextFunction != null);
+            Contract.Requires(currentFunction != null);
+            Contract.Requires(disposable != null);
+
+            return AsyncEnumerableExtensions.Create(moveNextFunction, currentFunction, disposable.Dispose);
+        }
 
         public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, Task<bool>> moveNextFunction, Func<T> currentFunction, Action disposeFunction)
         {
@@ -90,6 +98,15 @@ namespace System.Linq
             Contract.Requires(disposeFunction != null);
 
             return new FunctionAsyncEnumerator<T>(moveNextFunction, currentFunction, disposeFunction);
+        }
+
+        public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, TaskCompletionSource<bool>, Task<bool>> moveNextFunction, Func<T> currentFunction, IDisposable disposable)
+        {
+            Contract.Requires(moveNextFunction != null);
+            Contract.Requires(currentFunction != null);
+            Contract.Requires(disposable != null);
+
+            return AsyncEnumerableExtensions.Create(moveNextFunction, currentFunction, disposable.Dispose);
         }
 
         public static IAsyncEnumerator<T> Create<T>(Func<CancellationToken, TaskCompletionSource<bool>, Task<bool>> moveNextFunction, Func<T> currentFunction, Action disposeFunction)
