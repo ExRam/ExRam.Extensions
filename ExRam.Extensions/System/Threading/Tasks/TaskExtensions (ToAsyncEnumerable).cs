@@ -23,18 +23,28 @@ namespace System.Threading.Tasks
                    var completed = false;
 
                    return AsyncEnumerableExtensions.Create(
-                       ct =>
+                       (ct, tcs) =>
                        {
                            if (completed)
-                               return Task.FromResult(false);
+                               tcs.TrySetResult(false);
+                           else
+                           {
+                               task
+                                   .ContinueWith(closureTask =>
+                                   {
+                                       if (closureTask.IsFaulted)
+                                           tcs.TrySetException(closureTask.Exception.InnerExceptions);
+                                       else if (closureTask.IsCanceled)
+                                           tcs.TrySetCanceled();
+                                       else if (closureTask.IsCompleted)
+                                       {
+                                           completed = true;
+                                           tcs.TrySetResult(true);
+                                       }
+                                   }, ct);
+                           }
 
-                           return task
-                               .Then(() =>
-                               {
-                                   completed = true;
-
-                                   return true;
-                               });
+                           return tcs.Task;
                        },
                        () => Unit.Default,
                        () => {});
