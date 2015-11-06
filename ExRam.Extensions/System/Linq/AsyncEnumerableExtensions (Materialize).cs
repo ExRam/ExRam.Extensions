@@ -25,31 +25,28 @@ namespace System.Linq
                     var current = default(Notification<TSource>);
 
                     return AsyncEnumerableExtensions.Create(
-                        ct =>
-                        {
-                            return e
-                                .MoveNext(ct)
-                                .ContinueWith(task =>
+                        ct => e
+                            .MoveNext(ct)
+                            .ContinueWith(task =>
+                            {
+                                if (completed)
+                                    return false;
+
+                                if (task.IsFaulted)
                                 {
-                                    if (completed)
-                                        return false;
+                                    completed = true;
+                                    current = Notification.CreateOnError<TSource>(task.Exception.InnerException);
+                                }
+                                else if (task.Result)
+                                    current = Notification.CreateOnNext(e.Current);
+                                else
+                                {
+                                    completed = true;
+                                    current = Notification.CreateOnCompleted<TSource>();
+                                }
 
-                                    if (task.IsFaulted)
-                                    {
-                                        completed = true;
-                                        current = Notification.CreateOnError<TSource>(task.Exception.InnerException);
-                                    }
-                                    else if (task.Result)
-                                        current = Notification.CreateOnNext(e.Current);
-                                    else
-                                    {
-                                        completed = true;
-                                        current = Notification.CreateOnCompleted<TSource>();
-                                    }
-
-                                    return true;
-                                }, TaskContinuationOptions.NotOnCanceled);
-                        },
+                                return true;
+                            }, TaskContinuationOptions.NotOnCanceled),
                         () => current,
                         e.Dispose);
                 });
