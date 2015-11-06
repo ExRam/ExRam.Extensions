@@ -104,13 +104,13 @@ namespace System.Linq
                 {
                     var tcs = new TaskCompletionSource<bool>();
 
-                    var cancel = new Action(() =>
+                    var registration = ct.Register(() =>
                     {
                         ret.Dispose();
                         tcs.TrySetCanceled();
                     });
 
-                    using (ct.Register(cancel))
+                    using (registration)
                     {
                         return await moveNextFunction(ct, tcs);
                     }
