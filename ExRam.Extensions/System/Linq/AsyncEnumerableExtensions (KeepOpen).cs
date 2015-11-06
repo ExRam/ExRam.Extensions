@@ -21,11 +21,15 @@ namespace System.Linq
                 var e = enumerable.GetEnumerator();
 
                 return AsyncEnumerableExtensions.Create(
-                    (ct) => e
+                    (ct, tcs) => e
                         .MoveNext(ct)
-                        .Then(result => result 
-                            ? AsyncEnumerableExtensions.TrueTask
-                            : Task.Factory.GetUncompleted<bool>()),
+                        .Then(result =>
+                        {
+                            if (result)
+                                tcs.TrySetResult(true);
+
+                            return tcs.Task;
+                        }),
                     () => e.Current,
                     e.Dispose);
             });
