@@ -152,6 +152,7 @@
     <Compile Include="System\Text\EncodingExtensions.cs" />
     <Compile Include="System\Threading\CancellationTokenExtensions.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28HandleTaskCompletionSource%29.cs" />
+    <Compile Include="System\Threading\Tasks\TaskExtensions %28Using%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28Then%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28AsUnitTask%29.cs" />
     <Compile Include="System\Threading\Tasks\TaskExtensions %28AsAsyncEnumerable%29.cs" />
