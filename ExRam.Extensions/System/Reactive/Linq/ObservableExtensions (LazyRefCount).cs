@@ -74,7 +74,7 @@ namespace System.Reactive.Linq
                         outerObserver.OnError,
                         outerObserver.OnCompleted);
 
-                    return new CompositeDisposable(
+                    return StableCompositeDisposable.Create(
                         anonymousObserver,
                         innerObservable
                             .Subscribe(anonymousObserver));

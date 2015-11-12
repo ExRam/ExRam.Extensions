@@ -117,7 +117,7 @@ namespace System.Linq
             Contract.Requires(disposable != null);
 
             var cts = new CancellationDisposable();
-            var d = new CompositeDisposable(disposable, cts);
+            var d = StableCompositeDisposable.Create(disposable, cts);
 
             return new FunctionAsyncEnumerator<T>(
                 async ct =>

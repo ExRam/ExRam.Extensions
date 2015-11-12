@@ -54,7 +54,7 @@ namespace System.Reactive.Linq
                         obs.OnCompleted();
                     });
 
-                return new CompositeDisposable(
+                return StableCompositeDisposable.Create(
                     subscription,
                     Disposable.Create(() =>
                     {
