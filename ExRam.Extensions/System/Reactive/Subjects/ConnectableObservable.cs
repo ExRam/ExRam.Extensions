@@ -2,7 +2,7 @@
 
 namespace System.Reactive.Subjects
 {
-    public static class ConnectableObservable
+    public static partial class ConnectableObservable
     {
         #region FuncConnectableObservable
         private sealed class FuncConnectableObservable<T> : IConnectableObservable<T>
