@@ -22,5 +22,17 @@ namespace ExRam.Extensions.Tests
 
             await unitTask;
         }
+
+        [TestMethod]
+        public async Task ToObservable_produces_value_after_cancellation()
+        {
+            var cts = new CancellationTokenSource();
+            cts.Cancel();
+
+            // ReSharper disable once MethodSupportsCancellation
+            var unitTask = cts.Token.ToObservable().FirstAsync().ToTask();
+
+            await unitTask;
+        }
     }
 }
