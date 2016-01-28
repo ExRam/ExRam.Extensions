@@ -303,6 +303,21 @@ namespace ExRam.Extensions.Tests
         }
         #endregion
 
+        #region TakeWhileInclusive_has_correct_indizes
+        [TestMethod]
+        public async Task TakeWhileInclusive_has_correct_indizes()
+        {
+            var array = await new[] { 0, 1, 2, 3, 4, 4, 5 }
+                .ToObservable()
+                .RepeatWhileEmpty()
+                .TakeWhileInclusive((x, i) => x == i)
+                .ToArray()
+                .ToTask();
+
+            CollectionAssert.AreEqual(new[] { 0, 1, 2, 3, 4, 4 }, array);
+        }
+        #endregion
+
         #region Where_with_async_predicate_does_the_job
         [TestMethod]
         public async Task Where_with_async_predicate_does_the_job()
@@ -321,7 +336,6 @@ namespace ExRam.Extensions.Tests
             CollectionAssert.AreEquivalent(new[] { 2, 4, 6, 8, 0 }, filtered);
         }
         #endregion
-
 
         #region LazyRefCount_connects
         [TestMethod]
@@ -499,7 +513,6 @@ namespace ExRam.Extensions.Tests
             Assert.AreEqual(1, value);
         }
         #endregion
-
 
         [TestMethod]
         public void Debounce_lets_first_value_pass()

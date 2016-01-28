@@ -5,6 +5,7 @@
 // file.
 
 using System.Reactive.Disposables;
+using System.Threading;
 
 namespace System.Reactive.Linq
 {
@@ -12,18 +13,30 @@ namespace System.Reactive.Linq
     {
         public static IObservable<TSource> TakeWhileInclusive<TSource>(this IObservable<TSource> source, Func<TSource, bool> predicate)
         {
+            return source
+                .TakeWhileInclusive((x, i) => predicate(x));
+        }
+
+        public static IObservable<TSource> TakeWhileInclusive<TSource>(this IObservable<TSource> source, Func<TSource, int, bool> predicate)
+        {
             return Observable.Using(
                 () => new SingleAssignmentDisposable(),
                 disposable => Observable.Create<TSource>(
-                    o => disposable.Disposable = source.Subscribe(
-                        x =>
-                        {
-                            o.OnNext(x);
-                            if (!predicate(x))
-                                o.OnCompleted();
-                        },
-                        o.OnError,
-                        o.OnCompleted)));
+                    o =>
+                    {
+                        var index = 0;
+
+                        return disposable.Disposable = source
+                            .Subscribe(
+                            x =>
+                            {
+                                o.OnNext(x);
+                                if (!predicate(x, checked(index++)))
+                                    o.OnCompleted();
+                            },
+                            o.OnError,
+                            o.OnCompleted);
+                    }));
         }
     }
 }
