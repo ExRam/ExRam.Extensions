@@ -5,7 +5,7 @@
 // file.
 
 using System.Diagnostics.Contracts;
-using Monad;
+using LanguageExt;
 
 namespace System.Threading.Tasks
 {
@@ -28,7 +28,7 @@ namespace System.Threading.Tasks
         #endregion
 
         #region TryWithTimeout(Task<TResult>, TimeSpan)
-        public static async Task<OptionStrict<TResult>> TryWithTimeout<TResult>(this Task<TResult> task, TimeSpan timeout)
+        public static async Task<Option<TResult>> TryWithTimeout<TResult>(this Task<TResult> task, TimeSpan timeout)
         {
             Contract.Requires(task != null);
             Contract.Requires(timeout > TimeSpan.Zero);
@@ -36,12 +36,12 @@ namespace System.Threading.Tasks
             if (task == await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false))
                 return await task;
 
-            return OptionStrict<TResult>.Nothing;
+            return Option<TResult>.None;
         }
         #endregion 
 
         #region TryWithTimeout(Task<TResult>, TimeSpan)
-        public static async Task<OptionStrict<TResult>> TryWithTimeout<TResult>(this Task<OptionStrict<TResult>> task, TimeSpan timeout)
+        public static async Task<Option<TResult>> TryWithTimeout<TResult>(this Task<Option<TResult>> task, TimeSpan timeout)
         {
             Contract.Requires(task != null);
             Contract.Requires(timeout > TimeSpan.Zero);
@@ -49,7 +49,7 @@ namespace System.Threading.Tasks
             if (task == await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false))
                 return await task;
 
-            return OptionStrict<TResult>.Nothing;
+            return Option<TResult>.None;
         }
         #endregion 
     }

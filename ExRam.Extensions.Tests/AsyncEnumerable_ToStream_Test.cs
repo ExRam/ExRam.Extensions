@@ -8,36 +8,38 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
+using FluentAssertions;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class AsyncEnumerable_ToStream_Test
     {
         #region AsyncEnumerable_ReadByteAsync_throws_expected_exception
-        [TestMethod]
-        [ExpectedException(typeof(IOException))]
+        [Fact]
         public async Task AsyncEnumerable_ReadByteAsync_throws_expected_exception()
         {
             var throwingEnumerable = AsyncEnumerable.Throw<ArraySegment<byte>>(new IOException());
 
             var stream = throwingEnumerable.ToStream();
 
-            await stream.ReadAsync(new byte[1], 0, 1);
+            stream
+                .Awaiting(_ => _.ReadAsync(new byte[1], 0, 1))
+                .ShouldThrowExactly<IOException>();
         }
         #endregion
 
         #region AsyncEnumerable_ReadByteAsync_throws_expected_exception1
-        [TestMethod]
-        [ExpectedException(typeof(IOException))]
+        [Fact]
         public async Task AsyncEnumerable_ReadByteAsync_throws_expected_exception1()
         {
             var throwingEnumerable = AsyncEnumerable.Throw<ArraySegment<byte>>(new IOException());
 
             var stream = throwingEnumerable.ToStream();
 
-            await stream.ReadAsync(new byte[1], 0, 1);
+            stream
+                .Awaiting(_ => _.ReadAsync(new byte[1], 0, 1))
+                .ShouldThrowExactly<IOException>();
         }
         #endregion
     }

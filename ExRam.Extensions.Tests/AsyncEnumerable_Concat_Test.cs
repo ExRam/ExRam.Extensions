@@ -4,45 +4,45 @@
 // Full License description can be found in the LICENSE
 // file.
 
+using FluentAssertions;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class AsyncEnumerable_Concat_Test
     {
         #region AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_has_values
-        [TestMethod]
+        [Fact]
         public async Task AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_has_values()
         {
             var array = await new[] { 1, 2, 3 }
                 .ToAsyncEnumerable()
-                .Concat(maybe => maybe.Value == 3
+                .Concat(maybe => maybe.Value() == 3
                     ? AsyncEnumerable.Return(4) 
                     : AsyncEnumerable.Return(-1))
                 .ToArray();
 
-            CollectionAssert.AreEqual(new[] { 1, 2, 3, 4 }, array);
+            Assert.Equal(new[] { 1, 2, 3, 4 }, array);
         }
         #endregion
 
         #region AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_is_empty
-        [TestMethod]
+        [Fact]
         public async Task AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_is_empty()
         {
             var array = await AsyncEnumerable.Empty<int>()
-                .Concat(maybe => AsyncEnumerable.Return(!maybe.HasValue ? 1 : 2))
+                .Concat(maybe => AsyncEnumerable.Return(!maybe.IsSome ? 1 : 2))
                 .ToArray();
 
-            CollectionAssert.AreEqual(new[] { 1 }, array);
+            Assert.Equal(new[] { 1 }, array);
         }
         #endregion
 
         #region AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_faults
-        [TestMethod]
+        [Fact]
         public async Task AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_faults()
         {
             var ex = new Exception();
@@ -52,8 +52,13 @@ namespace ExRam.Extensions.Tests
                 .Materialize()
                 .ToArray();
 
-            Assert.AreEqual(1, array.Length);
-            Assert.AreEqual(ex, array[0].Exception);
+            array
+                .Should()
+                .HaveCount(1);
+
+            array[0].Exception
+                .Should()
+                .Be(ex);
         }
         #endregion
     }

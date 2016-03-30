@@ -5,19 +5,20 @@
 // file.
 
 using System;
-using System.Reactive;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Monad;
+using FluentAssertions;
+using LanguageExt;
+using Xunit;
+using Unit = System.Reactive.Unit;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class Task_TryWithCancellation_Test
     {
         #region TryWithCancellation_asynchronously_returns_false_if_cancelled_after_call
-        [TestMethod]
+        [Fact]
         public async Task TryWithCancellation_asynchronously_returns_false_if_cancelled_after_call()
         {
             var cts = new CancellationTokenSource();
@@ -26,12 +27,12 @@ namespace ExRam.Extensions.Tests
 
             cts.Cancel();
 
-            Assert.IsFalse((await cancellationTask).HasValue);
+            Assert.False((await cancellationTask).IsSome);
         }
         #endregion
 
         #region TryWithCancellation_asynchronously_returns_false_if_cancelled_before_call
-        [TestMethod]
+        [Fact]
         public async Task TryWithCancellation_asynchronously_returns_false_if_cancelled_before_call()
         {
             var cts = new CancellationTokenSource();
@@ -41,23 +42,23 @@ namespace ExRam.Extensions.Tests
 
             var cancellationTask = longRunningTask.TryWithCancellation(cts.Token);
 
-            Assert.IsFalse((await cancellationTask).HasValue);
+            Assert.False((await cancellationTask).IsSome);
         }
         #endregion
 
         #region TryWithCancellation_asynchronously_returns_true_if_not_cancelled
-        [TestMethod]
+        [Fact]
         public void TryWithCancellation_asynchronously_returns_true_if_not_cancelled()
         {
             var task = Task.Factory.StartNew(() => Thread.Sleep(100));
             var cts = new CancellationTokenSource();
 
-            Assert.AreEqual(true, task.TryWithCancellation(cts.Token).Result);
+            Assert.Equal(true, task.TryWithCancellation(cts.Token).Result);
         }
         #endregion
 
         #region TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_cancelled_after_call
-        [TestMethod]
+        [Fact]
         public async Task TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_cancelled_after_call()
         {
             var cts = new CancellationTokenSource();
@@ -66,12 +67,12 @@ namespace ExRam.Extensions.Tests
 
             cts.Cancel();
 
-            Assert.IsFalse((await cancellationTask).HasValue);
+            Assert.False((await cancellationTask).IsSome);
         }
         #endregion
 
         #region TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_cancelled_before_call
-        [TestMethod]
+        [Fact]
         public async Task TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_cancelled_before_call()
         {
             var cts = new CancellationTokenSource();
@@ -81,12 +82,12 @@ namespace ExRam.Extensions.Tests
 
             var cancellationTask = longRunningTask.TryWithCancellation(cts.Token);
 
-            Assert.IsFalse((await cancellationTask).HasValue);
+            Assert.False((await cancellationTask).IsSome);
         }
         #endregion
 
         #region TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_not_cancelled
-        [TestMethod]
+        [Fact]
         [Description("Sind die Felder im MaybeCancelled-Objekt aus dem Rückgabe-Task von WithCancellation korrekt, wenn das CancellationToken nicht gecancellt wird, und der Task ganz normal 36 zurückgibt ?")]
         public async Task TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_not_cancelled()
         {
@@ -100,74 +101,75 @@ namespace ExRam.Extensions.Tests
 
             var maybeInt = await task.TryWithCancellation(cts.Token);
 
-            Assert.IsTrue(maybeInt.HasValue);
-            Assert.AreEqual(36, maybeInt.Value);
+            Assert.True(maybeInt.IsSome);
+            Assert.Equal(36, maybeInt.Value());
         }
         #endregion
 
         #region TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_cancelled_after_call
-        [TestMethod]
+        [Fact]
         public async Task TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_cancelled_after_call()
         {
             var cts = new CancellationTokenSource();
-            var longRunningTask = Task.Factory.GetUncompleted<OptionStrict<int>>();
+            var longRunningTask = Task.Factory.GetUncompleted<Option<int>>();
             var cancellationTask = longRunningTask.TryWithCancellation(cts.Token);
 
             cts.Cancel();
 
-            Assert.IsFalse((await cancellationTask).HasValue);
+            Assert.False((await cancellationTask).IsSome);
         }
         #endregion
 
         #region TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_cancelled_before_call
-        [TestMethod]
+        [Fact]
         public async Task TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_cancelled_before_call()
         {
             var cts = new CancellationTokenSource();
-            var longRunningTask = Task.Factory.GetUncompleted<OptionStrict<int>>();
+            var longRunningTask = Task.Factory.GetUncompleted<Option<int>>();
 
             cts.Cancel();
 
             var cancellationTask = longRunningTask.TryWithCancellation(cts.Token);
 
-            Assert.IsFalse((await cancellationTask).HasValue);
+            Assert.False((await cancellationTask).IsSome);
         }
         #endregion
 
         #region TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_not_cancelled
-        [TestMethod]
+        [Fact]
         public async Task TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_not_cancelled()
         {
             var task = Task.Factory.StartNew(() =>
             {
                 Thread.Sleep(100);
-                return (OptionStrict<int>)36;
+                return (Option<int>)36;
             });
 
             var cts = new CancellationTokenSource();
 
             var maybeInt = await task.TryWithCancellation(cts.Token);
 
-            Assert.IsTrue(maybeInt.HasValue);
-            Assert.AreEqual(36, maybeInt.Value);
+            Assert.True(maybeInt.IsSome);
+            Assert.Equal(36, maybeInt.Value());
         }
         #endregion
 
         #region TryWithCancellation_throws_if_called_on_cancelled_task
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task TryWithCancellation_throws_if_called_on_cancelled_task()
         {
             var cts = new CancellationTokenSource();
             var longRunningTask = Task.Factory.GetCanceled<Unit>();
             var cancellationTask = longRunningTask.TryWithCancellation(cts.Token);
 
-            await cancellationTask;
+            cancellationTask
+                .Awaiting(_ => _)
+                .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
 
         #region Exceptions_Are_Propagated_Through_TryWithCancellation_Of_Task
-        [TestMethod]
+        [Fact]
         public async Task Exceptions_Are_Propagated_Through_TryWithCancellation_Of_Task()
         {
             var ex = new ApplicationException();
@@ -177,20 +179,15 @@ namespace ExRam.Extensions.Tests
                 throw ex;
             };
 
-            try
-            {
-                await faultingTaskFunc().TryWithCancellation(CancellationToken.None);
-                Assert.Fail();
-            }
-            catch (ApplicationException ex2)
-            {
-                Assert.AreEqual(ex, ex2);
-            }
+            faultingTaskFunc
+                .Awaiting(_ => _().TryWithCancellation(CancellationToken.None))
+                .ShouldThrowExactly<ApplicationException>()
+                .Where(ex2 => ex == ex2);
         }
         #endregion
 
         #region Exceptions_Are_Propagated_Through_TryWithCancellation_With_Task_Of_Int
-        [TestMethod]
+        [Fact]
         public async Task Exceptions_Are_Propagated_Through_TryWithCancellation_With_Task_Of_Int()
         {
             var ex = new ApplicationException();
@@ -200,15 +197,10 @@ namespace ExRam.Extensions.Tests
                 throw ex;
             };
 
-            try
-            {
-                await faultingTaskFunc().TryWithCancellation(CancellationToken.None);
-                Assert.Fail();
-            }
-            catch (ApplicationException ex2)
-            {
-                Assert.AreEqual(ex, ex2);
-            }
+            faultingTaskFunc
+                .Awaiting(_ => _().TryWithCancellation(CancellationToken.None))
+                .ShouldThrowExactly<ApplicationException>()
+                .Where(ex2 => ex == ex2);
         }
         #endregion
     }

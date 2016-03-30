@@ -5,17 +5,17 @@
 // file.
 
 using System.Collections.Generic;
-using Monad;
+using LanguageExt;
 
 namespace System.Linq
 {
     public static partial class AsyncEnumerableExtensions
     {
-        public static IAsyncEnumerable<T> SelectValueWhereAvailable<T>(this IAsyncEnumerable<OptionStrict<T>> enumerable)
+        public static IAsyncEnumerable<T> SelectValueWhereAvailable<T>(this IAsyncEnumerable<Option<T>> enumerable)
         {
             return enumerable
-                .Where(x => x.HasValue)
-                .Select(x => x.Value);
+                .Where(x => x.IsSome)
+                .Select(x => x.Value());
         }
     }
 }

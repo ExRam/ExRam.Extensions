@@ -7,14 +7,13 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class AsyncEnumerable_KeepOpen_Test
     {
-        [TestMethod]
+        [Fact]
         public async Task Final_MoveNext_does_not_complete()
         {
             var source = AsyncEnumerable
@@ -25,14 +24,14 @@ namespace ExRam.Extensions.Tests
             {
                 for (var i = 1; i <= 10; i++)
                 {
-                    Assert.IsTrue(await e.MoveNext(CancellationToken.None));
-                    Assert.AreEqual(i, e.Current);
+                    Assert.True(await e.MoveNext(CancellationToken.None));
+                    Assert.Equal(i, e.Current);
                 }
 
                 var lastTask = e.MoveNext(CancellationToken.None);
                 await Task.Delay(200);
 
-                Assert.IsFalse(lastTask.IsCompleted);
+                Assert.False(lastTask.IsCompleted);
             }
         }
     }

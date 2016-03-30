@@ -5,7 +5,7 @@
 // file.
 
 using System.Diagnostics.Contracts;
-using Monad;
+using LanguageExt;
 
 namespace System.Threading.Tasks
 {
@@ -29,7 +29,7 @@ namespace System.Threading.Tasks
         #endregion
 
         #region Swallow<TException>(Task<Result>)
-        public static async Task<OptionStrict<TResult>> Swallow<TException, TResult>(this Task<OptionStrict<TResult>> task) where TException : Exception
+        public static async Task<Option<TResult>> Swallow<TException, TResult>(this Task<Option<TResult>> task) where TException : Exception
         {
             Contract.Requires(task != null);
 
@@ -41,11 +41,11 @@ namespace System.Threading.Tasks
             catch (TException)
             // ReSharper restore EmptyGeneralCatchClause
             {
-                return OptionStrict<TResult>.Nothing;
+                return Option<TResult>.None;
             }
         }
 
-        public static async Task<OptionStrict<TResult>> Swallow<TException, TResult>(this Task<TResult> task) where TException : Exception
+        public static async Task<Option<TResult>> Swallow<TException, TResult>(this Task<TResult> task) where TException : Exception
         {
             Contract.Requires(task != null);
 
@@ -57,13 +57,13 @@ namespace System.Threading.Tasks
             catch (TException)
             // ReSharper restore EmptyGeneralCatchClause
             {
-                return OptionStrict<TResult>.Nothing;
+                return Option<TResult>.None;
             }
         }
         #endregion
 
         #region Swallow(Task<TResult>)
-        public static async Task<OptionStrict<TResult>> Swallow<TResult>(this Task<OptionStrict<TResult>> task)
+        public static async Task<Option<TResult>> Swallow<TResult>(this Task<Option<TResult>> task)
         {
             Contract.Requires(task != null);
 
@@ -73,11 +73,11 @@ namespace System.Threading.Tasks
             }
             catch
             {
-                return OptionStrict<TResult>.Nothing;
+                return Option<TResult>.None;
             }
         }
 
-        public static async Task<OptionStrict<TResult>> Swallow<TResult>(this Task<TResult> task)
+        public static async Task<Option<TResult>> Swallow<TResult>(this Task<TResult> task)
         {
             Contract.Requires(task != null);
 
@@ -87,7 +87,7 @@ namespace System.Threading.Tasks
             }
             catch
             {
-                return OptionStrict<TResult>.Nothing;
+                return Option<TResult>.None;
             }
         }
         #endregion

@@ -7,13 +7,13 @@
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reactive;
-using Monad;
+using LanguageExt;
 
 namespace System.Linq
 {
     public static partial class AsyncEnumerableExtensions
     {
-        public static IAsyncEnumerable<T> Concat<T>(this IAsyncEnumerable<T> source, Func<OptionStrict<T>, IAsyncEnumerable<T>> continuationSelector)
+        public static IAsyncEnumerable<T> Concat<T>(this IAsyncEnumerable<T> source, Func<Option<T>, IAsyncEnumerable<T>> continuationSelector)
         {
             Contract.Requires(source != null);
             Contract.Requires(continuationSelector != null);
@@ -41,7 +41,7 @@ namespace System.Linq
 
                     return tuple.Previous != null
                         ? continuationSelector(tuple.Previous.Value)
-                        : continuationSelector(OptionStrict<T>.Nothing);
+                        : continuationSelector(Option<T>.None);
                 });
         }
     }

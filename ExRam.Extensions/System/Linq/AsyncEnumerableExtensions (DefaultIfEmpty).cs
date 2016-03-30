@@ -16,7 +16,7 @@ namespace System.Linq
             Contract.Requires(source != null);
             Contract.Requires(defaultObservable != null);
 
-            return source.Concat(maybe => !maybe.HasValue ? defaultObservable : AsyncEnumerable.Empty<T>());
+            return source.Concat(maybe => !maybe.IsSome ? defaultObservable : AsyncEnumerable.Empty<T>());
         }
     }
 }

@@ -7,15 +7,14 @@
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class AsyncEnumerable_SelectMany_Test
     {
         #region AsyncEnumerable_SelectMany_Works
-        [TestMethod]
+        [Fact]
         public async Task AsyncEnumerable_SelectMany_Works()
         {
             var array = await new[] { 1, 2, 3 }.ToAsyncEnumerable()
@@ -26,14 +25,14 @@ namespace ExRam.Extensions.Tests
                 })
                 .ToArray(CancellationToken.None);
 
-            Assert.AreEqual("1", array[0]);
-            Assert.AreEqual("2", array[1]);
-            Assert.AreEqual("3", array[2]);
+            Assert.Equal("1", array[0]);
+            Assert.Equal("2", array[1]);
+            Assert.Equal("3", array[2]);
         }
         #endregion
 
         #region AsyncEnumerable_SelectMany_Calls_Selector_InOrder
-        [TestMethod]
+        [Fact]
         public async Task AsyncEnumerable_SelectMany_Calls_Selector_InOrder()
         {
             var counter = 0;
@@ -42,15 +41,15 @@ namespace ExRam.Extensions.Tests
                 .SelectMany(async (x, ct) =>
                 {
                     await Task.Delay(50, ct);
-                    Assert.AreEqual(x, Interlocked.Increment(ref counter));
+                    Assert.Equal(x, Interlocked.Increment(ref counter));
 
                     return x.ToString();
                 })
                 .ToArray(CancellationToken.None);
 
-            Assert.AreEqual("1", array[0]);
-            Assert.AreEqual("2", array[1]);
-            Assert.AreEqual("3", array[2]);
+            Assert.Equal("1", array[0]);
+            Assert.Equal("2", array[1]);
+            Assert.Equal("3", array[2]);
         }
         #endregion
     }

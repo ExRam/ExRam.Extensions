@@ -5,18 +5,18 @@
 // file.
 
 using System;
-using System.Reactive;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Monad;
+using LanguageExt;
+using Xunit;
+using Unit = System.Reactive.Unit;
+using FluentAssertions;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class Task_TryWithTimeout_Test
     {
         #region Completed_Task_TryWithTimeout_Completes
-        [TestMethod]
+        [Fact]
         public async Task Completed_Task_TryWithTimeout_Completes()
         {
             var completedTask = Task.FromResult(0);
@@ -25,223 +25,247 @@ namespace ExRam.Extensions.Tests
         #endregion
 
         #region Completed_TaskOfInt_TryWithTimeout_Completes
-        [TestMethod]
+        [Fact]
         public async Task Completed_TaskOfInt_TryWithTimeout_Completes()
         {
             var completedTask = Task.FromResult(36);
-            Assert.AreEqual(36, await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500)));
+            Assert.Equal(36, await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500)));
         }
         #endregion
 
         #region Completed_TaskOfMaybeOfInt_TryWithTimeout_Completes
-        [TestMethod]
+        [Fact]
         public async Task Completed_TaskOfMaybeOfInt_TryWithTimeout_Completes()
         {
-            var completedTask = Task.FromResult<OptionStrict<int>>(36);
-            Assert.AreEqual(36, (await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).Value);
+            var completedTask = Task.FromResult<Option<int>>(36);
+            Assert.Equal(36, (await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).Value());
         }
         #endregion
 
         #region Faulted_Task_TryWithTimeout_Faults
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public async Task Faulted_Task_TryWithTimeout_Faults()
         {
             var completedTask = Task.Factory.GetFaulted<Unit>(new InvalidOperationException());
-            await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            completedTask
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .ShouldThrowExactly<InvalidOperationException>();
         }
         #endregion
 
         #region Faulted_TaskOfInt_TryWithTimeout_Faults
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public async Task Faulted_TaskOfInt_TryWithTimeout_Faults()
         {
             var completedTask = Task.Factory.GetFaulted<int>(new InvalidOperationException());
-            await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            completedTask
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .ShouldThrowExactly<InvalidOperationException>();
         }
         #endregion
 
         #region Faulted_TaskOfMaybeOfInt_TryWithTimeout_Faults
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public async Task Faulted_TaskOfMaybeOfInt_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<OptionStrict<int>>(new InvalidOperationException());
-            await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+            var completedTask = Task.Factory.GetFaulted<Option<int>>(new InvalidOperationException());
+
+            completedTask
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .ShouldThrowExactly<InvalidOperationException>();
         }
         #endregion
 
         #region Canceled_Task_TryWithTimeout_Faults
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task Canceled_Task_TryWithTimeout_Faults()
         {
             var completedTask = Task.Factory.GetCanceled<Unit>();
-            await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            completedTask
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
 
         #region Canceled_TaskOfInt_TryWithTimeout_Faults
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task Canceled_TaskOfInt_TryWithTimeout_Faults()
         {
             var completedTask = Task.Factory.GetCanceled<int>();
-            await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            completedTask
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
 
         #region Canceled_TaskOfMaybeOfInt_TryWithTimeout_Faults
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task Canceled_TaskOfMaybeOfInt_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetCanceled<OptionStrict<int>>();
-            await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+            var completedTask = Task.Factory.GetCanceled<Option<int>>();
+
+            completedTask
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
 
         #region Uncompleted_Task_TryWithTimeout_returns_unset_Maybe
-        [TestMethod]
+        [Fact]
         public async Task Uncompleted_Task_TryWithTimeout_returns_unset_Maybe()
         {
             var uncompletedTask = Task.Factory.GetUncompleted<Unit>();
-            Assert.IsFalse((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.False((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
         }
         #endregion
 
         #region Uncompleted_TaskOfInt_TryWithTimeout_returns_unset_Maybe
-        [TestMethod]
+        [Fact]
         public async Task Uncompleted_TaskOfInt_TryWithTimeout_returns_unset_Maybe()
         {
             var uncompletedTask = Task.Factory.GetUncompleted<int>();
-            Assert.IsFalse((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.False((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
         }
         #endregion
 
         #region Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_returns_unset_Maybe
-        [TestMethod]
+        [Fact]
         public async Task Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_returns_unset_Maybe()
         {
-            var uncompletedTask = Task.Factory.GetUncompleted<OptionStrict<int>>();
-            Assert.IsFalse((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            var uncompletedTask = Task.Factory.GetUncompleted<Option<int>>();
+            Assert.False((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
         }
         #endregion
 
         #region Uncompleted_Task_TryWithTimeout_can_complete_afterwards
-        [TestMethod]
+        [Fact]
         public async Task Uncompleted_Task_TryWithTimeout_can_complete_afterwards()
         {
             var tcs = new TaskCompletionSource<object>();
 
-            Assert.IsFalse((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
             tcs.SetResult(new object());
 
             var next = await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
-            Assert.IsTrue((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.True((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
         }
         #endregion
 
         #region Uncompleted_Task_TryWithTimeout_can_fault_afterwards
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public async Task Uncompleted_Task_TryWithTimeout_can_fault_afterwards()
         {
             var tcs = new TaskCompletionSource<object>();
 
-            Assert.IsFalse((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
             tcs.SetException(new InvalidOperationException());
-            await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            tcs.Task
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .ShouldThrowExactly<InvalidOperationException>();
         }
         #endregion
 
         #region Uncompleted_Task_TryWithTimeout_can_be_canceled_afterwards
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task Uncompleted_Task_TryWithTimeout_can_be_canceled_afterwards()
         {
             var tcs = new TaskCompletionSource<object>();
 
-            Assert.IsFalse((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
             tcs.SetCanceled();
-            await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            tcs.Task
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
 
         #region Uncompleted_TaskOfInt_TryWithTimeout_can_complete_afterwards
-        [TestMethod]
+        [Fact]
         public async Task Uncompleted_TaskOfInt_TryWithTimeout_can_complete_afterwards()
         {
             var tcs = new TaskCompletionSource<int>();
 
-            Assert.IsFalse((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
             tcs.SetResult(36);
-            Assert.IsTrue((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.True((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
         }
         #endregion
 
         #region Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_can_complete_afterwards
-        [TestMethod]
+        [Fact]
         public async Task Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_can_complete_afterwards()
         {
-            var tcs = new TaskCompletionSource<OptionStrict<int>>();
+            var tcs = new TaskCompletionSource<Option<int>>();
 
-            Assert.IsFalse((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
             tcs.SetResult(36);
-            Assert.IsTrue((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.True((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
         }
         #endregion
 
         #region Uncompleted_TaskOfInt_TryWithTimeout_can_fault_afterwards
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public async Task Uncompleted_TaskOfInt_TryWithTimeout_can_fault_afterwards()
         {
             var tcs = new TaskCompletionSource<int>();
 
             await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
             tcs.SetException(new InvalidOperationException());
-            await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            tcs.Task
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .ShouldThrowExactly<InvalidOperationException>();
         }
         #endregion
 
         #region Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_can_fault_afterwards
-        [TestMethod]
-        [ExpectedException(typeof(InvalidOperationException))]
+        [Fact]
         public async Task Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_can_fault_afterwards()
         {
-            var tcs = new TaskCompletionSource<OptionStrict<int>>();
+            var tcs = new TaskCompletionSource<Option<int>>();
 
             await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
             tcs.SetException(new InvalidOperationException());
-            await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            tcs.Task
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .ShouldThrowExactly<InvalidOperationException>();
         }
         #endregion
 
         #region Uncompleted_TaskOfInt_TryWithTimeout_can_be_canceled_afterwards
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task Uncompleted_TaskOfInt_TryWithTimeout_can_be_canceled_afterwards()
         {
             var tcs = new TaskCompletionSource<int>();
 
-            Assert.IsFalse((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
             tcs.SetCanceled();
-            await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            tcs.Task
+               .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+               .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
 
         #region Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_can_be_canceled_afterwards
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_can_be_canceled_afterwards()
         {
-            var tcs = new TaskCompletionSource<OptionStrict<int>>();
+            var tcs = new TaskCompletionSource<Option<int>>();
 
-            Assert.IsFalse((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).HasValue);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
             tcs.SetCanceled();
-            await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            tcs.Task
+               .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+               .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
     }

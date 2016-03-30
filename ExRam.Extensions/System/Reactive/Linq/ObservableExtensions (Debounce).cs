@@ -7,7 +7,9 @@
 using System.Diagnostics.Contracts;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
-using Monad;
+using LanguageExt;
+using LanguageExt.SomeHelp;
+using LanguageExt.Trans;
 
 namespace System.Reactive.Linq
 {
@@ -47,7 +49,7 @@ namespace System.Reactive.Linq
                             var isCompleted = false;
                             var isDebouncing = false;
                             var syncRoot = new object();
-                            OptionStrict<T> latestValue;
+                            Option<T> latestValue;
 
                             return source
                                 .Subscribe(
@@ -59,7 +61,7 @@ namespace System.Reactive.Linq
                                             {
                                                 isDebouncing = true;
 
-                                                latestValue = OptionStrict<T>.Nothing;
+                                                latestValue = Option<T>.None;
                                                 obs.OnNext(value);
 
                                                 serial.Disposable = scheduler.Schedule(value, debounceInterval, (self, state) =>
@@ -68,14 +70,14 @@ namespace System.Reactive.Linq
                                                     {
                                                         isDebouncing = false;
 
-                                                        if ((!isCompleted) && (emitLatestValue) && (latestValue.HasValue))
-                                                            obs.OnNext(latestValue.Value);
+                                                        if ((!isCompleted) && (emitLatestValue) && (latestValue.IsSome))
+                                                            obs.OnNext(latestValue.Value());
                                                     }
                                                 });
                                             }
                                             else
                                             {
-                                                latestValue = value.ToOptionStrict();
+                                                latestValue = value.ToSome();
                                             }
                                         }
                                     },

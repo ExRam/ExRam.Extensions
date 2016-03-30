@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics.Contracts;
 using System.Reactive;
 using System.Threading.Tasks;
-using Monad;
 
 namespace System.Linq
 {

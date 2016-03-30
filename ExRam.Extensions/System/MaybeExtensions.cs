@@ -1,15 +1,17 @@
-﻿using System.Diagnostics.Contracts;
-using Monad;
+﻿using LanguageExt;
 
 namespace System
 {
     public static class MaybeExtensions
     {
-        public static T? ToNullable<T>(this OptionStrict<T> maybe) where T : struct
+        private static class FailFunctionHolder<T>
         {
-            Contract.Requires(maybe != null);
-
-            return ((maybe.HasValue) ? (maybe.Value) : (new T?()));
+            public static readonly Func<T> FailFunction = () =>
+            {
+                throw new ValueIsNoneException();
+            };
         }
+
+        public static T Value<T>(this Option<T> self) => self.IfNone(FailFunctionHolder<T>.FailFunction);
     }
 }

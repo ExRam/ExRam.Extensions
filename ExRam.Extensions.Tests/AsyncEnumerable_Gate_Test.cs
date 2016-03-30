@@ -8,15 +8,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class AsyncEnumerable_Gate_Test
     {
         #region AsyncEnumerable_Gate_Works
-        [TestMethod]
+        [Fact]
         public async Task AsyncEnumerable_Gate_Works()
         {
             var i = 0;
@@ -32,12 +31,12 @@ namespace ExRam.Extensions.Tests
                 var task = enumerator.MoveNext(CancellationToken.None);
                 await Task.Delay(50);
 
-                Assert.IsFalse(task.IsCompleted);
+                Assert.False(task.IsCompleted);
 
                 tcs[(j - 1)].SetResult(null);
 
-                Assert.IsTrue(await task);
-                Assert.AreEqual(j, enumerator.Current);
+                Assert.True(await task);
+                Assert.Equal(j, enumerator.Current);
             }
         }
         #endregion

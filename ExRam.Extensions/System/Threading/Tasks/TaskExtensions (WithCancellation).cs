@@ -21,10 +21,10 @@ namespace System.Threading.Tasks
         {
             var maybe = await task.TryWithCancellation(token).ConfigureAwait(false);
 
-            if (!maybe.HasValue)
+            if (!maybe.IsSome)
                 throw new TaskCanceledException();
 
-            return maybe.Value;
+            return maybe.Value();
         }
         #endregion
     }

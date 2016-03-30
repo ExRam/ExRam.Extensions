@@ -9,7 +9,7 @@ using System.Reactive.Disposables;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
-using Monad;
+using LanguageExt;
 
 namespace System.Reactive.Linq
 {
@@ -23,9 +23,9 @@ namespace System.Reactive.Linq
             return source
                 .SelectMany(x => predicate(x)
                     .ToObservable()
-                    .Select(b => b ? x : OptionStrict<T>.Nothing))
-                .Where(x => x.HasValue)
-                .Select(x => x.Value);
+                    .Select(b => b ? x : Option<T>.None))
+                .Where(x => x.IsSome)
+                .Select(x => x.Value());
         }
 
         public static IObservable<T> Where<T>(this IObservable<T> source, Func<T, CancellationToken, Task<bool>> predicate)
@@ -38,9 +38,9 @@ namespace System.Reactive.Linq
                     .WithCancellation(
                         ct => predicate(x, ct)
                             .ToObservable()
-                            .Select(b => b ? x : OptionStrict<T>.Nothing)))
-                .Where(x => x.HasValue)
-                .Select(x => x.Value);
+                            .Select(b => b ? x : Option<T>.None)))
+                .Where(x => x.IsSome)
+                .Select(x => x.Value());
         }
     }
 }

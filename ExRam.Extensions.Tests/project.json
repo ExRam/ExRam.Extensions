@@ -1,0 +1,22 @@
+﻿{
+  "version": "1.0.0-*",
+  "description": "ExRam.Extensions.Tests",
+  "authors": [ "dw_000" ],
+  "tags": [ "" ],
+  "projectUrl": "",
+  "licenseUrl": "",
+  "dependencies": {
+    "ExRam.Extensions": "1.0.0-*",
+    "FluentAssertions": "4.2.2",
+    "xunit": "2.1.0",
+    "xunit.runner.dnx": "2.1.0-rc1-build204",
+    "Moq": "4.2.1510.2205",
+    "LanguageExt.Core": "1.7.32"
+  },
+  "commands": {
+    "test": "xunit.runner.dnx"
+  },
+  "frameworks": {
+    "dnx451": { }
+  }
+}

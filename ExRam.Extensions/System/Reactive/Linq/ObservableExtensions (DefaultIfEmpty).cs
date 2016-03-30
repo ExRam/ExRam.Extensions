@@ -15,7 +15,7 @@ namespace System.Reactive.Linq
             Contract.Requires(source != null);
             Contract.Requires(defaultObservable != null);
 
-            return source.Concat(maybe => !maybe.HasValue ? defaultObservable : Observable.Empty<T>());
+            return source.Concat(maybe => !maybe.IsSome ? defaultObservable : Observable.Empty<T>());
         }
     }
 }

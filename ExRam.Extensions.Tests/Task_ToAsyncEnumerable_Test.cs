@@ -7,28 +7,27 @@
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
+using FluentAssertions;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class Task_ToAsyncEnumerable_Test
     {
-        [TestMethod]
+        [Fact]
         public async Task ToAsyncEnumerable_completes()
         {
             var tcs = new TaskCompletionSource<bool>();
 
             var task = ((Task)tcs.Task).ToAsyncEnumerable().First();
 
-            Assert.IsFalse(task.IsCompleted);
+            Assert.False(task.IsCompleted);
             tcs.SetResult(true);
 
             await task;
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(DivideByZeroException))]
+        [Fact]
         public async Task ToAsyncEnumerable_forwards_exception()
         {
             var tcs = new TaskCompletionSource<bool>();
@@ -37,18 +36,13 @@ namespace ExRam.Extensions.Tests
                 .ToAsyncEnumerable()
                 .First();
 
-            Assert.IsFalse(task.IsCompleted);
+            Assert.False(task.IsCompleted);
             tcs.SetException(new DivideByZeroException());
 
-            try
-            {
-                await task;
-            }
-            catch(AggregateException ex)
-            {
-                throw ex.GetBaseException();
-            }
+            task
+                .Awaiting(_ => _)
+                .ShouldThrowExactly<AggregateException>()
+                .Where(ex => ex.GetBaseException() is DivideByZeroException);
         }
-        
     }
 }

@@ -8,16 +8,15 @@ using System;
 using System.Reactive;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using FluentAssertions;
+using Xunit;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class Task_WithCancellation_Test
     {
         #region WithCancellation_throws_if_cancelled_after_call
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task WithCancellation_throws_if_cancelled_after_call()
         {
             var cts = new CancellationTokenSource();
@@ -26,13 +25,14 @@ namespace ExRam.Extensions.Tests
 
             cts.Cancel();
 
-            await cancellationTask;
+            cancellationTask
+                .Awaiting(_ => _)
+                .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
 
         #region WithCancellation_throws_if_cancelled_before_call
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task WithCancellation_throws_if_cancelled_before_call()
         {
             var cts = new CancellationTokenSource();
@@ -42,12 +42,14 @@ namespace ExRam.Extensions.Tests
 
             var cancellationTask = longRunningTask.WithCancellation(cts.Token);
 
-            await cancellationTask;
+            cancellationTask
+                .Awaiting(_ => _)
+                .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
 
         #region WithCancellation_succeeds_if_not_cancelled
-        [TestMethod]
+        [Fact]
         public async Task WithCancellation_succeeds_if_not_cancelled()
         {
             var task = Task.Factory.StartNew(() => Thread.Sleep(100));
@@ -58,8 +60,7 @@ namespace ExRam.Extensions.Tests
         #endregion
 
         #region WithCancellation_with_TaskOfInt_throws_if_cancelled_after_call
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task WithCancellation_with_TaskOfInt_throws_if_cancelled_after_call()
         {
             var cts = new CancellationTokenSource();
@@ -68,13 +69,14 @@ namespace ExRam.Extensions.Tests
 
             cts.Cancel();
 
-            await cancellationTask;
+            cancellationTask
+                .Awaiting(_ => _)
+                .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
 
         #region WithCancellation_with_TaskOfInt_throws_if_cancelled_before_call
-        [TestMethod]
-        [ExpectedException(typeof(TaskCanceledException))]
+        [Fact]
         public async Task WithCancellation_with_TaskOfInt_throws_if_cancelled_before_call()
         {
             var cts = new CancellationTokenSource();
@@ -84,12 +86,14 @@ namespace ExRam.Extensions.Tests
 
             var cancellationTask = longRunningTask.WithCancellation(cts.Token);
 
-            await cancellationTask;
+            cancellationTask
+                .Awaiting(_ => _)
+                .ShouldThrowExactly<TaskCanceledException>();
         }
         #endregion
 
         #region WithCancellation_with_TaskOfInt_succeeds_if_not_cancelled
-        [TestMethod]
+        [Fact]
         public async Task WithCancellation_with_TaskOfInt_succeeds_if_not_cancelled()
         {
             var task = Task.Factory.StartNew(() =>
@@ -100,12 +104,12 @@ namespace ExRam.Extensions.Tests
 
             var cts = new CancellationTokenSource();
 
-            Assert.AreEqual(36, await task.WithCancellation(cts.Token));
+            Assert.Equal(36, await task.WithCancellation(cts.Token));
         }
         #endregion
 
         #region Exceptions_Are_Propagated_Through_WithCancellation_Of_Task
-        [TestMethod]
+        [Fact]
         public async Task Exceptions_Are_Propagated_Through_WithCancellation_Of_Task()
         {
             var ex = new ApplicationException();
@@ -115,20 +119,15 @@ namespace ExRam.Extensions.Tests
                 throw ex;
             };
 
-            try
-            {
-                await faultingTaskFunc().WithCancellation(CancellationToken.None);
-                Assert.Fail();
-            }
-            catch (ApplicationException ex2)
-            {
-                Assert.AreEqual(ex, ex2);
-            }
+            faultingTaskFunc
+                .Awaiting(_ => _().TryWithCancellation(CancellationToken.None))
+                .ShouldThrowExactly<ApplicationException>()
+                .Where(ex2 => ex == ex2);
         }
         #endregion
 
         #region Exceptions_Are_Propagated_Through_WithCancellation_With_Task_Of_Int
-        [TestMethod]
+        [Fact]
         public async Task Exceptions_Are_Propagated_Through_WithCancellation_With_Task_Of_Int()
         {
             var ex = new ApplicationException();
@@ -138,20 +137,15 @@ namespace ExRam.Extensions.Tests
                 throw ex;
             };
 
-            try
-            {
-                await faultingTaskFunc().WithCancellation(CancellationToken.None);
-                Assert.Fail();
-            }
-            catch (ApplicationException ex2)
-            {
-                Assert.AreEqual(ex, ex2);
-            }
+            faultingTaskFunc
+                .Awaiting(_ => _().TryWithCancellation(CancellationToken.None))
+                .ShouldThrowExactly<ApplicationException>()
+                .Where(ex2 => ex == ex2);
         }
         #endregion
 
         #region Exceptions_Are_Propagated_Through_Nested_TryWithCancellation_With_Task_Of_Int
-        [TestMethod]
+        [Fact]
         public async Task Exceptions_Are_Propagated_Through_Nested_TryWithCancellation_With_Task_Of_Int()
         {
             var ex = new ApplicationException();
@@ -161,18 +155,12 @@ namespace ExRam.Extensions.Tests
                 throw ex;
             };
 
-            try
-            {
-                await faultingTaskFunc()
+            faultingTaskFunc
+                .Awaiting(_ => _()
                     .TryWithCancellation(CancellationToken.None)
-                    .TryWithCancellation(CancellationToken.None);
-
-                Assert.Fail();
-            }
-            catch (ApplicationException ex2)
-            {
-                Assert.AreEqual(ex, ex2);
-            }
+                    .TryWithCancellation(CancellationToken.None))
+                .ShouldThrowExactly<ApplicationException>()
+                .Where(ex2 => ex == ex2);
         }
         #endregion
     }

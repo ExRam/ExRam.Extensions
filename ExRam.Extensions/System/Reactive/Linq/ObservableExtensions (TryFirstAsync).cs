@@ -5,18 +5,18 @@
 // file.
 
 using System.Diagnostics.Contracts;
-using Monad;
+using LanguageExt;
 
 namespace System.Reactive.Linq
 {
     public static partial class ObservableExtensions
     {
-        public static IObservable<OptionStrict<T>> TryFirstAsync<T>(this IObservable<T> source)
+        public static IObservable<Option<T>> TryFirstAsync<T>(this IObservable<T> source)
         {
             Contract.Requires(source != null);
 
             return source
-                .Select(x => (OptionStrict<T>)x)
+                .Select(x => (Option<T>)x)
                 .FirstOrDefaultAsync();
         }
     }

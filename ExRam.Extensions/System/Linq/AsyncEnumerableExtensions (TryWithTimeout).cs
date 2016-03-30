@@ -34,7 +34,7 @@ namespace System.Linq
                                     .TryWithTimeout(timeout)
                                     .ConfigureAwait(false);
 
-                                return option.HasValue && option.Value;
+                                return option.IsSome && option.Value();
                             }
                         },
                         () => e.Current,

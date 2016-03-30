@@ -8,15 +8,14 @@ using System;
 using System.Linq;
 using System.Reactive;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class AsyncEnumerable_Materialize_Test
     {
         #region AsyncEnumerable_Materialize_handles_OnNext_correctly
-        [TestMethod]
+        [Fact]
         public async Task AsyncEnumerable_Materialize_handles_OnNext_correctly()
         {
             var notifications = await AsyncEnumerable.Range(0, 100)
@@ -24,18 +23,18 @@ namespace ExRam.Extensions.Tests
                 .Take(10)
                 .ToArray();
 
-            Assert.AreEqual(10, notifications.Length);
-            Assert.IsTrue(notifications.All(x => x.Kind == NotificationKind.OnNext));
+            Assert.Equal(10, notifications.Length);
+            Assert.True(notifications.All(x => x.Kind == NotificationKind.OnNext));
 
             for(var i = 0; i < notifications.Length; i++)
             {
-                Assert.AreEqual(i, notifications[i].Value);
+                Assert.Equal(i, notifications[i].Value);
             }
         }
         #endregion
 
         #region AsyncEnumerable_Materialize_handles_OnCompleted_correctly
-        [TestMethod]
+        [Fact]
         public async Task AsyncEnumerable_Materialize_handles_OnCompleted_correctly()
         {
             var notifications = await AsyncEnumerable.Range(0, 100)
@@ -43,22 +42,22 @@ namespace ExRam.Extensions.Tests
                 .Materialize()
                 .ToArray();
 
-            Assert.AreEqual(11, notifications.Length);
+            Assert.Equal(11, notifications.Length);
 
             for (var i = 0; i < notifications.Length - 1; i++)
             {
-                Assert.AreEqual(NotificationKind.OnNext, notifications[i].Kind);
-                Assert.AreEqual(i, notifications[i].Value);
+                Assert.Equal(NotificationKind.OnNext, notifications[i].Kind);
+                Assert.Equal(i, notifications[i].Value);
             }
 
             var lastNotificaton = notifications.Last();
 
-            Assert.AreEqual(NotificationKind.OnCompleted, lastNotificaton.Kind);
+            Assert.Equal(NotificationKind.OnCompleted, lastNotificaton.Kind);
         }
         #endregion
 
         #region AsyncEnumerable_Materialize_handles_OnError_correctly
-        [TestMethod]
+        [Fact]
         public async Task AsyncEnumerable_Materialize_handles_OnError_correctly()
         {
             var ex = new DivideByZeroException();
@@ -68,18 +67,18 @@ namespace ExRam.Extensions.Tests
                 .Materialize()
                 .ToArray();
 
-            Assert.AreEqual(11, notifications.Length);
+            Assert.Equal(11, notifications.Length);
 
             for (var i = 0; i < notifications.Length - 1; i++)
             {
-                Assert.AreEqual(NotificationKind.OnNext, notifications[i].Kind);
-                Assert.AreEqual(i, notifications[i].Value);
+                Assert.Equal(NotificationKind.OnNext, notifications[i].Kind);
+                Assert.Equal(i, notifications[i].Value);
             }
 
             var lastNotificaton = notifications.Last();
 
-            Assert.AreEqual(NotificationKind.OnError, lastNotificaton.Kind);
-            Assert.AreEqual(ex, lastNotificaton.Exception);
+            Assert.Equal(NotificationKind.OnError, lastNotificaton.Kind);
+            Assert.Equal(ex, lastNotificaton.Exception);
         }
         #endregion
     }

@@ -6,14 +6,13 @@
 
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 
 namespace ExRam.Extensions.Tests
 {
-    [TestClass]
     public class AsyncEnumerable_ScanAsync_Test
     {
-        [TestMethod]
+        [Fact]
         public async Task ScanAsync_behaves_like_scan()
         {
             var source = AsyncEnumerable.Range(1, 10);
@@ -33,7 +32,7 @@ namespace ExRam.Extensions.Tests
                     })
                 .ToArray();
 
-            CollectionAssert.AreEqual(array1, array2);
+            Assert.Equal(array1, array2);
         }
     }
 }

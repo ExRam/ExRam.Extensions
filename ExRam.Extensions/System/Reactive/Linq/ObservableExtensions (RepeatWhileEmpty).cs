@@ -33,7 +33,7 @@ namespace System.Reactive.Linq
                 return Observable.Empty<T>();
 
             return source
-                .Concat(maybe => !maybe.HasValue ? source.RepeatWhileEmpty(repeatCount - 1) : Observable.Empty<T>());
+                .Concat(maybe => !maybe.IsSome ? source.RepeatWhileEmpty(repeatCount - 1) : Observable.Empty<T>());
         }
     }
 }

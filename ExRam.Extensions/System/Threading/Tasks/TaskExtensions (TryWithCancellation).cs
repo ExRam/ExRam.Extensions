@@ -5,7 +5,7 @@
 // file.
 
 using System.Diagnostics.Contracts;
-using Monad;
+using LanguageExt;
 
 namespace System.Threading.Tasks
 {
@@ -32,7 +32,7 @@ namespace System.Threading.Tasks
         #endregion
 
         #region TryWithCancellation(Task<TResult>, CancellationToken)
-        public static async Task<OptionStrict<TResult>> TryWithCancellation<TResult>(this Task<TResult> task, CancellationToken ct)
+        public static async Task<Option<TResult>> TryWithCancellation<TResult>(this Task<TResult> task, CancellationToken ct)
         {
             Contract.Requires(task != null);
 
@@ -46,18 +46,18 @@ namespace System.Threading.Tasks
 
             return ret
                 ? await task.ConfigureAwait(false)
-                : OptionStrict<TResult>.Nothing;
+                : Option<TResult>.None;
         }
         #endregion
 
         #region TryWithCancellation(Task<Maybe<TResult>>, CancellationToken)
-        public static async Task<OptionStrict<TResult>> TryWithCancellation<TResult>(this Task<OptionStrict<TResult>> task, CancellationToken token)
+        public static async Task<Option<TResult>> TryWithCancellation<TResult>(this Task<Option<TResult>> task, CancellationToken token)
         {
-            var maybe = await task.TryWithCancellation<OptionStrict<TResult>>(token);
-            if ((maybe.HasValue) && (maybe.Value.HasValue))
-                return maybe.Value.Value;
+            var maybe = await task.TryWithCancellation<Option<TResult>>(token);
+            if ((maybe.IsSome) && (maybe.Value().IsSome))
+                return maybe.Value().Value();
 
-            return OptionStrict<TResult>.Nothing;
+            return Option<TResult>.None;
         }
         #endregion
     }

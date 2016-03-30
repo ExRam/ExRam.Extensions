@@ -27,7 +27,7 @@ namespace System.Threading.Tasks
         {
             Contract.Requires(task != null);
 
-            if (!(await task.TryWithTimeout(timeout).ConfigureAwait(false)).HasValue)
+            if (!(await task.TryWithTimeout(timeout).ConfigureAwait(false)).IsSome)
                 throw new TimeoutException();
 
             return await task;

@@ -7,25 +7,25 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using Monad;
+using LanguageExt;
 
 namespace System.Linq
 {
     public static partial class AsyncEnumerableExtensions
     {
-        public static Task<OptionStrict<T>> TryFirst<T>(this IAsyncEnumerable<T> enumerable)
+        public static Task<Option<T>> TryFirst<T>(this IAsyncEnumerable<T> enumerable)
         {
             return enumerable.TryFirst(CancellationToken.None);
         }
 
-        public static async Task<OptionStrict<T>> TryFirst<T>(this IAsyncEnumerable<T> enumerable, CancellationToken token)
+        public static async Task<Option<T>> TryFirst<T>(this IAsyncEnumerable<T> enumerable, CancellationToken token)
         {
             using (var enumerator = enumerable.GetEnumerator())
             {
                 if (await enumerator.MoveNext(token).ConfigureAwait(false))
                     return enumerator.Current;
 
-                return OptionStrict<T>.Nothing;
+                return Option<T>.None;
             }
         }
     }
