@@ -71,7 +71,7 @@ namespace System.Reactive.Linq
                                                         isDebouncing = false;
 
                                                         if ((!isCompleted) && (emitLatestValue) && (latestValue.IsSome))
-                                                            obs.OnNext(latestValue.Value());
+                                                            obs.OnNext(latestValue.GetValue());
                                                     }
                                                 });
                                             }

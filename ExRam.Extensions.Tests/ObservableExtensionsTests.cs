@@ -194,7 +194,7 @@ namespace ExRam.Extensions.Tests
         {
             var array = await new[] { 1, 2, 3 }
                 .ToObservable()
-                .Concat(maybe => maybe.Value() == 3 ? Observable.Return(4) : Observable.Return(-1))
+                .Concat(maybe => maybe.GetValue() == 3 ? Observable.Return(4) : Observable.Return(-1))
                 .ToArray()
                 .ToTask();
 

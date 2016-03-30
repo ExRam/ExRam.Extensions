@@ -4,14 +4,12 @@ namespace System
 {
     public static class MaybeExtensions
     {
-        private static class FailFunctionHolder<T>
+        public static T GetValue<T>(this Option<T> self)
         {
-            public static readonly Func<T> FailFunction = () =>
-            {
-                throw new ValueIsNoneException();
-            };
-        }
+            if (self.IsNone)
+                throw new InvalidOperationException();
 
-        public static T Value<T>(this Option<T> self) => self.IfNone(FailFunctionHolder<T>.FailFunction);
+            return self.IfNoneUnsafe(default(Func<T>));
+        }
     }
 }

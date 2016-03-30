@@ -25,7 +25,7 @@ namespace System.Reactive.Linq
                     .ToObservable()
                     .Select(b => b ? x : Option<T>.None))
                 .Where(x => x.IsSome)
-                .Select(x => x.Value());
+                .Select(x => x.GetValue());
         }
 
         public static IObservable<T> Where<T>(this IObservable<T> source, Func<T, CancellationToken, Task<bool>> predicate)
@@ -40,7 +40,7 @@ namespace System.Reactive.Linq
                             .ToObservable()
                             .Select(b => b ? x : Option<T>.None)))
                 .Where(x => x.IsSome)
-                .Select(x => x.Value());
+                .Select(x => x.GetValue());
         }
     }
 }

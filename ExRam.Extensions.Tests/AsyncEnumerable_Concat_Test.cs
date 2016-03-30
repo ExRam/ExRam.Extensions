@@ -20,7 +20,7 @@ namespace ExRam.Extensions.Tests
         {
             var array = await new[] { 1, 2, 3 }
                 .ToAsyncEnumerable()
-                .Concat(maybe => maybe.Value() == 3
+                .Concat(maybe => maybe.GetValue() == 3
                     ? AsyncEnumerable.Return(4) 
                     : AsyncEnumerable.Return(-1))
                 .ToArray();

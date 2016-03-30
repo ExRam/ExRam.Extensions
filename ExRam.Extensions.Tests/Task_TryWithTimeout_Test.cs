@@ -38,7 +38,7 @@ namespace ExRam.Extensions.Tests
         public async Task Completed_TaskOfMaybeOfInt_TryWithTimeout_Completes()
         {
             var completedTask = Task.FromResult<Option<int>>(36);
-            Assert.Equal(36, (await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).Value());
+            Assert.Equal(36, (await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).GetValue());
         }
         #endregion
 

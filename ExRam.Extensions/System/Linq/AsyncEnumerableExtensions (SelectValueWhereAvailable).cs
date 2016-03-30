@@ -15,7 +15,7 @@ namespace System.Linq
         {
             return enumerable
                 .Where(x => x.IsSome)
-                .Select(x => x.Value());
+                .Select(x => x.GetValue());
         }
     }
 }

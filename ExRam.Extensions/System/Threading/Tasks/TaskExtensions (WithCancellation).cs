@@ -24,7 +24,7 @@ namespace System.Threading.Tasks
             if (!maybe.IsSome)
                 throw new TaskCanceledException();
 
-            return maybe.Value();
+            return maybe.GetValue();
         }
         #endregion
     }
