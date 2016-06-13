@@ -482,7 +482,7 @@
           "lib/net35/xunit.runner.utility.desktop.dll": {}
         }
       },
-      "ExRam.Extensions/1.1.0": {
+      "ExRam.Extensions/1.2.0": {
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
@@ -1274,7 +1274,7 @@
         "xunit.runner.utility.nuspec"
       ]
     },
-    "ExRam.Extensions/1.1.0": {
+    "ExRam.Extensions/1.2.0": {
       "type": "project",
       "path": "../ExRam.Extensions/project.json",
       "msbuildProject": "../ExRam.Extensions/ExRam.Extensions.xproj"
