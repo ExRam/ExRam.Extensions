@@ -2,33 +2,18 @@
   "version": "1.1.0-*",
   "description": "ExRam.Extensions",
   "authors": [ "Daniel C. Weber" ],
-  "tags": [ "" ],
-  "projectUrl": "",
-  "licenseUrl": "",
   "frameworks": {
-    "net45": {
-      "frameworkAssemblies": {
-        "System.Core": "4.0.0.0"
-      }
-    },
-    "net46": {
-      "frameworkAssemblies": {
-        "System.Core": "4.0.0.0"
-      }
-    },
-    "dnx451": { },
-    "dnx461": { },
-    "dnxcore50": {
+     "netstandard1.1": {
+      "imports": [ "dnxcore50", "portable-net45+win8" ],
       "dependencies": {
-        "System.Runtime": "4.0.20",
-        "System.ObjectModel": "4.0.10",
-        "System.ComponentModel": "4.0.0",
-        "System.Diagnostics.Contracts": "4.0.0"
+        "System.Diagnostics.Contracts": "4.0.0",
+        "System.ObjectModel": "4.0.0",
+        "System.ComponentModel": "4.0.0"
       }
     }
   },
   "dependencies": {
-    "LanguageExt.Core": "1.7.32",
+    "LanguageExt.Core": "1.8.2-alpha",
     "Ix-Async": "1.2.5",
     "Rx-Linq": "2.3.0-beta2"
   }
