@@ -49,19 +49,6 @@
           "lib/net45/FluentAssertions.dll": {}
         }
       },
-      "Ix-Async/1.2.5": {
-        "type": "package",
-        "frameworkAssemblies": [
-          "System",
-          "System.Core"
-        ],
-        "compile": {
-          "lib/net45/System.Interactive.Async.dll": {}
-        },
-        "runtime": {
-          "lib/net45/System.Interactive.Async.dll": {}
-        }
-      },
       "LanguageExt.Core/1.8.2-alpha": {
         "type": "package",
         "dependencies": {
@@ -372,6 +359,19 @@
           "lib/net45/_._": {}
         }
       },
+      "System.Interactive.Async/3.0.0-beta-00397": {
+        "type": "package",
+        "frameworkAssemblies": [
+          "System",
+          "System.Core"
+        ],
+        "compile": {
+          "lib/net45/System.Interactive.Async.dll": {}
+        },
+        "runtime": {
+          "lib/net45/System.Interactive.Async.dll": {}
+        }
+      },
       "System.IO/4.0.10": {
         "type": "package",
         "compile": {
@@ -486,11 +486,11 @@
         "type": "project",
         "framework": ".NETStandard,Version=v1.1",
         "dependencies": {
-          "Ix-Async": "1.2.5",
           "LanguageExt.Core": "1.8.2-alpha",
           "Rx-Linq": "2.3.0-beta2",
           "System.ComponentModel": "4.0.0",
           "System.Diagnostics.Contracts": "4.0.0",
+          "System.Interactive.Async": "3.0.0-beta-00397",
           "System.ObjectModel": "4.0.0"
         },
         "compile": {
@@ -615,20 +615,6 @@
         "lib/xamarin.ios/FluentAssertions.Core.dll",
         "lib/xamarin.ios/FluentAssertions.Core.pdb",
         "lib/xamarin.ios/FluentAssertions.Core.xml"
-      ]
-    },
-    "Ix-Async/1.2.5": {
-      "sha512": "8EXO8q7cpDUH9G2q+UOPOO/6uZ9aN7mx/4xjFIfkp+qLWVJiYuglkRhjY8Ggs2CucXzHR8GHnovJKB5yQoYaJg==",
-      "type": "package",
-      "files": [
-        "Ix-Async.1.2.5.nupkg.sha512",
-        "Ix-Async.nuspec",
-        "lib/net40/System.Interactive.Async.XML",
-        "lib/net40/System.Interactive.Async.dll",
-        "lib/net45/System.Interactive.Async.XML",
-        "lib/net45/System.Interactive.Async.dll",
-        "lib/portable-windows8+net45+wp8/System.Interactive.Async.XML",
-        "lib/portable-windows8+net45+wp8/System.Interactive.Async.dll"
       ]
     },
     "LanguageExt.Core/1.8.2-alpha": {
@@ -1035,6 +1021,22 @@
         "ref/wp80/_._",
         "ref/wpa81/_._",
         "runtimes/win8-aot/lib/netcore50/System.Diagnostics.Contracts.dll"
+      ]
+    },
+    "System.Interactive.Async/3.0.0-beta-00397": {
+      "sha512": "jfa5hd3paAOVKwMU6/w033/PyagC0wqZUQePUK4udWpO4Ns+hr3LcA+Cj6jGUKsH2sjx+KF6jqNvppWtI4dy9w==",
+      "type": "package",
+      "files": [
+        "System.Interactive.Async.3.0.0-beta-00397.nupkg.sha512",
+        "System.Interactive.Async.nuspec",
+        "lib/net40/System.Interactive.Async.dll",
+        "lib/net40/System.Interactive.Async.pdb",
+        "lib/net45/System.Interactive.Async.dll",
+        "lib/net45/System.Interactive.Async.pdb",
+        "lib/netstandard1.0/System.Interactive.Async.dll",
+        "lib/netstandard1.0/System.Interactive.Async.pdb",
+        "lib/sl5/System.Interactive.Async.dll",
+        "lib/sl5/System.Interactive.Async.pdb"
       ]
     },
     "System.IO/4.0.10": {
