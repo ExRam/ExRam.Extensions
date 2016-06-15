@@ -101,8 +101,11 @@ namespace ExRam.Extensions.Tests
 
             var maybeInt = await task.TryWithCancellation(cts.Token);
 
-            Assert.True(maybeInt.IsSome);
-            Assert.Equal(36, maybeInt.GetValue());
+            maybeInt.IsSome.Should().BeTrue();
+            maybeInt.IfSome(val =>
+            {
+                val.Should().Be(36);
+            });
         }
         #endregion
 
@@ -149,8 +152,11 @@ namespace ExRam.Extensions.Tests
 
             var maybeInt = await task.TryWithCancellation(cts.Token);
 
-            Assert.True(maybeInt.IsSome);
-            Assert.Equal(36, maybeInt.GetValue());
+            maybeInt.IsSome.Should().BeTrue();
+            maybeInt.IfSome(val =>
+            {
+                val.Should().Be(36);
+            });
         }
         #endregion
 

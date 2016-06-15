@@ -37,8 +37,12 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Completed_TaskOfMaybeOfInt_TryWithTimeout_Completes()
         {
-            var completedTask = Task.FromResult<Option<int>>(36);
-            Assert.Equal(36, (await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).GetValue());
+            var maybeValue = await Task
+                .FromResult<Option<int>>(36)
+                .TryWithTimeout(TimeSpan.FromMilliseconds(500));
+
+            maybeValue.IsSome.Should().BeTrue();
+            maybeValue.IfSome(val => val.Should().Be(36));
         }
         #endregion
 
