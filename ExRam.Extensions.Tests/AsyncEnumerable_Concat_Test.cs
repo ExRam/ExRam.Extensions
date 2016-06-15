@@ -20,9 +20,11 @@ namespace ExRam.Extensions.Tests
         {
             var array = await new[] { 1, 2, 3 }
                 .ToAsyncEnumerable()
-                .Concat(maybe => maybe.GetValue() == 3
-                    ? AsyncEnumerable.Return(4) 
-                    : AsyncEnumerable.Return(-1))
+                .Concat(maybe => maybe
+                    .Filter(x => x == 3)
+                    .Match(
+                        _ => AsyncEnumerable.Return(4), 
+                        () => AsyncEnumerable.Return(-1)))
                 .ToArray();
 
             Assert.Equal(new[] { 1, 2, 3, 4 }, array);
