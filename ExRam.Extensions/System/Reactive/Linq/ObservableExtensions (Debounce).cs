@@ -49,7 +49,7 @@ namespace System.Reactive.Linq
                             var isCompleted = false;
                             var isDebouncing = false;
                             var syncRoot = new object();
-                            Option<T> latestValue;
+                            Option<T> maybeLatestValue;
 
                             return source
                                 .Subscribe(
@@ -61,7 +61,7 @@ namespace System.Reactive.Linq
                                             {
                                                 isDebouncing = true;
 
-                                                latestValue = Option<T>.None;
+                                                maybeLatestValue = Option<T>.None;
                                                 obs.OnNext(value);
 
                                                 serial.Disposable = scheduler.Schedule(value, debounceInterval, (self, state) =>
@@ -70,14 +70,14 @@ namespace System.Reactive.Linq
                                                     {
                                                         isDebouncing = false;
 
-                                                        if ((!isCompleted) && (emitLatestValue) && (latestValue.IsSome))
-                                                            obs.OnNext(latestValue.GetValue());
+                                                        if (!isCompleted && emitLatestValue)
+                                                            maybeLatestValue.IfSome(latestValue => obs.OnNext(latestValue));
                                                     }
                                                 });
                                             }
                                             else
                                             {
-                                                latestValue = value.ToSome();
+                                                maybeLatestValue = value.ToSome();
                                             }
                                         }
                                     },
