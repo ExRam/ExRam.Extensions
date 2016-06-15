@@ -54,10 +54,8 @@ namespace System.Threading.Tasks
         public static async Task<Option<TResult>> TryWithCancellation<TResult>(this Task<Option<TResult>> task, CancellationToken token)
         {
             var maybe = await task.TryWithCancellation<Option<TResult>>(token);
-            if ((maybe.IsSome) && (maybe.GetValue().IsSome))
-                return maybe.GetValue().GetValue();
 
-            return Option<TResult>.None;
+            return maybe.Bind(x => x);
         }
         #endregion
     }
