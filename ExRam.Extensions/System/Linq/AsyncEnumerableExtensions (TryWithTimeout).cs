@@ -34,7 +34,7 @@ namespace System.Linq
                                     .TryWithTimeout(timeout)
                                     .ConfigureAwait(false);
 
-                                return option.IsSome && option.GetValue();
+                                return option.Exists(_ => _);
                             }
                         },
                         () => e.Current,
