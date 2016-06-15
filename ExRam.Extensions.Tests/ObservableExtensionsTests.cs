@@ -323,11 +323,12 @@ namespace ExRam.Extensions.Tests
             var source = new[]{ 8, 2, 6, 5, 0, 1, 9, 7, 3, 4}.ToObservable();
 
             var filtered = await source
-                .Where(async x =>
-                {
-                    await Task.Delay(x * 10);
-                    return x % 2 == 0;
-                })
+                .Where(
+                    async (x, ct) =>
+                    {
+                        await Task.Delay(x * 10, ct);
+                        return x % 2 == 0;
+                    })
                 .ToArray()
                 .ToTask();
 
