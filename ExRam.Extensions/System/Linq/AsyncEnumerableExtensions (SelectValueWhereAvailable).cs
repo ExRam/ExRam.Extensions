@@ -14,8 +14,7 @@ namespace System.Linq
         public static IAsyncEnumerable<T> SelectValueWhereAvailable<T>(this IAsyncEnumerable<Option<T>> enumerable)
         {
             return enumerable
-                .Where(x => x.IsSome)
-                .Select(x => x.GetValue());
+                .SelectMany(maybe => maybe.ToAsyncEnumerable());
         }
     }
 }
