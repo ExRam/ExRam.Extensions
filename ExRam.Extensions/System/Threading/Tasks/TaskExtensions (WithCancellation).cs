@@ -21,10 +21,8 @@ namespace System.Threading.Tasks
         {
             var maybe = await task.TryWithCancellation(token).ConfigureAwait(false);
 
-            if (!maybe.IsSome)
-                throw new TaskCanceledException();
-
-            return maybe.GetValue();
+            return maybe
+                .IfNone(() => { throw new TaskCanceledException(); });
         }
         #endregion
     }
