@@ -3,7 +3,7 @@
   "description": "ExRam.Extensions.Tests",
   "authors": [ "dw_000" ],
   "dependencies": {
-    "ExRam.Extensions": "1.5.0-*",
+    "ExRam.Extensions": "1.5.1-*",
     "FluentAssertions": "4.2.2",
     "xunit": "2.1.0",
     "dotnet-test-xunit": "1.0.0-rc2-build10025",

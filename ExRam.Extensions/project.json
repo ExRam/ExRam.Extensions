@@ -1,5 +1,5 @@
 {
-  "version": "1.5.0-*",
+  "version": "1.5.1-*",
   "description": "ExRam.Extensions",
   "authors": [ "Daniel C. Weber" ],
   "frameworks": {
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "LanguageExt.Core": "1.9.1",
-    "System.Interactive.Async": "3.0.0",
-    "System.Reactive.Linq": "3.0.0"
+    "System.Interactive.Async": "3.1.0",
+    "System.Reactive.Linq": "3.1.0"
   }
 }
