@@ -5,18 +5,17 @@
   "dependencies": {
     "ExRam.Extensions": "1.5.1-*",
     "FluentAssertions": "4.2.2",
-    "xunit": "2.1.0",
-    "dotnet-test-xunit": "1.0.0-rc2-build10025",
     "Moq": "4.2.1510.2205",
     "LanguageExt.Core": "1.9.1",
-    "System.IO": "4.0.10"
+    "System.IO": "4.0.10",
+    "dotnet-test-xunit": "2.2.0-preview2-build1029",
+    "xunit": "2.2.0-beta4-build3444"
   },
   "testRunner": "xunit",
   "frameworks": {
     "net46": {
       "dependencies": {
-        "Microsoft.NETCore.Platforms": "1.0.1"
-      }
+        "Microsoft.NETCore.Platforms": "1.0.1" }
     }
   }
 }
