@@ -1,10 +1,10 @@
 {
-  "version": "1.6.0-*",
+  "version": "1.6.1-*",
   "description": "ExRam.Extensions",
   "authors": [ "Daniel C. Weber" ],
   "frameworks": {
-    "netstandard1.6": {
-      "imports": [ "dnxcore50", "portable-net45+win8" ],
+    "netstandard1.3": {
+      "imports": [ "portable-net45+win8" ],
       "dependencies": {
         "System.Diagnostics.Contracts": "4.0.1",
         "System.ObjectModel": "4.0.12",
@@ -16,7 +16,7 @@
     }
   },
   "dependencies": {
-    "LanguageExt.Core": "1.9.1",
+    "LanguageExt.Core": "1.9.7",
     "System.Interactive.Async": "3.1.0",
     "System.Reactive.Linq": "3.1.0"
   }

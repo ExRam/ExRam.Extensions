@@ -3,10 +3,9 @@
   "description": "ExRam.Extensions.Tests",
   "authors": [ "dw_000" ],
   "dependencies": {
-    "ExRam.Extensions": "1.5.1-*",
+    "ExRam.Extensions": "1.6.1-*",
     "FluentAssertions": "4.2.2",
     "Moq": "4.2.1510.2205",
-    "LanguageExt.Core": "1.9.1",
     "System.IO": "4.0.10",
     "dotnet-test-xunit": "2.2.0-preview2-build1029",
     "xunit": "2.2.0-beta4-build3444"
