@@ -17,35 +17,22 @@ namespace System.Threading.Tasks
         {
             Contract.Requires(task != null);
 
-            return AsyncEnumerableExtensions.Create(
+            return AsyncEnumerable.CreateEnumerable(
                 () =>
                 {
                     var completed = false;
 
-                    return AsyncEnumerableExtensions.Create(
-                        (ct, tcs) =>
+                    return AsyncEnumerable.CreateEnumerator(
+                        ct =>
                         {
                             if (completed)
-                                tcs.TrySetResult(false);
-                            else
-                            {
-                                task
-                                    .ContinueWith(
-                                        (closureTask, closureTcs1) =>
-                                        {
-                                            closureTask.HandleTaskCompletionSource(
-                                                (TaskCompletionSource<bool>)closureTcs1,
-                                                closureTcs2 =>
-                                                {
-                                                    completed = true;
-                                                    closureTcs2.TrySetResult(true);
-                                                });
-                                        }, 
-                                        tcs, 
-                                        ct);
-                            }
+                                return Task.FromResult(false);
 
-                            return tcs.Task;
+                            return task.Then(() =>
+                            {
+                                completed = true;
+                                return true;
+                            });
                         },
                         () => Unit.Default,
                         () => { });

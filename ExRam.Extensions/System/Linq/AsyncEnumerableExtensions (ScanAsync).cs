@@ -18,13 +18,13 @@ namespace System.Linq
             Contract.Requires(source != null);
             Contract.Requires(accumulator != null);
 
-            return AsyncEnumerableExtensions.Create(
+            return AsyncEnumerable.CreateEnumerable(
                 () =>
                 {
                     var acc = seed;
                     var e = source.GetEnumerator();
 
-                    return AsyncEnumerableExtensions.Create(
+                    return AsyncEnumerable.CreateEnumerator(
                         ct => e
                             .MoveNext(ct)
                             .Then(result => result
@@ -35,9 +35,9 @@ namespace System.Linq
 
                                         return true;
                                     })
-                                : AsyncEnumerableExtensions.FalseTask),
+                                : Task.FromResult(false)),
                         () => acc,
-                        e);
+                        e.Dispose);
                 });
         }
     }

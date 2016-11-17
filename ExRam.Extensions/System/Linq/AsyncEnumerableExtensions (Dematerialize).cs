@@ -17,13 +17,13 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return AsyncEnumerableExtensions.Create(
+            return AsyncEnumerable.CreateEnumerable(
                 () =>
                 {
                     var e = enumerable.GetEnumerator();
                     var current = default(TSource);
 
-                    return AsyncEnumerableExtensions.Create(
+                    return AsyncEnumerable.CreateEnumerator(
                         ct =>
                         {
                             return e
@@ -46,7 +46,7 @@ namespace System.Linq
                                 });
                         },
                         () => current,
-                        e);
+                        e.Dispose);
                 });
         }
     }

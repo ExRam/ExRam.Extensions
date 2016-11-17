@@ -14,13 +14,13 @@ namespace System.Linq
     {
         public static IAsyncEnumerable<T> Empty<T>(TimeSpan delay)
         {
-            return AsyncEnumerableExtensions.Create(
-                () => AsyncEnumerableExtensions.Create<T>(
+            return AsyncEnumerable.CreateEnumerable(
+                () => AsyncEnumerable.CreateEnumerator<T>(
                     ct => Task
                         .Delay(delay, ct)
                         .Then(() => false),
                     () => { throw new InvalidOperationException(); },
-                    Disposable.Empty));
+                    null));
         }
     }
 }

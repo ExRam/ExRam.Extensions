@@ -19,12 +19,12 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return AsyncEnumerableExtensions.Create(
+            return AsyncEnumerable.CreateEnumerable(
                 () =>
                 {
                     var e = enumerable.GetEnumerator();
 
-                    return AsyncEnumerableExtensions.Create(
+                    return AsyncEnumerable.CreateEnumerator(
                         async ct =>
                         {
                             using (var cts = new CancellationDisposable())
@@ -38,7 +38,7 @@ namespace System.Linq
                             }
                         },
                         () => e.Current,
-                        e);
+                        e.Dispose);
                 });
         }
     }

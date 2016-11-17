@@ -15,13 +15,13 @@ namespace System.Linq
     {
         public static IAsyncEnumerable<TResult> SelectMany<TSource, TResult>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, CancellationToken, Task<TResult>> selector)
         {
-            return AsyncEnumerableExtensions.Create(
+            return AsyncEnumerable.CreateEnumerable(
                 () =>
                 {
                     var current = default(TResult);
                     var e = enumerable.GetEnumerator();
 
-                    return AsyncEnumerableExtensions.Create(
+                    return AsyncEnumerable.CreateEnumerator(
                         ct => e
                             .MoveNext(ct)
                             .Then(result => result
@@ -32,9 +32,9 @@ namespace System.Linq
 
                                         return true;
                                     })
-                                : AsyncEnumerableExtensions.FalseTask),
+                                : Task.FromResult(false)),
                         () => current,
-                        e);
+                        e.Dispose);
                 });
         }
 

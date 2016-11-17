@@ -16,22 +16,23 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return AsyncEnumerableExtensions.Create(() =>
+            return AsyncEnumerable.CreateEnumerable(() =>
             {
                 var e = enumerable.GetEnumerator();
 
-                return AsyncEnumerableExtensions.Create(
-                    (ct, tcs) => e
+                return AsyncEnumerable.CreateEnumerator(
+                    ct => e
                         .MoveNext(ct)
                         .Then(result =>
                         {
                             if (result)
-                                tcs.TrySetResult(true);
+                                return Task.FromResult(true);
 
-                            return tcs.Task;
+                            e.Dispose();
+                            return Task.Factory.GetUncompleted<bool>();
                         }),
                     () => e.Current,
-                    e);
+                    e.Dispose);
             });
         }
     }

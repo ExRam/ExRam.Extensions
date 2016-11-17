@@ -17,14 +17,14 @@ namespace System.Linq
         {
             Contract.Requires(enumerable != null);
 
-            return AsyncEnumerableExtensions.Create(
+            return AsyncEnumerable.CreateEnumerable(
                 () =>
                 {
                     var completed = false;
                     var e = enumerable.GetEnumerator();
                     var current = default(Notification<TSource>);
 
-                    return AsyncEnumerableExtensions.Create(
+                    return AsyncEnumerable.CreateEnumerator(
                         ct => e
                             .MoveNext(ct)
                             .ContinueWith(task =>
@@ -48,7 +48,7 @@ namespace System.Linq
                                 return true;
                             }, TaskContinuationOptions.NotOnCanceled),
                         () => current,
-                        e);
+                        e.Dispose);
                 });
         }
     }

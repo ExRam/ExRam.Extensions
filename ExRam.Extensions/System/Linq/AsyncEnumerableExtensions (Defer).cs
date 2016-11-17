@@ -17,28 +17,27 @@ namespace System.Linq
             if (asyncFactory == null)
                 throw new ArgumentNullException(nameof(asyncFactory));
 
-            return AsyncEnumerableExtensions.Create(
-                () =>
-                {
-                    var baseEnumerator = default(IAsyncEnumerator<TSource>);
+            return AsyncEnumerable.CreateEnumerable(() =>
+            {
+                var baseEnumerator = default(IAsyncEnumerator<TSource>);
 
-                    return AsyncEnumerableExtensions.Create(
-                        async ct =>
-                        {
-                            if (baseEnumerator == null)
-                                baseEnumerator = (await asyncFactory(ct).ConfigureAwait(false)).GetEnumerator();
+                return AsyncEnumerable.CreateEnumerator(
+                    async ct =>
+                    {
+                        if (baseEnumerator == null)
+                            baseEnumerator = (await asyncFactory(ct).ConfigureAwait(false)).GetEnumerator();
 
-                            return await baseEnumerator.MoveNext(ct).ConfigureAwait(false);
-                        },
-                        () =>
-                        {
-                            if (baseEnumerator == null)
-                                throw new InvalidOperationException();
+                        return await baseEnumerator.MoveNext(ct).ConfigureAwait(false);
+                    },
+                    () =>
+                    {
+                        if (baseEnumerator == null)
+                            throw new InvalidOperationException();
 
-                            return baseEnumerator.Current;
-                        },
-                        () => baseEnumerator?.Dispose());
-                });
+                        return baseEnumerator.Current;
+                    },
+                    () => baseEnumerator?.Dispose());
+            });
         }
     }
 }
