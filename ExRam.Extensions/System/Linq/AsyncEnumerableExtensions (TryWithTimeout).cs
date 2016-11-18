@@ -6,7 +6,6 @@
 
 using System.Collections.Generic;
 using System.Diagnostics.Contracts;
-using System.Reactive;
 using System.Reactive.Disposables;
 using System.Threading;
 using System.Threading.Tasks;

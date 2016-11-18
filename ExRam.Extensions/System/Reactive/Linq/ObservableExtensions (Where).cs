@@ -5,7 +5,6 @@
 // file.
 
 using System.Diagnostics.Contracts;
-using System.Reactive.Disposables;
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;

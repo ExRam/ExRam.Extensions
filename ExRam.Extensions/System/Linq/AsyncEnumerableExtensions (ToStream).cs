@@ -96,29 +96,11 @@ namespace System.Linq
                 base.Dispose(disposing);
             }
 
-            public override bool CanRead
-            {
-                get
-                {
-                    return true;
-                }
-            }
+            public override bool CanRead => true;
 
-            public override bool CanSeek
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            public override bool CanSeek => false;
 
-            public override bool CanWrite
-            {
-                get
-                {
-                    return false;
-                }
-            }
+            public override bool CanWrite => false;
 
             public override long Length
             {

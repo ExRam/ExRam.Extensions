@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using Moq;
 using Xunit;
-using ObservableExtensions = System.Reactive.Linq.ObservableExtensions;
 
 namespace ExRam.Extensions.Tests
 {

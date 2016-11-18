@@ -8,30 +8,15 @@ namespace System.Reactive
 {
     public struct Counting<T>
     {
-        private readonly T _value;
-        private readonly ulong _number;
-
         public Counting(ulong number, T value)
         {
-            this._value = value;
-            this._number = number;
+            this.Value = value;
+            this.Number = number;
         }
 
-        public T Value
-        {
-            get 
-            {
-                return this._value; 
-            }
-        }
+        public T Value { get; }
 
-        public ulong Number
-        {
-            get
-            {
-                return this._number; 
-            }
-        }
+        public ulong Number { get; }
 
         public static bool operator ==(Counting<T> counting1, Counting<T> counting2)
         {
@@ -48,7 +33,7 @@ namespace System.Reactive
             if (obj is Counting<T>)
             {
                 var counting2 = (Counting<T>)obj;
-                return ((this._number == counting2._number) && (object.Equals(this._value, counting2._value)));
+                return ((this.Number == counting2.Number) && (object.Equals(this.Value, counting2.Value)));
             }
 
             return false;
@@ -58,7 +43,7 @@ namespace System.Reactive
         {
             unchecked
             {
-                return (int)Math.Pow(2, this._number) * (int)Math.Pow(3, this._value.GetHashCode());
+                return (int)Math.Pow(2, this.Number) * (int)Math.Pow(3, this.Value.GetHashCode());
             }
         }
     }

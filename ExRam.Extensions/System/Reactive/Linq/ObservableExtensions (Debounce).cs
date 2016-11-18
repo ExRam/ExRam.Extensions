@@ -9,7 +9,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using LanguageExt;
 using LanguageExt.SomeHelp;
-using LanguageExt.Trans;
 
 namespace System.Reactive.Linq
 {

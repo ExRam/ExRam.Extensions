@@ -13,14 +13,13 @@ namespace System.Reactive.Linq
         #region GroupedObservableImpl
         private sealed class GroupedObservableImpl<TKey, TSource> : IGroupedObservable<TKey, TSource>
         {
-            private readonly TKey _key;
             private readonly IObservable<TSource> _baseObservable;
 
             public GroupedObservableImpl(IObservable<TSource> baseObservable, TKey key)
             {
                 Contract.Requires(baseObservable != null);
 
-                this._key = key;
+                this.Key = key;
                 this._baseObservable = baseObservable;
             }
 
@@ -29,13 +28,7 @@ namespace System.Reactive.Linq
                 return this._baseObservable.Subscribe(observer);
             }
 
-            public TKey Key
-            {
-                get
-                {
-                    return this._key;
-                }
-            }
+            public TKey Key { get; }
         }
         #endregion
 

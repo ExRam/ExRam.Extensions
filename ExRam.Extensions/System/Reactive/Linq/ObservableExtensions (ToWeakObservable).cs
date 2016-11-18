@@ -41,7 +41,6 @@ namespace System.Reactive.Linq
         #region WeakObserver
         private class WeakObserver<T> : IObserver<T>
         {
-            private readonly IDisposable _baseSubscription;
             private readonly WeakReference _weakObserverReference;
 
             public WeakObserver(IObservable<T> observable, IObserver<T> observer)
@@ -49,7 +48,7 @@ namespace System.Reactive.Linq
                 Contract.Requires(observable != null);
 
                 this._weakObserverReference = new WeakReference(observer);
-                this._baseSubscription = observable.Subscribe(this);
+                this.BaseSubscription = observable.Subscribe(this);
             }
 
             public void OnCompleted()
@@ -59,7 +58,7 @@ namespace System.Reactive.Linq
                 if (observer != null)
                     observer.OnCompleted();
                 else
-                    this._baseSubscription.Dispose();
+                    this.BaseSubscription.Dispose();
             }
 
             public void OnError(Exception error)
@@ -69,7 +68,7 @@ namespace System.Reactive.Linq
                 if (observer != null)
                     observer.OnError(error);
                 else
-                    this._baseSubscription.Dispose();
+                    this.BaseSubscription.Dispose();
             }
 
             public void OnNext(T value)
@@ -79,16 +78,10 @@ namespace System.Reactive.Linq
                 if (observer != null) 
                     observer.OnNext(value);
                 else
-                    this._baseSubscription.Dispose();
+                    this.BaseSubscription.Dispose();
             }
 
-            public IDisposable BaseSubscription
-            {
-                get
-                {
-                    return this._baseSubscription;
-                }
-            }
+            public IDisposable BaseSubscription { get; }
         }
         #endregion
 

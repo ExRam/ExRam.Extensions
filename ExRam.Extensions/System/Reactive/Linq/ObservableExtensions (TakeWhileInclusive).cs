@@ -5,7 +5,6 @@
 // file.
 
 using System.Reactive.Disposables;
-using System.Threading;
 
 namespace System.Reactive.Linq
 {
