@@ -1,15 +1,8 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{C6F1884F-6B32-4773-9BC4-BE2782BD7D77}"
-	ProjectSection(SolutionItems) = preProject
-		.nuget\NuGet.Config = .nuget\NuGet.Config
-		.nuget\NuGet.exe = .nuget\NuGet.exe
-		.nuget\NuGet.targets = .nuget\NuGet.targets
-	EndProjectSection
-EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExRam.Extensions", "ExRam.Extensions\ExRam.Extensions.xproj", "{CEAB8911-8BCC-424C-A504-5B09A0A494D3}"
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExRam.Extensions.Tests", "ExRam.Extensions.Tests\ExRam.Extensions.Tests.xproj", "{17ADE104-EA68-4BEA-A41F-516AC87DCA5A}"
