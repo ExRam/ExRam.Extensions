@@ -10,7 +10,7 @@ namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
     {
-        public async static Task<T> Using<T, TResource>(Func<TResource> resourceFactory, Func<TResource, Task<T>> taskFactory)
+        public static async Task<T> Using<T, TResource>(Func<TResource> resourceFactory, Func<TResource, Task<T>> taskFactory)
             where TResource : IDisposable
         {
             Contract.Requires(resourceFactory != null);
@@ -18,7 +18,7 @@ namespace System.Threading.Tasks
 
             using (var res = resourceFactory())
             {
-                return await taskFactory(res);
+                return await taskFactory(res).ConfigureAwait(false);
             }
         }
     }

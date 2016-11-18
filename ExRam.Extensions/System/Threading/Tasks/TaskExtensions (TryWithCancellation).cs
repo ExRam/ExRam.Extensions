@@ -25,7 +25,7 @@ namespace System.Threading.Tasks
             }
 
             if (ret)
-                await task;
+                await task.ConfigureAwait(false);
 
             return ret;
         }
@@ -53,7 +53,7 @@ namespace System.Threading.Tasks
         #region TryWithCancellation(Task<Maybe<TResult>>, CancellationToken)
         public static async Task<Option<TResult>> TryWithCancellation<TResult>(this Task<Option<TResult>> task, CancellationToken token)
         {
-            var maybe = await task.TryWithCancellation<Option<TResult>>(token);
+            var maybe = await task.TryWithCancellation<Option<TResult>>(token).ConfigureAwait(false);
 
             return maybe.Bind(x => x);
         }

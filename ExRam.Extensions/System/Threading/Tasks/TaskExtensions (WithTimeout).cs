@@ -18,7 +18,7 @@ namespace System.Threading.Tasks
             if (!(await task.TryWithTimeout(timeout).ConfigureAwait(false)))
                 throw new TimeoutException();
 
-            await task;
+            await task.ConfigureAwait(false);
         }
         #endregion
 
@@ -30,7 +30,7 @@ namespace System.Threading.Tasks
             if (!(await task.TryWithTimeout(timeout).ConfigureAwait(false)).IsSome)
                 throw new TimeoutException();
 
-            return await task;
+            return await task.ConfigureAwait(false);
         }
         #endregion 
     }

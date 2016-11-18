@@ -11,7 +11,7 @@ namespace System.Threading.Tasks
         #region WithCancellation(Task, CancellationToken)
         public static async Task WithCancellation(this Task task, CancellationToken token)
         {
-            if (!(await task.TryWithCancellation(token)))
+            if (!await task.TryWithCancellation(token).ConfigureAwait(false))
                 throw new TaskCanceledException();
         }
         #endregion

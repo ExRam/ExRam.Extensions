@@ -14,7 +14,9 @@ namespace System.IO
 
             while (count > 0)
             {
-                var read = await stream.ReadAsync(buffer, (buffer.Length - count), count);
+                var read = await stream
+                    .ReadAsync(buffer, (buffer.Length - count), count)
+                    .ConfigureAwait(false);
 
                 if (read == 0)
                     throw new EndOfStreamException();
@@ -31,7 +33,7 @@ namespace System.IO
         {
             try
             {
-                return (await stream.ReadAsync(1))[0];
+                return (await stream.ReadAsync(1).ConfigureAwait(false))[0];
             }
             catch (EndOfStreamException)
             {

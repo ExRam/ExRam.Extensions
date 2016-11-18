@@ -19,7 +19,7 @@ namespace System.Threading.Tasks
 
             if (task == await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false))
             {
-                await task;
+                await task.ConfigureAwait(false);
                 return true;
             }
 
@@ -34,7 +34,7 @@ namespace System.Threading.Tasks
             Contract.Requires(timeout > TimeSpan.Zero);
 
             if (task == await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false))
-                return await task;
+                return await task.ConfigureAwait(false);
 
             return Option<TResult>.None;
         }
@@ -47,7 +47,7 @@ namespace System.Threading.Tasks
             Contract.Requires(timeout > TimeSpan.Zero);
 
             if (task == await Task.WhenAny(task, Task.Delay(timeout)).ConfigureAwait(false))
-                return await task;
+                return await task.ConfigureAwait(false);
 
             return Option<TResult>.None;
         }
