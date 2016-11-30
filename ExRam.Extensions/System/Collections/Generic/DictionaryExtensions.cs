@@ -1,5 +1,4 @@
 ﻿using System.Diagnostics.Contracts;
-using LanguageExt;
 
 namespace System.Collections.Generic
 {
@@ -19,16 +18,7 @@ namespace System.Collections.Generic
             Contract.Requires(!object.ReferenceEquals(key, null));
 
             TValue ret;
-            return ((dictionary.TryGetValue(key, out ret)) ? (ret) : (defaultValue));
-        }
-
-        public static Option<TValue> TryGetValue<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key)
-        {
-            Contract.Requires(dictionary != null);
-            Contract.Requires(!object.ReferenceEquals(key, null));
-
-            TValue item;
-            return ((dictionary.TryGetValue(key, out item)) ? (item) : (Option<TValue>.None));
+            return (dictionary.TryGetValue(key, out ret)) ? ret : defaultValue;
         }
     }
 }
