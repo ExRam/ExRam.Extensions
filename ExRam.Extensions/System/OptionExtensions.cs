@@ -4,7 +4,7 @@ using LanguageExt;
 
 namespace System
 {
-    public static class MaybeExtensions
+    public static class OptionExtensions
     {
         public static IAsyncEnumerable<T> ToAsyncEnumerable<T>(this Option<T> self)
         {
