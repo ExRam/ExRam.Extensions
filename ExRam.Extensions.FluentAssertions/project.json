@@ -1,0 +1,15 @@
+﻿{
+  "version": "3.0.0-alpha01",
+  "description": "ExRam.Extensions.FluentAssertions",
+  "authors": [ "Daniel C. Weber" ],
+  "frameworks": {
+    "netstandard1.3": {
+      "dependencies": {
+      }
+    }
+  },
+  "dependencies": {
+    "LanguageExt.Core": "1.9.7",
+    "FluentAssertions": "4.17.0"
+  }
+}
