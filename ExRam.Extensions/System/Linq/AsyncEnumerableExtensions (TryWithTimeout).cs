@@ -26,14 +26,17 @@ namespace System.Linq
                     return AsyncEnumerable.CreateEnumerator(
                         async ct =>
                         {
-                            using (var cts = new CancellationDisposable())
+                            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(ct))
                             {
                                 var option = await e
-                                    .MoveNext(CancellationTokenSource.CreateLinkedTokenSource(ct, cts.Token).Token)
+                                    .MoveNext(cts.Token)
                                     .TryWithTimeout(timeout)
                                     .ConfigureAwait(false);
 
-                                return option.Exists(_ => _);
+                                if (option.IsNone)
+                                    cts.Cancel();
+
+                                return option.IfNone(false);
                             }
                         },
                         () => e.Current,
