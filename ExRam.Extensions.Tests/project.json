@@ -3,7 +3,7 @@
   "description": "ExRam.Extensions.Tests",
   "authors": [ "dw_000" ],
   "dependencies": {
-    "ExRam.Extensions": "3.0.0-beta01",
+    "ExRam.Extensions": "3.0.0-beta02",
     "FluentAssertions": "4.2.2",
     "Moq": "4.2.1510.2205",
     "System.IO": "4.0.10",
