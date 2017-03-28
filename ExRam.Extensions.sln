@@ -1,13 +1,13 @@
-﻿
+
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.26114.2
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExRam.Extensions", "ExRam.Extensions\ExRam.Extensions.xproj", "{CEAB8911-8BCC-424C-A504-5B09A0A494D3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExRam.Extensions", "ExRam.Extensions\ExRam.Extensions.csproj", "{CEAB8911-8BCC-424C-A504-5B09A0A494D3}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExRam.Extensions.Tests", "ExRam.Extensions.Tests\ExRam.Extensions.Tests.xproj", "{17ADE104-EA68-4BEA-A41F-516AC87DCA5A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExRam.Extensions.Tests", "ExRam.Extensions.Tests\ExRam.Extensions.Tests.csproj", "{17ADE104-EA68-4BEA-A41F-516AC87DCA5A}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "ExRam.Extensions.FluentAssertions", "ExRam.Extensions.FluentAssertions\ExRam.Extensions.FluentAssertions.xproj", "{03068DF2-B198-4438-85CF-C2DCC45D10CF}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExRam.Extensions.FluentAssertions", "ExRam.Extensions.FluentAssertions\ExRam.Extensions.FluentAssertions.csproj", "{03068DF2-B198-4438-85CF-C2DCC45D10CF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
