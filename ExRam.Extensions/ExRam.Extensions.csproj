@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <Description>ExRam.Extensions</Description>
-    <VersionPrefix>3.0.0-beta02</VersionPrefix>
     <Authors>Daniel C. Weber</Authors>
     <TargetFramework>netstandard1.3</TargetFramework>
     <AssemblyName>ExRam.Extensions</AssemblyName>
@@ -16,6 +15,7 @@
     <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
+    <Version>3.0.1</Version>
   </PropertyGroup>
 
   <ItemGroup>
