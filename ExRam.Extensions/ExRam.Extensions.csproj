@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Description>ExRam.Extensions</Description>
     <Authors>Daniel C. Weber</Authors>
-    <TargetFramework>netstandard1.3</TargetFramework>
+    <TargetFrameworks>netstandard1.3;net45</TargetFrameworks>
     <AssemblyName>ExRam.Extensions</AssemblyName>
     <PackageId>ExRam.Extensions</PackageId>
     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
