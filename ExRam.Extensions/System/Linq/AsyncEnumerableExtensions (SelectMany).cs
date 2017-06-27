@@ -22,17 +22,16 @@ namespace System.Linq
                     var e = enumerable.GetEnumerator();
 
                     return AsyncEnumerable.CreateEnumerator(
-                        ct => e
-                            .MoveNext(ct)
-                            .Then(result => result
-                                ? selector(e.Current, ct)
-                                    .Then(newCurrent =>
-                                    {
-                                        current = newCurrent;
+                        async ct =>
+                        {
+                            if (await e.MoveNext(ct))
+                            {
+                                current = await selector(e.Current, ct);
+                                return true;
+                            }
 
-                                        return true;
-                                    })
-                                : Task.FromResult(false)),
+                            return false;
+                        },
                         () => current,
                         e.Dispose);
                 });
