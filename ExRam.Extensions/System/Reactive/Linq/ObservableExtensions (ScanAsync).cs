@@ -5,7 +5,6 @@
 // file.
 
 using System.Diagnostics.Contracts;
-using System.Reactive.Threading.Tasks;
 using System.Threading.Tasks;
 
 namespace System.Reactive.Linq
@@ -19,7 +18,7 @@ namespace System.Reactive.Linq
 
             return source
                 .Scan(Task.FromResult(seed), async (currentTask, value) => await accumulator(await currentTask.ConfigureAwait(false), value).ConfigureAwait(false))
-                .SelectMany(x => x.ToObservable());
+                .SelectMany(x => x);
         }
     }
 }
