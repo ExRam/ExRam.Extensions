@@ -14,7 +14,6 @@ namespace ExRam.Extensions.Tests
 {
     public class AsyncEnumerable_Concat_Test
     {
-        #region AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_has_values
         [Fact]
         public async Task AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_has_values()
         {
@@ -29,9 +28,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.Equal(new[] { 1, 2, 3, 4 }, array);
         }
-        #endregion
 
-        #region AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_is_empty
         [Fact]
         public async Task AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_is_empty()
         {
@@ -41,9 +38,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.Equal(new[] { 1 }, array);
         }
-        #endregion
 
-        #region AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_faults
         [Fact]
         public async Task AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_faults()
         {
@@ -62,6 +57,5 @@ namespace ExRam.Extensions.Tests
                 .Should()
                 .Be(ex);
         }
-        #endregion
     }
 }

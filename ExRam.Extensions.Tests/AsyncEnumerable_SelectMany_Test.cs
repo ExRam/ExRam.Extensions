@@ -13,7 +13,6 @@ namespace ExRam.Extensions.Tests
 {
     public class AsyncEnumerable_SelectMany_Test
     {
-        #region AsyncEnumerable_SelectMany_Works
         [Fact]
         public async Task AsyncEnumerable_SelectMany_Works()
         {
@@ -29,9 +28,7 @@ namespace ExRam.Extensions.Tests
             Assert.Equal("2", array[1]);
             Assert.Equal("3", array[2]);
         }
-        #endregion
 
-        #region AsyncEnumerable_SelectMany_Calls_Selector_InOrder
         [Fact]
         public async Task AsyncEnumerable_SelectMany_Calls_Selector_InOrder()
         {
@@ -51,6 +48,5 @@ namespace ExRam.Extensions.Tests
             Assert.Equal("2", array[1]);
             Assert.Equal("3", array[2]);
         }
-        #endregion
     }
 }

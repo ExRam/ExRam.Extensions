@@ -15,7 +15,6 @@ namespace ExRam.Extensions.Tests
 {
     public class AsyncEnumerable_ToStream_Test
     {
-        #region AsyncEnumerable_ReadByteAsync_throws_expected_exception
         [Fact]
         public async Task AsyncEnumerable_ReadByteAsync_throws_expected_exception()
         {
@@ -27,9 +26,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.ReadAsync(new byte[1], 0, 1))
                 .ShouldThrowExactly<IOException>();
         }
-        #endregion
 
-        #region AsyncEnumerable_ReadByteAsync_throws_expected_exception1
         [Fact]
         public async Task AsyncEnumerable_ReadByteAsync_throws_expected_exception1()
         {
@@ -41,6 +38,5 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.ReadAsync(new byte[1], 0, 1))
                 .ShouldThrowExactly<IOException>();
         }
-        #endregion
     }
 }

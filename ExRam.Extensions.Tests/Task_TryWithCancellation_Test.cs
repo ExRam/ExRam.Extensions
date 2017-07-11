@@ -17,7 +17,6 @@ namespace ExRam.Extensions.Tests
 {
     public class Task_TryWithCancellation_Test
     {
-        #region TryWithCancellation_asynchronously_returns_false_if_cancelled_after_call
         [Fact]
         public async Task TryWithCancellation_asynchronously_returns_false_if_cancelled_after_call()
         {
@@ -29,9 +28,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.False((await cancellationTask).IsSome);
         }
-        #endregion
 
-        #region TryWithCancellation_asynchronously_returns_false_if_cancelled_before_call
         [Fact]
         public async Task TryWithCancellation_asynchronously_returns_false_if_cancelled_before_call()
         {
@@ -44,9 +41,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.False((await cancellationTask).IsSome);
         }
-        #endregion
 
-        #region TryWithCancellation_asynchronously_returns_true_if_not_cancelled
         [Fact]
         public void TryWithCancellation_asynchronously_returns_true_if_not_cancelled()
         {
@@ -55,9 +50,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.Equal(true, task.TryWithCancellation(cts.Token).Result);
         }
-        #endregion
 
-        #region TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_cancelled_after_call
         [Fact]
         public async Task TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_cancelled_after_call()
         {
@@ -69,9 +62,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.False((await cancellationTask).IsSome);
         }
-        #endregion
 
-        #region TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_cancelled_before_call
         [Fact]
         public async Task TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_cancelled_before_call()
         {
@@ -84,9 +75,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.False((await cancellationTask).IsSome);
         }
-        #endregion
 
-        #region TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_not_cancelled
         [Fact]
         [Description("Sind die Felder im MaybeCancelled-Objekt aus dem Rückgabe-Task von WithCancellation korrekt, wenn das CancellationToken nicht gecancellt wird, und der Task ganz normal 36 zurückgibt ?")]
         public async Task TryWithCancellation_with_TaskOfInt_returns_correct_Maybe_value_if_not_cancelled()
@@ -107,9 +96,7 @@ namespace ExRam.Extensions.Tests
                 val.Should().Be(36);
             });
         }
-        #endregion
 
-        #region TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_cancelled_after_call
         [Fact]
         public async Task TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_cancelled_after_call()
         {
@@ -121,9 +108,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.False((await cancellationTask).IsSome);
         }
-        #endregion
 
-        #region TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_cancelled_before_call
         [Fact]
         public async Task TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_cancelled_before_call()
         {
@@ -136,9 +121,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.False((await cancellationTask).IsSome);
         }
-        #endregion
 
-        #region TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_not_cancelled
         [Fact]
         public async Task TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_not_cancelled()
         {
@@ -158,9 +141,7 @@ namespace ExRam.Extensions.Tests
                 val.Should().Be(36);
             });
         }
-        #endregion
 
-        #region TryWithCancellation_throws_if_called_on_cancelled_task
         [Fact]
         public async Task TryWithCancellation_throws_if_called_on_cancelled_task()
         {
@@ -172,9 +153,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _)
                 .ShouldThrowExactly<TaskCanceledException>();
         }
-        #endregion
 
-        #region Exceptions_Are_Propagated_Through_TryWithCancellation_Of_Task
         [Fact]
         public async Task Exceptions_Are_Propagated_Through_TryWithCancellation_Of_Task()
         {
@@ -190,9 +169,7 @@ namespace ExRam.Extensions.Tests
                 .ShouldThrowExactly<ApplicationException>()
                 .Where(ex2 => ex == ex2);
         }
-        #endregion
 
-        #region Exceptions_Are_Propagated_Through_TryWithCancellation_With_Task_Of_Int
         [Fact]
         public async Task Exceptions_Are_Propagated_Through_TryWithCancellation_With_Task_Of_Int()
         {
@@ -208,6 +185,5 @@ namespace ExRam.Extensions.Tests
                 .ShouldThrowExactly<ApplicationException>()
                 .Where(ex2 => ex == ex2);
         }
-        #endregion
     }
 }

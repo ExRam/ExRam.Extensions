@@ -15,7 +15,6 @@ namespace ExRam.Extensions.Tests
 {
     public class ObservableExtensionsTests
     {
-        #region SubscribeTotallyAtMostTest
         [Fact]
         public void SubscribeTotallyAtMostTest()
         {
@@ -31,9 +30,7 @@ namespace ExRam.Extensions.Tests
 
             observableMock.Verify(x => x.Subscribe(It.IsAny<IObserver<object>>()), Times.Exactly(3));
         }
-        #endregion
 
-        #region Observable_Current_blocks_if_no_current_element_is_present
         [Fact]
         public async Task Observable_Current_blocks_if_no_current_element_is_present()
         {
@@ -54,9 +51,7 @@ namespace ExRam.Extensions.Tests
                 Assert.Equal(1, asyncEnumerator.Current);
             }
         }
-        #endregion
 
-        #region Observable_Current_returns_latest_element
         [Fact]
         public async Task Observable_Current_returns_latest_element()
         {
@@ -73,9 +68,7 @@ namespace ExRam.Extensions.Tests
                 Assert.Equal(4, asyncEnumerator.Current);
             }
         }
-        #endregion
 
-        #region Observable_Current_returns_elements_repeatedly
         [Fact]
         public async Task Observable_Current_returns_elements_repeatedly()
         {
@@ -99,9 +92,7 @@ namespace ExRam.Extensions.Tests
                 }
             }
         }
-        #endregion
 
-        #region Observable_Current_propagates_exception
         [Fact]
         public async Task Observable_Current_propagates_exception()
         {
@@ -122,9 +113,7 @@ namespace ExRam.Extensions.Tests
                     .Where(ex => ex.GetBaseException() is InvalidOperationException);
             }
         }
-        #endregion
 
-        #region Observable_Current_completes_on_source_completion
         [Fact]
         public async Task Observable_Current_completes_on_source_completion()
         {
@@ -142,9 +131,7 @@ namespace ExRam.Extensions.Tests
                 Assert.False(await asyncEnumerator.MoveNext(CancellationToken.None));
             }
         }
-        #endregion
 
-        #region Observable_Current_enumerator_disposal_cancels_moveNext
         [Fact]
         public async Task Observable_Current_enumerator_disposal_cancels_moveNext()
         {
@@ -161,9 +148,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _)
                 .ShouldThrowExactly<TaskCanceledException>();
         }
-        #endregion
 
-        #region Observable_Current_MoveNext_cancellation_is_effective
         [Fact]
         public async Task Observable_Current_MoveNext_cancellation_is_effective()
         {
@@ -185,9 +170,7 @@ namespace ExRam.Extensions.Tests
                     .ShouldThrowExactly<TaskCanceledException>();
             }
         }
-        #endregion
 
-        #region Observable_Concat_produces_correct_sequence_when_first_sequence_has_values
         [Fact]
         public async Task Observable_Concat_produces_correct_sequence_when_first_sequence_has_values()
         {
@@ -203,9 +186,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.Equal(new[] { 1, 2, 3, 4 }, array);
         }
-        #endregion
 
-        #region Observable_Concat_produces_correct_sequence_when_first_sequence_is_empty
         [Fact]
         public async Task Observable_Concat_produces_correct_sequence_when_first_sequence_is_empty()
         {
@@ -216,9 +197,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.Equal(new[] { 1 }, array);
         }
-        #endregion
 
-        #region Observable_Concat_produces_correct_sequence_when_first_sequence_faults
         [Fact]
         public async Task Observable_Concat_produces_correct_sequence_when_first_sequence_faults()
         {
@@ -233,9 +212,7 @@ namespace ExRam.Extensions.Tests
             Assert.Equal(1, array.Length);
             Assert.Equal(ex, array[0].Exception);
         }
-        #endregion
 
-        #region RepeatWhileEmpty_produces_correct_values
         [Fact]
         public async Task RepeatWhileEmpty_produces_correct_values()
         {
@@ -260,9 +237,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.Equal(new[] { 1, 2, 3 }, array);
         }
-        #endregion
 
-        #region RepeatWhileEmpty_propagates_exception_correctly
         [Fact]
         public async Task RepeatWhileEmpty_propagates_exception_correctly()
         {
@@ -287,9 +262,7 @@ namespace ExRam.Extensions.Tests
                 .ShouldThrowExactly<InvalidOperationException>();
 
         }
-        #endregion
 
-        #region TakeWhileInclusive_takes_one_additional_element
         [Fact]
         public async Task TakeWhileInclusive_takes_one_additional_element()
         {
@@ -302,9 +275,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.Equal(new[] { 1, 2, 3 }, array);
         }
-        #endregion
 
-        #region TakeWhileInclusive_has_correct_indizes
         [Fact]
         public async Task TakeWhileInclusive_has_correct_indizes()
         {
@@ -317,9 +288,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.Equal(new[] { 0, 1, 2, 3, 4, 4 }, array);
         }
-        #endregion
 
-        #region Where_with_async_predicate_does_the_job
         [Fact]
         public async Task Where_with_async_predicate_does_the_job()
         {
@@ -339,9 +308,7 @@ namespace ExRam.Extensions.Tests
                 .Should()
                 .BeEquivalentTo(new[] { 2, 4, 6, 8, 0 });
         }
-        #endregion
 
-        #region LazyRefCount_connects
         [Fact]
         public void LazyRefCount_connects()
         {
@@ -370,9 +337,7 @@ namespace ExRam.Extensions.Tests
                     .Verify(x => x.Dispose(), Times.Never());
             }
         }
-        #endregion
 
-        #region LazyRefCount_does_not_disconnect_within_lazy_time
         [Fact(Skip = "Rx-Testing cannot be used at this time.")]
         public async Task LazyRefCount_does_not_disconnect_within_lazy_time()
         {
@@ -408,9 +373,7 @@ namespace ExRam.Extensions.Tests
             connectionMock
                 .Verify(x => x.Dispose(), Times.Once());*/
         }
-        #endregion
 
-        #region LazyRefCount_does_not_disconnect_after_lazy_time_when_new_connection_is_made
         [Fact(Skip = "Rx-Testing cannot be used at this time.")]
         public async Task LazyRefCount_does_not_disconnect_after_lazy_time_when_new_connection_is_made()
         {
@@ -453,9 +416,7 @@ namespace ExRam.Extensions.Tests
             //        .Verify(x => x.Dispose(), Times.Never());
             //}
         }
-        #endregion
 
-        #region LazyRefCount_disconnects_after_all_when_second_subscription_is_disposed
         [Fact(Skip = "Rx-Testing cannot be used at this time.")]
         public async Task LazyRefCount_disconnects_after_all_when_second_subscription_is_disposed()
         {
@@ -490,9 +451,7 @@ namespace ExRam.Extensions.Tests
             //connectionMock
             //    .Verify(x => x.Dispose(), Times.Once());
         }
-        #endregion
 
-        #region LazyRefCount_does_not_observe_values_after_unsubscription()
         [Fact(Skip = "Rx-Testing cannot be used at this time.")]
         public async Task LazyRefCount_does_not_observe_values_after_unsubscription()
         {
@@ -516,7 +475,6 @@ namespace ExRam.Extensions.Tests
             //subject.OnNext(2);
             //Assert.Equal(1, value);
         }
-        #endregion
 
         [Fact(Skip = "Rx-Testing cannot be used at this time.")]
         public void Debounce_lets_first_value_pass()

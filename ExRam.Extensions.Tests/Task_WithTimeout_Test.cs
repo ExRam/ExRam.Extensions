@@ -14,25 +14,20 @@ namespace ExRam.Extensions.Tests
 {
     public class Task_WithTimeout_Test
     {
-        #region Completed_Task_WithTimeout_Completes
         [Fact]
         public async Task Completed_Task_WithTimeout_Completes()
         {
             var completedTask = Task.FromResult(0);
             await completedTask.WithTimeout(TimeSpan.FromMilliseconds(500));
         }
-        #endregion
 
-        #region Completed_TaskOfInt_WithTimeout_Completes
         [Fact]
         public async Task Completed_TaskOfInt_WithTimeout_Completes()
         {
             var completedTask = Task.FromResult(36);
             Assert.Equal(36, await completedTask.WithTimeout(TimeSpan.FromMilliseconds(500)));
         }
-        #endregion
 
-        #region Faulted_Task_WithTimeout_Faults
         [Fact]
         public async Task Faulted_Task_WithTimeout_Faults()
         {
@@ -42,9 +37,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .ShouldThrowExactly<InvalidOperationException>();
         }
-        #endregion
 
-        #region Faulted_TaskOfInt_WithTimeout_Faults
         [Fact]
         public async Task Faulted_TaskOfInt_WithTimeout_Faults()
         {
@@ -54,9 +47,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .ShouldThrowExactly<InvalidOperationException>();
         }
-        #endregion
 
-        #region Canceled_Task_WithTimeout_Faults
         [Fact]
         public async Task Canceled_Task_WithTimeout_Faults()
         {
@@ -66,9 +57,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .ShouldThrowExactly<TaskCanceledException>();
         }
-        #endregion
 
-        #region Canceled_TaskOfInt_WithTimeout_Faults
         [Fact]
         public async Task Canceled_TaskOfInt_WithTimeout_Faults()
         {
@@ -78,9 +67,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .ShouldThrowExactly<TaskCanceledException>();
         }
-        #endregion
 
-        #region Uncompleted_Task_WithTimeout_faults_with_TimeoutException
         [Fact]
         public async Task Uncompleted_Task_WithTimeout_faults_with_TimeoutException()
         {
@@ -90,9 +77,7 @@ namespace ExRam.Extensions.Tests
                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
                .ShouldThrowExactly<TimeoutException>();
         }
-        #endregion
 
-        #region Uncompleted_TaskOfInt_WithTimeout_faults_with_TimeoutException
         [Fact]
         public async Task Uncompleted_TaskOfInt_WithTimeout_faults_with_TimeoutException()
         {
@@ -102,9 +87,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .ShouldThrowExactly<TimeoutException>();
         }
-        #endregion
 
-        #region Uncompleted_Task_WithTimeout_can_complete_afterwards
         [Fact]
         public async Task Uncompleted_Task_WithTimeout_can_complete_afterwards()
         {
@@ -114,9 +97,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .ShouldThrowExactly<TimeoutException>();
         }
-        #endregion
 
-        #region Uncompleted_Task_WithTimeout_can_fault_afterwards
         [Fact]
         public async Task Uncompleted_Task_WithTimeout_can_fault_afterwards()
         {
@@ -132,9 +113,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .ShouldThrowExactly<InvalidOperationException>();
         }
-        #endregion
 
-        #region Uncompleted_Task_WithTimeout_can_be_canceled_afterwards
         [Fact]
         public async Task Uncompleted_Task_WithTimeout_can_be_canceled_afterwards()
         {
@@ -144,9 +123,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .ShouldThrowExactly<TimeoutException>();
         }
-        #endregion
 
-        #region Uncompleted_TaskOfInt_WithTimeout_can_complete_afterwards
         [Fact]
         public async Task Uncompleted_TaskOfInt_WithTimeout_can_complete_afterwards()
         {
@@ -162,9 +139,7 @@ namespace ExRam.Extensions.Tests
                 .Should()
                 .Be(36);
         }
-        #endregion
 
-        #region Uncompleted_TaskOfInt_WithTimeout_can_fault_afterwards
         [Fact]
         public async Task Uncompleted_TaskOfInt_WithTimeout_can_fault_afterwards()
         {
@@ -180,9 +155,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .ShouldThrowExactly<InvalidOperationException>();
         }
-        #endregion
 
-        #region Uncompleted_TaskOfInt_WithTimeout_can_be_canceled_afterwards
         [Fact]
         public async Task Uncompleted_TaskOfInt_WithTimeout_can_be_canceled_afterwards()
         {
@@ -192,6 +165,5 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .ShouldThrowExactly<TimeoutException>();
         }
-        #endregion
     }
 }

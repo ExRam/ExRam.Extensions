@@ -14,7 +14,6 @@ namespace ExRam.Extensions.Tests
 {
     public class AsyncEnumerable_Materialize_Test
     {
-        #region AsyncEnumerable_Materialize_handles_OnNext_correctly
         [Fact]
         public async Task AsyncEnumerable_Materialize_handles_OnNext_correctly()
         {
@@ -31,9 +30,7 @@ namespace ExRam.Extensions.Tests
                 Assert.Equal(i, notifications[i].Value);
             }
         }
-        #endregion
 
-        #region AsyncEnumerable_Materialize_handles_OnCompleted_correctly
         [Fact]
         public async Task AsyncEnumerable_Materialize_handles_OnCompleted_correctly()
         {
@@ -54,9 +51,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.Equal(NotificationKind.OnCompleted, lastNotificaton.Kind);
         }
-        #endregion
 
-        #region AsyncEnumerable_Materialize_handles_OnError_correctly
         [Fact]
         public async Task AsyncEnumerable_Materialize_handles_OnError_correctly()
         {
@@ -80,6 +75,5 @@ namespace ExRam.Extensions.Tests
             Assert.Equal(NotificationKind.OnError, lastNotificaton.Kind);
             Assert.Equal(ex, lastNotificaton.Exception);
         }
-        #endregion
     }
 }

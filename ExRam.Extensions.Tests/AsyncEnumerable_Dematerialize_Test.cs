@@ -16,7 +16,6 @@ namespace ExRam.Extensions.Tests
 {
     public class AsyncEnumerable_Dematerialize_Test
     {
-        #region AsyncEnumerable_Dematerialize_handles_OnNext_correctly
         [Fact]
         public async Task AsyncEnumerable_Dematerialize_handles_OnNext_correctly()
         {
@@ -32,9 +31,7 @@ namespace ExRam.Extensions.Tests
                 Assert.Equal(i, values[i]);
             }
         }
-        #endregion
 
-        #region AsyncEnumerable_Materialize_handles_OnError_correctly
         [Fact]
         public async Task AsyncEnumerable_Materialize_handles_OnError_correctly()
         {
@@ -59,9 +56,7 @@ namespace ExRam.Extensions.Tests
                     .ShouldThrowExactly<DivideByZeroException>();
             }
         }
-        #endregion
 
-        #region AsyncEnumerable_Dematerialize_handles_empty_enumerable_correctly
         [Fact]
         public async Task AsyncEnumerable_Dematerialize_handles_empty_enumerable_correctly()
         {
@@ -72,6 +67,5 @@ namespace ExRam.Extensions.Tests
                 
             Assert.False(await enumerator.MoveNext(CancellationToken.None));
         }
-        #endregion
     }
 }

@@ -13,7 +13,6 @@ namespace ExRam.Extensions.Tests
 {
     public class AsyncEnumerable_Gate_Test
     {
-        #region AsyncEnumerable_Gate_Works
         [Fact]
         public async Task AsyncEnumerable_Gate_Works()
         {
@@ -38,6 +37,5 @@ namespace ExRam.Extensions.Tests
                 Assert.Equal(j, enumerator.Current);
             }
         }
-        #endregion
     }
 }

@@ -15,7 +15,6 @@ namespace ExRam.Extensions.Tests
 {
     public class Task_WithCancellation_Test
     {
-        #region WithCancellation_throws_if_cancelled_after_call
         [Fact]
         public async Task WithCancellation_throws_if_cancelled_after_call()
         {
@@ -29,9 +28,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _)
                 .ShouldThrowExactly<TaskCanceledException>();
         }
-        #endregion
 
-        #region WithCancellation_throws_if_cancelled_before_call
         [Fact]
         public async Task WithCancellation_throws_if_cancelled_before_call()
         {
@@ -46,9 +43,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _)
                 .ShouldThrowExactly<TaskCanceledException>();
         }
-        #endregion
 
-        #region WithCancellation_succeeds_if_not_cancelled
         [Fact]
         public async Task WithCancellation_succeeds_if_not_cancelled()
         {
@@ -57,9 +52,7 @@ namespace ExRam.Extensions.Tests
 
             await task.WithCancellation(cts.Token);
         }
-        #endregion
 
-        #region WithCancellation_with_TaskOfInt_throws_if_cancelled_after_call
         [Fact]
         public async Task WithCancellation_with_TaskOfInt_throws_if_cancelled_after_call()
         {
@@ -73,9 +66,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _)
                 .ShouldThrowExactly<TaskCanceledException>();
         }
-        #endregion
 
-        #region WithCancellation_with_TaskOfInt_throws_if_cancelled_before_call
         [Fact]
         public async Task WithCancellation_with_TaskOfInt_throws_if_cancelled_before_call()
         {
@@ -90,9 +81,7 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _)
                 .ShouldThrowExactly<TaskCanceledException>();
         }
-        #endregion
 
-        #region WithCancellation_with_TaskOfInt_succeeds_if_not_cancelled
         [Fact]
         public async Task WithCancellation_with_TaskOfInt_succeeds_if_not_cancelled()
         {
@@ -106,9 +95,7 @@ namespace ExRam.Extensions.Tests
 
             Assert.Equal(36, await task.WithCancellation(cts.Token));
         }
-        #endregion
 
-        #region Exceptions_Are_Propagated_Through_WithCancellation_Of_Task
         [Fact]
         public async Task Exceptions_Are_Propagated_Through_WithCancellation_Of_Task()
         {
@@ -124,9 +111,7 @@ namespace ExRam.Extensions.Tests
                 .ShouldThrowExactly<ApplicationException>()
                 .Where(ex2 => ex == ex2);
         }
-        #endregion
 
-        #region Exceptions_Are_Propagated_Through_WithCancellation_With_Task_Of_Int
         [Fact]
         public async Task Exceptions_Are_Propagated_Through_WithCancellation_With_Task_Of_Int()
         {
@@ -142,9 +127,7 @@ namespace ExRam.Extensions.Tests
                 .ShouldThrowExactly<ApplicationException>()
                 .Where(ex2 => ex == ex2);
         }
-        #endregion
 
-        #region Exceptions_Are_Propagated_Through_Nested_TryWithCancellation_With_Task_Of_Int
         [Fact]
         public async Task Exceptions_Are_Propagated_Through_Nested_TryWithCancellation_With_Task_Of_Int()
         {
@@ -162,6 +145,5 @@ namespace ExRam.Extensions.Tests
                 .ShouldThrowExactly<ApplicationException>()
                 .Where(ex2 => ex == ex2);
         }
-        #endregion
     }
 }
