@@ -441,8 +441,89 @@ namespace ExRam.Extensions.Tests
             outerCt.IsCancellationRequested.Should().BeTrue();
         }
 
-        [Fact(Skip = "Not.")]
-        public async Task Finally_is_executed()
+        [Fact]
+        public async Task OperationCanceledException_is_thrown_on_enumerator_dispose()
+        {
+            var exceptionThrown = false;
+
+            var array = await AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await yielder.Return(1);
+                    
+                    try
+                    {
+                        await yielder.Return(2);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        exceptionThrown = true;
+                    }
+                })
+                .Take(2)
+                .ToArray();
+
+            array.Should().Equal(1, 2);
+            await Task.Delay(100);
+            exceptionThrown.Should().BeTrue();
+        }
+        
+        [Fact]
+        public async Task OperationCanceledException_is_thrown_on_break()
+        {
+            var exceptionThrown = false;
+
+            var array = await AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await yielder.Return(1);
+                    await yielder.Return(2);
+                    
+                    try
+                    {
+                        await yielder.Break();
+                    }
+                    catch(OperationCanceledException)
+                    {
+                        exceptionThrown = true;
+                    }
+                })
+                .ToArray();
+
+            array.Should().Equal(1, 2);
+            await Task.Delay(100);
+            exceptionThrown.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task Finally_is_executed_on_enumerator_dispose()
+        {
+            var finallyCalled = false;
+
+            var array = await AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await yielder.Return(1);
+
+                    try
+                    {
+                        await yielder.Return(2);
+                    }
+                    finally
+                    {
+                        finallyCalled = true;
+                    }
+                })
+                .Take(2)
+                .ToArray();
+
+            array.Should().Equal(1, 2);
+            await Task.Delay(100);
+            finallyCalled.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task Finally_is_executed_on_break()
         {
             var finallyCalled = false;
 

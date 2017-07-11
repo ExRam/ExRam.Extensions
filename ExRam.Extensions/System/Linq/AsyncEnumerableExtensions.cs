@@ -101,6 +101,11 @@ namespace System.Linq
 
             public void GetResult()
             {
+                lock (this)
+                {
+                    if (this._state == YielderState.Stopped)
+                        throw new OperationCanceledException();
+                }
             }
 
             [SecurityCritical]
@@ -113,7 +118,7 @@ namespace System.Linq
             {
                 lock (this)
                 {
-                    if (this._state == YielderState.InFlight)
+                    if (this._state == YielderState.InFlight || this._state == YielderState.Stopped)
                         continuation();
                     else
                         this._yieldContinuation = continuation;
@@ -169,7 +174,7 @@ namespace System.Linq
                         {
                             this._state = YielderState.InFlight;
 
-#pragma warning disable 4014
+                            #pragma warning disable 4014
                             this._createAction(this._cts.Token, this)
                                 // ReSharper disable once MethodSupportsCancellation
                                 .ContinueWith(
@@ -180,11 +185,12 @@ namespace System.Linq
                                             if (t.IsFaulted)
                                                 this._exception = t.Exception;
 
-                                            this.Break();
+                                            if (!t.IsCanceled)
+                                                this.Break();
                                         }
                                     },
                                     TaskContinuationOptions.ExecuteSynchronously);
-#pragma warning restore 4014
+                            #pragma warning restore 4014
                         }
                     }
 
@@ -215,6 +221,8 @@ namespace System.Linq
                 {
                     this._cts.Cancel();
                     this._state = YielderState.Stopped;
+
+                    this._yieldContinuation?.Invoke();
                 }
             }
 
