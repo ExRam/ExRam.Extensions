@@ -21,16 +21,8 @@ namespace System.Linq
             return source
                 .Materialize()
                 .Scan(
-                    new
-                    {
-                        Previous = (Notification<T>)null,
-                        Current = (Notification<T>)null
-                    },
-                    (previous, current) => new
-                    {
-                        Previous = previous.Current,
-                        Current = current
-                    })
+                    (Previous: (Notification<T>)null, Current: (Notification<T>)null),
+                    (tuple, current) => (Previous: tuple.Current, Current: current))
                 .SelectMany(tuple =>
                 {
                     if (tuple.Current.HasValue)
