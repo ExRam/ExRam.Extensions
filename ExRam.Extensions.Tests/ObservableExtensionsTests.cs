@@ -8,6 +8,7 @@ using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
+using Microsoft.Reactive.Testing;
 using Moq;
 using Xunit;
 
@@ -338,10 +339,10 @@ namespace ExRam.Extensions.Tests
             }
         }
 
-        [Fact(Skip = "Rx-Testing cannot be used at this time.")]
+        [Fact]
         public async Task LazyRefCount_does_not_disconnect_within_lazy_time()
         {
-            /*var testScheduler = new TestScheduler();
+            var testScheduler = new TestScheduler();
 
             var connectionMock = new Mock<IDisposable>();
             var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
@@ -371,211 +372,211 @@ namespace ExRam.Extensions.Tests
             testScheduler.AdvanceBy(2);
 
             connectionMock
-                .Verify(x => x.Dispose(), Times.Once());*/
+                .Verify(x => x.Dispose(), Times.Once());
         }
 
-        [Fact(Skip = "Rx-Testing cannot be used at this time.")]
+        [Fact]
         public async Task LazyRefCount_does_not_disconnect_after_lazy_time_when_new_connection_is_made()
         {
-            //var testScheduler = new TestScheduler();
+            var testScheduler = new TestScheduler();
 
-            //var connectionMock = new Mock<IDisposable>();
-            //var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
+            var connectionMock = new Mock<IDisposable>();
+            var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
 
-            //connectableObservableMock
-            //    .Setup(x => x.Connect())
-            //    .Returns(connectionMock.Object);
+            connectableObservableMock
+                .Setup(x => x.Connect())
+                .Returns(connectionMock.Object);
 
-            //connectableObservableMock
-            //    .Setup(x => x.Subscribe(It.IsAny<IObserver<Unit>>()))
-            //    .Returns(Disposable.Empty);
+            connectableObservableMock
+                .Setup(x => x.Subscribe(It.IsAny<IObserver<Unit>>()))
+                .Returns(Disposable.Empty);
 
-            //var refCount = connectableObservableMock
-            //    .Object
-            //    .LazyRefCount(TimeSpan.FromTicks(20), testScheduler);
+            var refCount = connectableObservableMock
+                .Object
+                .LazyRefCount(TimeSpan.FromTicks(20), testScheduler);
 
-            //using (refCount.Subscribe())
-            //{
-            //    connectableObservableMock
-            //        .Verify(x => x.Connect(), Times.Once());
-            //}
+            using (refCount.Subscribe())
+            {
+                connectableObservableMock
+                    .Verify(x => x.Connect(), Times.Once());
+            }
 
-            //connectionMock
-            //    .Verify(x => x.Dispose(), Times.Never());
+            connectionMock
+                .Verify(x => x.Dispose(), Times.Never());
 
-            //testScheduler.AdvanceBy(19);
+            testScheduler.AdvanceBy(19);
 
-            //connectionMock
-            //    .Verify(x => x.Dispose(), Times.Never());
+            connectionMock
+                .Verify(x => x.Dispose(), Times.Never());
 
-            //using (refCount.Subscribe())
-            //{
-            //    testScheduler.AdvanceBy(2);
+            using (refCount.Subscribe())
+            {
+                testScheduler.AdvanceBy(2);
 
-            //    connectionMock
-            //        .Verify(x => x.Dispose(), Times.Never());
-            //}
+                connectionMock
+                    .Verify(x => x.Dispose(), Times.Never());
+            }
         }
 
-        [Fact(Skip = "Rx-Testing cannot be used at this time.")]
+        [Fact]
         public async Task LazyRefCount_disconnects_after_all_when_second_subscription_is_disposed()
         {
-            //var testScheduler = new TestScheduler();
+            var testScheduler = new TestScheduler();
 
-            //var connectionMock = new Mock<IDisposable>();
-            //var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
+            var connectionMock = new Mock<IDisposable>();
+            var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
 
-            //connectableObservableMock
-            //    .Setup(x => x.Connect())
-            //    .Returns(connectionMock.Object);
+            connectableObservableMock
+                .Setup(x => x.Connect())
+                .Returns(connectionMock.Object);
 
-            //connectableObservableMock
-            //    .Setup(x => x.Subscribe(It.IsAny<IObserver<Unit>>()))
-            //    .Returns(Disposable.Empty);
+            connectableObservableMock
+                .Setup(x => x.Subscribe(It.IsAny<IObserver<Unit>>()))
+                .Returns(Disposable.Empty);
 
-            //var refCount = connectableObservableMock
-            //    .Object
-            //    .LazyRefCount(TimeSpan.FromTicks(20), testScheduler);
+            var refCount = connectableObservableMock
+                .Object
+                .LazyRefCount(TimeSpan.FromTicks(20), testScheduler);
 
-            //refCount.Subscribe().Dispose();
+            refCount.Subscribe().Dispose();
 
-            //testScheduler.AdvanceBy(19);
+            testScheduler.AdvanceBy(19);
 
-            //using (refCount.Subscribe())
-            //{
-            //    testScheduler.AdvanceBy(2);
-            //}
+            using (refCount.Subscribe())
+            {
+                testScheduler.AdvanceBy(2);
+            }
 
-            //testScheduler.AdvanceBy(20);
+            testScheduler.AdvanceBy(20);
 
-            //connectionMock
-            //    .Verify(x => x.Dispose(), Times.Once());
+            connectionMock
+                .Verify(x => x.Dispose(), Times.Once());
         }
 
-        [Fact(Skip = "Rx-Testing cannot be used at this time.")]
+        [Fact]
         public async Task LazyRefCount_does_not_observe_values_after_unsubscription()
         {
-            //var value = 0;
-            //var subject = new Subject<int>();
+            var value = 0;
+            var subject = new Subject<int>();
 
-            //var subscription = subject
-            //    .Publish()
-            //    .LazyRefCount(TimeSpan.FromSeconds(2), Scheduler.Default)
-            //    .Subscribe(Observer.Create<int>(x =>
-            //    {
-            //        value = x;
-            //    }));
+            var subscription = subject
+                .Publish()
+                .LazyRefCount(TimeSpan.FromSeconds(2), Scheduler.Default)
+                .Subscribe(Observer.Create<int>(x =>
+                {
+                    value = x;
+                }));
 
-            //using (subscription)
-            //{
-            //    subject.OnNext(1);
-            //    Assert.Equal(1, value);
-            //}
+            using (subscription)
+            {
+                subject.OnNext(1);
+                Assert.Equal(1, value);
+            }
 
-            //subject.OnNext(2);
-            //Assert.Equal(1, value);
+            subject.OnNext(2);
+            Assert.Equal(1, value);
         }
 
-        [Fact(Skip = "Rx-Testing cannot be used at this time.")]
+        [Fact]
         public void Debounce_lets_first_value_pass()
         {
-            //var testScheduler = new TestScheduler();
+            var testScheduler = new TestScheduler();
 
-            //var xs = testScheduler.CreateHotObservable<int>(
-            //    new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
-            //    new Recorded<Notification<int>>(3, Notification.CreateOnCompleted<int>()));
+            var xs = testScheduler.CreateHotObservable<int>(
+                new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
+                new Recorded<Notification<int>>(3, Notification.CreateOnCompleted<int>()));
 
-            //var latestValue = 0;
+            var latestValue = 0;
 
-            //xs
-            //    .Debounce(TimeSpan.FromTicks(200), false, testScheduler)
-            //    .Subscribe(value => latestValue = value);
+            xs
+                .Debounce(TimeSpan.FromTicks(200), false, testScheduler)
+                .Subscribe(value => latestValue = value);
 
-            //testScheduler.AdvanceBy(1);
-            //Assert.Equal(0, latestValue);
+            testScheduler.AdvanceBy(1);
+            Assert.Equal(0, latestValue);
 
-            //testScheduler.AdvanceBy(1);
-            //Assert.Equal(1, latestValue);
+            testScheduler.AdvanceBy(1);
+            Assert.Equal(1, latestValue);
         }
 
-        [Fact(Skip = "Rx-Testing cannot be used at this time.")]
+        [Fact]
         public void Debounce_blocks_value_within_debounce_interval_does_not_emit_value_after_debounce_interval_if_configured()
         {
-            //var testScheduler = new TestScheduler();
+            var testScheduler = new TestScheduler();
 
-            //var xs = testScheduler.CreateHotObservable<int>(
-            //    new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
-            //    new Recorded<Notification<int>>(3, Notification.CreateOnNext(2)),
-            //    new Recorded<Notification<int>>(4, Notification.CreateOnCompleted<int>()));
+            var xs = testScheduler.CreateHotObservable<int>(
+                new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
+                new Recorded<Notification<int>>(3, Notification.CreateOnNext(2)),
+                new Recorded<Notification<int>>(4, Notification.CreateOnCompleted<int>()));
 
-            //var latestValue = 0;
+            var latestValue = 0;
 
-            //xs
-            //    .Debounce(TimeSpan.FromTicks(200), false, testScheduler)
-            //    .Subscribe(value => latestValue = value);
+            xs
+                .Debounce(TimeSpan.FromTicks(200), false, testScheduler)
+                .Subscribe(value => latestValue = value);
 
-            //testScheduler.AdvanceBy(1);
-            //Assert.Equal(0, latestValue);
+            testScheduler.AdvanceBy(1);
+            Assert.Equal(0, latestValue);
 
-            //testScheduler.AdvanceBy(1);
-            //Assert.Equal(1, latestValue);
+            testScheduler.AdvanceBy(1);
+            Assert.Equal(1, latestValue);
 
-            //testScheduler.AdvanceBy(200);
-            //Assert.Equal(1, latestValue);
+            testScheduler.AdvanceBy(200);
+            Assert.Equal(1, latestValue);
         }
 
-        [Fact(Skip = "Rx-Testing cannot be used at this time.")]
+        [Fact]
         public void Debounce_blocks_value_within_debounce_interval_and_emits_value_after_debounce_interval_if_configured()
         {
-            //var testScheduler = new TestScheduler();
+            var testScheduler = new TestScheduler();
 
-            //var xs = testScheduler.CreateHotObservable<int>(
-            //    new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
-            //    new Recorded<Notification<int>>(3, Notification.CreateOnNext(2)),
-            //    new Recorded<Notification<int>>(4, Notification.CreateOnNext(3)),
-            //    new Recorded<Notification<int>>(400, Notification.CreateOnCompleted<int>()));
+            var xs = testScheduler.CreateHotObservable<int>(
+                new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
+                new Recorded<Notification<int>>(3, Notification.CreateOnNext(2)),
+                new Recorded<Notification<int>>(4, Notification.CreateOnNext(3)),
+                new Recorded<Notification<int>>(400, Notification.CreateOnCompleted<int>()));
 
-            //var latestValue = 0;
+            var latestValue = 0;
 
-            //xs
-            //    .Debounce(TimeSpan.FromTicks(200), true, testScheduler)
-            //    .Subscribe(value => latestValue = value);
+            xs
+                .Debounce(TimeSpan.FromTicks(200), true, testScheduler)
+                .Subscribe(value => latestValue = value);
 
-            //testScheduler.AdvanceBy(1);
-            //Assert.Equal(0, latestValue);
+            testScheduler.AdvanceBy(1);
+            Assert.Equal(0, latestValue);
 
-            //testScheduler.AdvanceBy(1);
-            //Assert.Equal(1, latestValue);
+            testScheduler.AdvanceBy(1);
+            Assert.Equal(1, latestValue);
 
-            //testScheduler.AdvanceBy(200);
-            //Assert.Equal(3, latestValue);
+            testScheduler.AdvanceBy(200);
+            Assert.Equal(3, latestValue);
         }
 
-        [Fact(Skip = "Rx-Testing cannot be used at this time.")]
+        [Fact]
         public void Debounce_blocks_value_within_debounce_interval_and_emits_nothing_if_completed_meanwhile()
         {
-            //var testScheduler = new TestScheduler();
+            var testScheduler = new TestScheduler();
 
-            //var xs = testScheduler.CreateHotObservable<int>(
-            //    new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
-            //    new Recorded<Notification<int>>(3, Notification.CreateOnNext(2)),
-            //    new Recorded<Notification<int>>(4, Notification.CreateOnNext(3)),
-            //    new Recorded<Notification<int>>(5, Notification.CreateOnCompleted<int>()));
+            var xs = testScheduler.CreateHotObservable<int>(
+                new Recorded<Notification<int>>(2, Notification.CreateOnNext(1)),
+                new Recorded<Notification<int>>(3, Notification.CreateOnNext(2)),
+                new Recorded<Notification<int>>(4, Notification.CreateOnNext(3)),
+                new Recorded<Notification<int>>(5, Notification.CreateOnCompleted<int>()));
 
-            //var latestValue = 0;
+            var latestValue = 0;
 
-            //xs
-            //    .Debounce(TimeSpan.FromTicks(200), true, testScheduler)
-            //    .Subscribe(value => latestValue = value);
+            xs
+                .Debounce(TimeSpan.FromTicks(200), true, testScheduler)
+                .Subscribe(value => latestValue = value);
 
-            //testScheduler.AdvanceBy(1);
-            //Assert.Equal(0, latestValue);
+            testScheduler.AdvanceBy(1);
+            Assert.Equal(0, latestValue);
 
-            //testScheduler.AdvanceBy(1);
-            //Assert.Equal(1, latestValue);
+            testScheduler.AdvanceBy(1);
+            Assert.Equal(1, latestValue);
 
-            //testScheduler.AdvanceBy(200);
-            //Assert.Equal(1, latestValue);
+            testScheduler.AdvanceBy(200);
+            Assert.Equal(1, latestValue);
         }
     }
 }
