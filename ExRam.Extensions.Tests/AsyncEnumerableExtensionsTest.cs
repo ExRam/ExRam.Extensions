@@ -15,7 +15,7 @@ using Xunit;
 
 namespace ExRam.Extensions.Tests
 {
-    public partial class AsyncEnumerableExtensionsTest
+    public class AsyncEnumerableExtensionsTest
     {
         [Fact]
         public async Task AsyncEnumerable_Concat_produces_correct_sequence_when_first_sequence_has_values()
@@ -303,6 +303,248 @@ namespace ExRam.Extensions.Tests
             stream
                 .Awaiting(_ => _.ReadAsync(new byte[1], 0, 1))
                 .ShouldThrowExactly<IOException>();
+        }
+
+        [Fact]
+        public async Task Return_and_break()
+        {
+            var array = await AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await yielder.Return(1);
+                    await yielder.Return(2);
+
+                    await yielder.Break();
+                })
+                .ToArray();
+
+            array.Should().Equal(1, 2);
+        }
+
+        [Fact]
+        public async Task Return_break_and_return()
+        {
+            var array = await AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await yielder.Return(1);
+                    await yielder.Return(2);
+
+                    await yielder.Break();
+
+                    await yielder.Return(2);
+                })
+                .ToArray();
+
+            array.Should().Equal(1, 2);
+        }
+
+        [Fact]
+        public async Task Return_with_delays()
+        {
+            var array = await AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await Task.Delay(100, ct);
+                    await yielder.Return(1);
+                    await Task.Delay(100, ct);
+                    await yielder.Return(2);
+
+                    await yielder.Break();
+                })
+                .ToArray();
+
+            array.Should().Equal(1, 2);
+        }
+
+        [Fact]
+        public async Task Return_without_break()
+        {
+            var array = await AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await yielder.Return(1);
+                    await yielder.Return(2);
+                })
+                .ToArray();
+
+            array.Should().Equal(1, 2);
+        }
+
+        [Fact]
+        public async Task Return_without_break_with_delays()
+        {
+            var array = await AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await Task.Delay(100, ct);
+                    await yielder.Return(1);
+                    await Task.Delay(100, ct);
+                    await yielder.Return(2);
+                })
+                .ToArray();
+
+            array.Should().Equal(1, 2);
+        }
+
+        [Fact]
+        public async Task Cancellation_of_MoveNext()
+        {
+            CancellationToken outerCt;
+
+            var e = AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    outerCt = ct;
+                    await Task.Delay(TimeSpan.FromHours(1));
+                })
+                .GetEnumerator();
+
+            var cts = new CancellationTokenSource();
+
+            var moveNextTask = e.MoveNext(cts.Token);
+            await Task.Delay(50);
+
+            outerCt.CanBeCanceled.Should().BeTrue();
+            outerCt.IsCancellationRequested.Should().BeFalse();
+
+            cts.Cancel();
+            await Task.Delay(50);
+
+            outerCt.IsCancellationRequested.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task Cancellation_by_Dispose()
+        {
+            CancellationToken outerCt;
+
+            var e = AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    outerCt = ct;
+                    await Task.Delay(TimeSpan.FromHours(1));
+                })
+                .GetEnumerator();
+
+            var cts = new CancellationTokenSource();
+
+            var moveNextTask = e.MoveNext(cts.Token);
+            await Task.Delay(50);
+
+            outerCt.CanBeCanceled.Should().BeTrue();
+            outerCt.IsCancellationRequested.Should().BeFalse();
+
+            e.Dispose();
+            await Task.Delay(50);
+
+            outerCt.IsCancellationRequested.Should().BeTrue();
+        }
+
+        [Fact(Skip = "Not.")]
+        public async Task Finally_is_executed()
+        {
+            var finallyCalled = false;
+
+            var array = await AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    try
+                    {
+                        await yielder.Return(1);
+                        await yielder.Return(2);
+
+                        await yielder.Break();
+                    }
+                    finally
+                    {
+                        finallyCalled = true;
+                    }
+                })
+                .ToArray();
+
+            array.Should().Equal(1, 2);
+            await Task.Delay(100);
+            finallyCalled.Should().BeTrue();
+        }
+
+        [Fact]
+        public async Task Exception_bubbles_up()
+        {
+            var enumerable = AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await yielder.Return(1);
+                    await yielder.Return(2);
+
+                    throw new DivideByZeroException();
+                });
+
+            enumerable
+                .Awaiting(closure => closure.ToArray())
+                .ShouldThrow<DivideByZeroException>();
+        }
+
+        [Fact]
+        public async Task Exception_bubbles_up_with_delay()
+        {
+            var enumerable = AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await yielder.Return(1);
+                    await yielder.Return(2);
+
+                    await Task.Delay(100, ct);
+                    throw new DivideByZeroException();
+                });
+
+            enumerable
+                .Awaiting(closure => closure.ToArray())
+                .ShouldThrow<DivideByZeroException>();
+        }
+
+        [Fact]
+        public async Task Exception_is_only_thrown_once()
+        {
+            var enumerable = AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await yielder.Return(1);
+                    await yielder.Return(2);
+
+                    throw new DivideByZeroException();
+                });
+
+            using (var enumerator = enumerable.GetEnumerator())
+            {
+                (await enumerator.MoveNext(CancellationToken.None)).Should().BeTrue();
+                (await enumerator.MoveNext(CancellationToken.None)).Should().BeTrue();
+
+                enumerator
+                    .Awaiting(closure => closure.MoveNext(CancellationToken.None))
+                    .ShouldThrow<DivideByZeroException>();
+
+                (await enumerator.MoveNext(CancellationToken.None)).Should().BeFalse();
+            }
+        }
+
+        [Fact]
+        public async Task MoveNext_throws_when_called_in_wrong_state()
+        {
+            var enumerable = AsyncEnumerableExtensions
+                .Create<int>(async (ct, yielder) =>
+                {
+                    await Task.Delay(-1, ct);
+                });
+
+            using (var enumerator = enumerable.GetEnumerator())
+            {
+                enumerator.MoveNext(CancellationToken.None);
+
+                enumerator
+                    .Awaiting(closure => closure.MoveNext(CancellationToken.None))
+                    .ShouldThrow<InvalidOperationException>();
+            }
         }
     }
 }
