@@ -23,6 +23,53 @@ namespace System.Reactive.Linq
 {
     public static partial class ObservableExtensions
     {
+        private sealed class ResourceEachUsingObserver<T> : IObserver<T>, IDisposable
+        {
+            private readonly IObserver<T> _baseObserver;
+            private readonly object _syncRoot = new object();
+            private readonly Func<T, IDisposable> _resourceFactory;
+
+            private IDisposable _resource;
+           
+            public ResourceEachUsingObserver(IObserver<T> baseObserver, Func<T, IDisposable> resourceFactory)
+            {
+                this._baseObserver = baseObserver;
+                this._resourceFactory = resourceFactory;
+            }
+
+            public void OnCompleted()
+            {
+                this.Dispose();
+                this._baseObserver.OnCompleted();
+            }
+
+            public void OnError(Exception error)
+            {
+                this.Dispose();
+                this._baseObserver.OnError(error);
+            }
+
+            public void OnNext(T value)
+            {
+                lock (this._syncRoot)
+                {
+                    this._resource?.Dispose();
+                    this._resource = this._resourceFactory(value);
+                }
+
+                this._baseObserver.OnNext(value);
+            }
+
+            public void Dispose()
+            {
+                lock (this._syncRoot)
+                {
+                    this._resource?.Dispose();
+                    this._resource = null;
+                }
+            }
+        }
+        
         public static IObservable<object> Box<T>(this IObservable<T> source) where T : struct
         {
             Contract.Requires(source != null);
@@ -212,52 +259,9 @@ namespace System.Reactive.Linq
 
             return Observable.Create<T>(obs =>
             {
-                IDisposable resource = null;
-                var syncRoot = new object();
+                var eachUsingObserver = new ResourceEachUsingObserver<T>(obs, resourceFactory);
 
-                var subscription = source.Subscribe(
-                    value =>
-                    {
-                        lock (syncRoot)
-                        {
-                            resource?.Dispose();
-                            resource = resourceFactory(value);
-                        }
-
-                        obs.OnNext(value);
-                    },
-                    ex =>
-                    {
-                        lock (syncRoot)
-                        {
-                            resource?.Dispose();
-                            resource = null;
-                        }
-
-                        obs.OnError(ex);
-
-                    },
-                    () =>
-                    {
-                        lock (syncRoot)
-                        {
-                            resource?.Dispose();
-                            resource = null;
-                        }
-
-                        obs.OnCompleted();
-                    });
-
-                return StableCompositeDisposable.Create(
-                    subscription,
-                    Disposable.Create(() =>
-                    {
-                        lock (syncRoot)
-                        {
-                            resource?.Dispose();
-                            resource = null;
-                        }
-                    }));
+                return StableCompositeDisposable.Create(source.Subscribe(eachUsingObserver), eachUsingObserver);
             });
         }
 
