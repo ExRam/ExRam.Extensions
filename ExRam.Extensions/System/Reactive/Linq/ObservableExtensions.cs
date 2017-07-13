@@ -69,7 +69,85 @@ namespace System.Reactive.Linq
                 }
             }
         }
-        
+
+        private sealed class ObservableEachUsingObserver<TSource, TOther> : IObserver<TSource>, IDisposable
+        {
+            private sealed class InnerObserver : IObserver<TOther>
+            {
+                private readonly IDisposable _subscription;
+                private readonly ObservableEachUsingObserver<TSource, TOther> _parentObserver;
+
+                public InnerObserver(ObservableEachUsingObserver<TSource, TOther> parentObserver, IDisposable subscription)
+                {
+                    this._parentObserver = parentObserver;
+                    this._subscription = subscription;
+                }
+
+                public void OnCompleted()
+                {
+                    this._subscription.Dispose();
+                }
+
+                public void OnError(Exception error)
+                {
+                    this._parentObserver.OnError(error);
+                }
+
+                public void OnNext(TOther value)
+                {
+                }
+            }
+
+            private readonly object _syncRoot = new object();
+            private readonly IObserver<TSource> _baseObserver;
+            private readonly Func<TSource, IObservable<TOther>> _observableFactory;
+
+            private IDisposable _resource;
+
+            public ObservableEachUsingObserver(IObserver<TSource> baseObserver, Func<TSource, IObservable<TOther>> observableFactory)
+            {
+                this._baseObserver = baseObserver;
+                this._observableFactory = observableFactory;
+            }
+
+            public void OnCompleted()
+            {
+                this.Dispose();
+                this._baseObserver.OnCompleted();
+            }
+
+            public void OnError(Exception error)
+            {
+                this.Dispose();
+                this._baseObserver.OnError(error);
+            }
+
+            public void OnNext(TSource value)
+            {
+                lock (this._syncRoot)
+                {
+                    var subscription = new SingleAssignmentDisposable();
+
+                    this._resource?.Dispose();
+                    this._resource = subscription;
+
+                    subscription.Disposable = this._observableFactory(value)
+                        .Subscribe(new InnerObserver(this, subscription));
+                }
+
+                this._baseObserver.OnNext(value);
+            }
+            
+            public void Dispose()
+            {
+                lock (this._syncRoot)
+                {
+                    this._resource?.Dispose();
+                    this._resource = null;
+                }
+            }
+        }
+
         public static IObservable<object> Box<T>(this IObservable<T> source) where T : struct
         {
             Contract.Requires(source != null);
@@ -260,6 +338,19 @@ namespace System.Reactive.Linq
             return Observable.Create<T>(obs =>
             {
                 var eachUsingObserver = new ResourceEachUsingObserver<T>(obs, resourceFactory);
+
+                return StableCompositeDisposable.Create(source.Subscribe(eachUsingObserver), eachUsingObserver);
+            });
+        }
+
+        public static IObservable<TSource> EachUsing<TSource, TOther>(this IObservable<TSource> source, Func<TSource, IObservable<TOther>> observableFactory)
+        {
+            Contract.Requires(source != null);
+            Contract.Requires(observableFactory != null);
+
+            return Observable.Create<TSource>(obs =>
+            {
+                var eachUsingObserver = new ObservableEachUsingObserver<TSource, TOther>(obs, observableFactory);
 
                 return StableCompositeDisposable.Create(source.Subscribe(eachUsingObserver), eachUsingObserver);
             });
