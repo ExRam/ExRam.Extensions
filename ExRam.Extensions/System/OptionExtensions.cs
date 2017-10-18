@@ -1,16 +1,27 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using LanguageExt;
+﻿using System;
+using System.Threading.Tasks;
 
-namespace System
+namespace LanguageExt
 {
     public static class OptionExtensions
     {
-        public static IAsyncEnumerable<T> ToAsyncEnumerable<T>(this Option<T> self)
+        public static Option<T> IfNone<T>(this Option<T> option, Func<Option<T>> none)
         {
-            return self
-                .Map(AsyncEnumerable.Return)
-                .IfNone(AsyncEnumerable.Empty<T>());
+            return option
+                .Match(x => x, none);
+        }
+
+        public static Task<Option<T>> IfNoneAsync<T>(this Option<T> option, Func<Task<Option<T>>> none)
+        {
+            return option
+                .MatchAsync(x => Task.FromResult((Option<T>)x), none);
+        }
+
+        public static async Task<Option<T>> IfNoneAsync<T>(this Task<Option<T>> option, Func<Task<Option<T>>> none)
+        {
+            return await (await option.ConfigureAwait(false))
+                .MatchAsync(x => Task.FromResult((Option<T>)x), none)
+                .ConfigureAwait(false);
         }
     }
 }
