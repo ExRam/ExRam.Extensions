@@ -1,33 +1,15 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>ExRam.Extensions</Description>
-    <Authors>Daniel C. Weber</Authors>
+    <Copyright>ExRam EDV GmbH &amp; Co. KG</Copyright>
     <TargetFrameworks>netstandard20</TargetFrameworks>
-    <AssemblyName>ExRam.Extensions</AssemblyName>
-    <PackageId>ExRam.Extensions</PackageId>
-    <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
-    <GenerateAssemblyDescriptionAttribute>false</GenerateAssemblyDescriptionAttribute>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
-    <GenerateAssemblyCopyrightAttribute>false</GenerateAssemblyCopyrightAttribute>
-    <GenerateNeutralResourcesLanguageAttribute>false</GenerateNeutralResourcesLanguageAttribute>
-    <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
-    <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
-    <Version>3.1.0</Version>
+    <Version>3.2.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="LanguageExt.Core" Version="2.1.23" />
     <PackageReference Include="System.Interactive" Version="3.1.1" />
     <PackageReference Include="System.Interactive.Async" Version="3.1.1" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard1.3' ">
-    <PackageReference Include="System.Diagnostics.Contracts" Version="4.0.1" />
-    <PackageReference Include="System.ObjectModel" Version="4.3.0" />
-    <PackageReference Include="System.ComponentModel" Version="4.0.1" />
   </ItemGroup>
 
 </Project>

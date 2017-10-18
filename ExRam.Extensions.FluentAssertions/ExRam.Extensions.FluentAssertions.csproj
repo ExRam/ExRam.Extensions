@@ -1,15 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>ExRam.Extensions.FluentAssertions</Description>
-    <VersionPrefix>3.1.0</VersionPrefix>
-    <Authors>Daniel C. Weber</Authors>
+    <VersionPrefix>3.2.0</VersionPrefix>
+    <Copyright>ExRam EDV GmbH &amp; Co. KG</Copyright>
     <TargetFrameworks>netstandard20</TargetFrameworks>
-    <AssemblyName>ExRam.Extensions.FluentAssertions</AssemblyName>
-    <PackageId>ExRam.Extensions.FluentAssertions</PackageId>
-    <GenerateAssemblyConfigurationAttribute>false</GenerateAssemblyConfigurationAttribute>
-    <GenerateAssemblyCompanyAttribute>false</GenerateAssemblyCompanyAttribute>
-    <GenerateAssemblyProductAttribute>false</GenerateAssemblyProductAttribute>
   </PropertyGroup>
 
   <ItemGroup>
