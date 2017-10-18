@@ -29,7 +29,7 @@
     <PackageReference Include="Microsoft.Reactive.Testing" Version="3.1.1" />
     <PackageReference Include="System.Reactive.PlatformServices" Version="3.1.1" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.2.0-beta5-build1225" />
-    <PackageReference Include="FluentAssertions" Version="4.2.2" />
+    <PackageReference Include="FluentAssertions" Version="4.19.4" />
     <PackageReference Include="Moq" Version="4.2.1510.2205" />
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="xunit" Version="2.2.0-beta5-build3474" />
