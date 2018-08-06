@@ -44,7 +44,8 @@ namespace ExRam.Extensions.Tests
 
             task
                 .Awaiting(_ => _)
-                .ShouldThrowExactly<AggregateException>()
+                .Should()
+                .ThrowExactly<AggregateException>()
                 .Where(ex => ex.GetBaseException() is DivideByZeroException);
         }
 
@@ -182,7 +183,8 @@ namespace ExRam.Extensions.Tests
 
             cancellationTask
                 .Awaiting(_ => _)
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -197,7 +199,8 @@ namespace ExRam.Extensions.Tests
 
             faultingTaskFunc
                 .Awaiting(_ => _().TryWithCancellation(CancellationToken.None))
-                .ShouldThrowExactly<ApplicationException>()
+                .Should()
+                .ThrowExactly<ApplicationException>()
                 .Where(ex2 => ex == ex2);
         }
 
@@ -213,7 +216,8 @@ namespace ExRam.Extensions.Tests
 
             faultingTaskFunc
                 .Awaiting(_ => _().TryWithCancellation(CancellationToken.None))
-                .ShouldThrowExactly<ApplicationException>()
+                .Should()
+                .ThrowExactly<ApplicationException>()
                 .Where(ex2 => ex == ex2);
         }
 
@@ -249,7 +253,8 @@ namespace ExRam.Extensions.Tests
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [Fact]
@@ -259,7 +264,8 @@ namespace ExRam.Extensions.Tests
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [Fact]
@@ -269,7 +275,8 @@ namespace ExRam.Extensions.Tests
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [Fact]
@@ -279,7 +286,8 @@ namespace ExRam.Extensions.Tests
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -289,7 +297,8 @@ namespace ExRam.Extensions.Tests
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -299,7 +308,8 @@ namespace ExRam.Extensions.Tests
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -345,7 +355,8 @@ namespace ExRam.Extensions.Tests
 
             tcs.Task
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [Fact]
@@ -358,7 +369,8 @@ namespace ExRam.Extensions.Tests
 
             tcs.Task
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -391,7 +403,8 @@ namespace ExRam.Extensions.Tests
 
             tcs.Task
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [Fact]
@@ -404,7 +417,8 @@ namespace ExRam.Extensions.Tests
 
             tcs.Task
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [Fact]
@@ -417,7 +431,8 @@ namespace ExRam.Extensions.Tests
 
             tcs.Task
                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-               .ShouldThrowExactly<TaskCanceledException>();
+               .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -430,7 +445,8 @@ namespace ExRam.Extensions.Tests
 
             tcs.Task
                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
-               .ShouldThrowExactly<TaskCanceledException>();
+               .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -444,7 +460,8 @@ namespace ExRam.Extensions.Tests
 
             cancellationTask
                 .Awaiting(_ => _)
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -459,7 +476,8 @@ namespace ExRam.Extensions.Tests
 
             cancellationTask
                 .Awaiting(_ => _)
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -482,7 +500,8 @@ namespace ExRam.Extensions.Tests
 
             cancellationTask
                 .Awaiting(_ => _)
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -497,7 +516,8 @@ namespace ExRam.Extensions.Tests
 
             cancellationTask
                 .Awaiting(_ => _)
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -526,7 +546,8 @@ namespace ExRam.Extensions.Tests
 
             faultingTaskFunc
                 .Awaiting(_ => _().TryWithCancellation(CancellationToken.None))
-                .ShouldThrowExactly<ApplicationException>()
+                .Should()
+                .ThrowExactly<ApplicationException>()
                 .Where(ex2 => ex == ex2);
         }
 
@@ -542,7 +563,8 @@ namespace ExRam.Extensions.Tests
 
             faultingTaskFunc
                 .Awaiting(_ => _().TryWithCancellation(CancellationToken.None))
-                .ShouldThrowExactly<ApplicationException>()
+                .Should()
+                .ThrowExactly<ApplicationException>()
                 .Where(ex2 => ex == ex2);
         }
 
@@ -560,7 +582,8 @@ namespace ExRam.Extensions.Tests
                 .Awaiting(_ => _()
                     .TryWithCancellation(CancellationToken.None)
                     .TryWithCancellation(CancellationToken.None))
-                .ShouldThrowExactly<ApplicationException>()
+                .Should()
+                .ThrowExactly<ApplicationException>()
                 .Where(ex2 => ex == ex2);
         }
 
@@ -585,7 +608,8 @@ namespace ExRam.Extensions.Tests
 
             completedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [Fact]
@@ -595,7 +619,8 @@ namespace ExRam.Extensions.Tests
 
             completedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [Fact]
@@ -605,7 +630,8 @@ namespace ExRam.Extensions.Tests
 
             completedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -615,7 +641,8 @@ namespace ExRam.Extensions.Tests
 
             completedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -625,7 +652,8 @@ namespace ExRam.Extensions.Tests
 
             uncompletedTask
                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
-               .ShouldThrowExactly<TimeoutException>();
+               .Should()
+                .ThrowExactly<TimeoutException>();
         }
 
         [Fact]
@@ -635,7 +663,8 @@ namespace ExRam.Extensions.Tests
 
             uncompletedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TimeoutException>();
+                .Should()
+                .ThrowExactly<TimeoutException>();
         }
 
         [Fact]
@@ -645,7 +674,8 @@ namespace ExRam.Extensions.Tests
 
             tcs
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TimeoutException>();
+                .Should()
+                .ThrowExactly<TimeoutException>();
         }
 
         [Fact]
@@ -655,13 +685,15 @@ namespace ExRam.Extensions.Tests
 
             tcs
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TimeoutException>();
+                .Should()
+                .ThrowExactly<TimeoutException>();
 
             tcs.SetException(new InvalidOperationException());
 
             tcs
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [Fact]
@@ -671,7 +703,8 @@ namespace ExRam.Extensions.Tests
 
             tcs
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TimeoutException>();
+                .Should()
+                .ThrowExactly<TimeoutException>();
         }
 
         [Fact]
@@ -681,7 +714,8 @@ namespace ExRam.Extensions.Tests
 
             tcs
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TimeoutException>();
+                .Should()
+                .ThrowExactly<TimeoutException>();
 
             tcs.SetResult(36);
 
@@ -697,13 +731,15 @@ namespace ExRam.Extensions.Tests
 
             tcs
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TimeoutException>();
+                .Should()
+                .ThrowExactly<TimeoutException>();
 
             tcs.SetException(new InvalidOperationException());
 
             tcs
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
         }
 
         [Fact]
@@ -713,7 +749,8 @@ namespace ExRam.Extensions.Tests
 
             tcs
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
-                .ShouldThrowExactly<TimeoutException>();
+                .Should()
+                .ThrowExactly<TimeoutException>();
         }
     }
 }

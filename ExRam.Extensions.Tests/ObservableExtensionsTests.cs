@@ -110,7 +110,8 @@ namespace ExRam.Extensions.Tests
 
                 asyncEnumerator
                     .Awaiting(_ => _.MoveNext(CancellationToken.None))
-                    .ShouldThrowExactly<AggregateException>()
+                    .Should()
+                    .ThrowExactly<AggregateException>()
                     .Where(ex => ex.GetBaseException() is InvalidOperationException);
             }
         }
@@ -147,7 +148,8 @@ namespace ExRam.Extensions.Tests
 
             moveNextTask
                 .Awaiting(_ => _)
-                .ShouldThrowExactly<TaskCanceledException>();
+                .Should()
+                .ThrowExactly<TaskCanceledException>();
         }
 
         [Fact]
@@ -168,7 +170,8 @@ namespace ExRam.Extensions.Tests
 
                 moveNextTask
                     .Awaiting(_ => _)
-                    .ShouldThrowExactly<TaskCanceledException>();
+                    .Should()
+                    .ThrowExactly<TaskCanceledException>();
             }
         }
 
@@ -260,7 +263,8 @@ namespace ExRam.Extensions.Tests
 
             t
                 .Awaiting(_ => _)
-                .ShouldThrowExactly<InvalidOperationException>();
+                .Should()
+                .ThrowExactly<InvalidOperationException>();
 
         }
 

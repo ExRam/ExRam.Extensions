@@ -98,7 +98,8 @@ namespace ExRam.Extensions.Tests
 
                 e
                     .Awaiting(_ => _.MoveNext(CancellationToken.None))
-                    .ShouldThrowExactly<DivideByZeroException>();
+                    .Should()
+                    .ThrowExactly<DivideByZeroException>();
             }
         }
 
@@ -290,7 +291,8 @@ namespace ExRam.Extensions.Tests
 
             stream
                 .Awaiting(_ => _.ReadAsync(new byte[1], 0, 1))
-                .ShouldThrowExactly<IOException>();
+                .Should()
+                .ThrowExactly<IOException>();
         }
 
         [Fact]
@@ -302,7 +304,8 @@ namespace ExRam.Extensions.Tests
 
             stream
                 .Awaiting(_ => _.ReadAsync(new byte[1], 0, 1))
-                .ShouldThrowExactly<IOException>();
+                .Should()
+                .ThrowExactly<IOException>();
         }
 
         [Fact]
@@ -563,7 +566,8 @@ namespace ExRam.Extensions.Tests
 
             enumerable
                 .Awaiting(closure => closure.ToArray())
-                .ShouldThrow<DivideByZeroException>();
+                .Should()
+                .Throw<DivideByZeroException>();
         }
 
         [Fact]
@@ -581,7 +585,8 @@ namespace ExRam.Extensions.Tests
 
             enumerable
                 .Awaiting(closure => closure.ToArray())
-                .ShouldThrow<DivideByZeroException>();
+                .Should()
+                .Throw<DivideByZeroException>();
         }
 
         [Fact]
@@ -603,7 +608,8 @@ namespace ExRam.Extensions.Tests
 
                 enumerator
                     .Awaiting(closure => closure.MoveNext(CancellationToken.None))
-                    .ShouldThrow<DivideByZeroException>();
+                    .Should()
+                    .Throw<DivideByZeroException>();
 
                 (await enumerator.MoveNext(CancellationToken.None)).Should().BeFalse();
             }
@@ -624,7 +630,8 @@ namespace ExRam.Extensions.Tests
 
                 enumerator
                     .Awaiting(closure => closure.MoveNext(CancellationToken.None))
-                    .ShouldThrow<InvalidOperationException>();
+                    .Should()
+                    .Throw<InvalidOperationException>();
             }
         }
     }
