@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <VersionPrefix>3.2.0</VersionPrefix>
+    <VersionPrefix>3.3.0</VersionPrefix>
     <Copyright>ExRam EDV GmbH &amp; Co. KG</Copyright>
     <TargetFrameworks>netstandard20</TargetFrameworks>
   </PropertyGroup>
