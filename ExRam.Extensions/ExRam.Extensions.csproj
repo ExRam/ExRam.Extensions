@@ -3,7 +3,6 @@
   <PropertyGroup>
     <Copyright>ExRam EDV GmbH &amp; Co. KG</Copyright>
     <TargetFrameworks>netstandard20</TargetFrameworks>
-    <Version>3.4.0</Version>
   </PropertyGroup>
 
   <ItemGroup>
