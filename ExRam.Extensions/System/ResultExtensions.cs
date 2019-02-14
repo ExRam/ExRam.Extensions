@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace LanguageExt
 {
-    internal static class ResultExtensions
+    public static class ResultExtensions
     {
         [Pure]
         public static Task<Result<B>> MapResult<A, B>(this Task<Result<A>> resultTask, Func<A, B> f)
