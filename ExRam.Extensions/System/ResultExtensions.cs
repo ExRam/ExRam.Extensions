@@ -53,5 +53,24 @@ namespace LanguageExt
                 _ => _,
                 ex => Option<A>.None);
         }
+
+        [Pure]
+        public static Option<T> Handle<T>(this Result<T> result, Action<Exception> handler)
+        {
+            return result.Match(
+                _ => _,
+                ex =>
+                {
+                    handler(ex);
+
+                    return Option<T>.None;
+                });
+        }
+
+        [Pure]
+        public static async Task<Option<T>> Handle<T>(this Task<Result<T>> resultTask, Action<Exception> handler)
+        {
+            return (await resultTask).Handle(handler);
+        }
     }
 }
