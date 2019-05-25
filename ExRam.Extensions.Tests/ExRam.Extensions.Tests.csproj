@@ -1,13 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <Description>ExRam.Extensions.Tests</Description>
     <TargetFramework>netcoreapp20</TargetFramework>
-    <AssemblyName>ExRam.Extensions.Tests</AssemblyName>
-    <PackageId>ExRam.Extensions.Tests</PackageId>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+  <PropertyGroup>
     <NoWarn>1701;1702;1705;1998</NoWarn>
   </PropertyGroup>
 
@@ -23,16 +20,6 @@
     <PackageReference Include="Moq" Version="4.9.0" />
     <PackageReference Include="System.IO" Version="4.3.0" />
     <PackageReference Include="xunit" Version="2.4.0" />
-  </ItemGroup>
-
-  <ItemGroup Condition=" '$(TargetFramework)' == 'net46' ">
-    <PackageReference Include="Microsoft.NETCore.Platforms" Version="1.1.0" />
-    <Reference Include="System" />
-    <Reference Include="Microsoft.CSharp" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Properties\" />
   </ItemGroup>
 
 </Project>
