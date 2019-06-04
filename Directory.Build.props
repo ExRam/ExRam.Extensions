@@ -15,7 +15,7 @@
   </PropertyGroup>  
 
   <ItemGroup>
-    <PackageReference Update="Nerdbank.GitVersioning" Version="2.3.167">
+    <PackageReference Include="Nerdbank.GitVersioning" Version="2.3.167">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

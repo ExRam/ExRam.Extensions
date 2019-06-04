@@ -3,6 +3,7 @@
   <PropertyGroup>
     <Copyright>ExRam EDV GmbH &amp; Co. KG</Copyright>
     <TargetFrameworks>netstandard20</TargetFrameworks>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
