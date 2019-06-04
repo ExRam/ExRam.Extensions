@@ -5,7 +5,7 @@
     <Authors>ExRam EDV GmbH &amp; Co. KG</Authors>
     <NoWarn>$(NoWarn);CS1998</NoWarn>
     <PublicRelease>true</PublicRelease>
-    <LangVersion>7.3</LangVersion>
+    <LangVersion>8.0</LangVersion>
     <DefineConstants>$(DefineConstants);TRACE</DefineConstants>
   </PropertyGroup>
 
@@ -15,7 +15,9 @@
   </PropertyGroup>  
 
   <ItemGroup>
-    <PackageReference Include="Nerdbank.GitVersioning" Version="2.1.84" />
+    <PackageReference Update="Nerdbank.GitVersioning" Version="2.3.167">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
-
 </Project>

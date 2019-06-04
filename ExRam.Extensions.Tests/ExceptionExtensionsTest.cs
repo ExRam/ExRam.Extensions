@@ -8,7 +8,7 @@ namespace ExRam.Framework.Tests
         [Fact]
         public void ExceptionMessages_are_concatenated_by_GetSafeMessage()
         {
-            var inner = new InvalidOperationException();
+            var inner = new DivideByZeroException();
             var outer = new ArgumentNullException("Eine Message", inner);
 
             Assert.Equal(outer.Message + " ---> " + inner.Message, outer.GetSafeMessage());

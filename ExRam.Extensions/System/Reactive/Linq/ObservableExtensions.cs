@@ -218,23 +218,29 @@ namespace System.Reactive.Linq
 
         public static IAsyncEnumerable<T> Current<T>(this IObservable<T> source)
         {
-            Contract.Requires(source != null);
+            return AsyncEnumerable.Create(Core);
 
-            return AsyncEnumerable
-                .Using(
-                    () => new ReplaySubject<Notification<T>>(1),
-                    subject => AsyncEnumerable
-                        .Using(
-                            () => source
-                                .Materialize()
-                                .Multicast(subject)
-                                .Connect(),
-                            _ => AsyncEnumerable
-                                .Repeat(Unit.Default)
-                                .SelectMany(unit => subject
-                                    .FirstAsync()
-                                    .ToAsyncEnumerable())
-                                .Dematerialize()));
+            async IAsyncEnumerator<T> Core(CancellationToken ct)
+            {
+                var replaySubject = new ReplaySubject<Notification<T>>(1);
+
+                using (source.Materialize().Multicast(replaySubject).Connect())
+                {
+                    while (true)
+                    {
+                        var notification = await replaySubject
+                            .FirstAsync()
+                            .ToTask(ct);
+
+                        if (notification.HasValue)
+                            yield return notification.Value;
+                        else if (notification.Exception != null)
+                            throw notification.Exception;
+                        else
+                            yield break;
+                    }
+                }
+            }
         }
 
         public static IObservable<T> Debounce<T>(this IObservable<T> source, TimeSpan debounceInterval) where T : struct

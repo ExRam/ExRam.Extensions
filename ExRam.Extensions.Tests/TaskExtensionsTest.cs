@@ -22,7 +22,7 @@ namespace ExRam.Extensions.Tests
         {
             var tcs = new TaskCompletionSource<bool>();
 
-            var task = ((Task)tcs.Task).ToAsyncEnumerable().First();
+            var task = ((Task)tcs.Task).ToAsyncEnumerable().FirstAsync();
 
             Assert.False(task.IsCompleted);
             tcs.SetResult(true);
@@ -37,13 +37,13 @@ namespace ExRam.Extensions.Tests
 
             var task = ((Task)tcs.Task)
                 .ToAsyncEnumerable()
-                .First();
+                .FirstAsync();
 
             Assert.False(task.IsCompleted);
             tcs.SetException(new DivideByZeroException());
 
             task
-                .Awaiting(_ => _)
+                .Awaiting(_ => _.AsTask())
                 .Should()
                 .ThrowExactly<AggregateException>()
                 .Where(ex => ex.GetBaseException() is DivideByZeroException);
@@ -249,34 +249,34 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Faulted_Task_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<Unit>(new InvalidOperationException());
+            var completedTask = Task.Factory.GetFaulted<Unit>(new DivideByZeroException());
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]
         public async Task Faulted_TaskOfInt_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<int>(new InvalidOperationException());
+            var completedTask = Task.Factory.GetFaulted<int>(new DivideByZeroException());
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]
         public async Task Faulted_TaskOfMaybeOfInt_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<Option<int>>(new InvalidOperationException());
+            var completedTask = Task.Factory.GetFaulted<Option<int>>(new DivideByZeroException());
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]
@@ -351,12 +351,12 @@ namespace ExRam.Extensions.Tests
             var tcs = new TaskCompletionSource<object>();
 
             Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
-            tcs.SetException(new InvalidOperationException());
+            tcs.SetException(new DivideByZeroException());
 
-            tcs.Task
-                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+            tcs
+                .Awaiting(_ => _.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]
@@ -399,12 +399,12 @@ namespace ExRam.Extensions.Tests
             var tcs = new TaskCompletionSource<int>();
 
             await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
-            tcs.SetException(new InvalidOperationException());
+            tcs.SetException(new DivideByZeroException());
 
             tcs.Task
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]
@@ -413,12 +413,12 @@ namespace ExRam.Extensions.Tests
             var tcs = new TaskCompletionSource<Option<int>>();
 
             await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
-            tcs.SetException(new InvalidOperationException());
+            tcs.SetException(new DivideByZeroException());
 
             tcs.Task
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]
@@ -604,23 +604,23 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Faulted_Task_WithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<Unit>(new InvalidOperationException());
+            var completedTask = Task.Factory.GetFaulted<Unit>(new DivideByZeroException());
 
             completedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]
         public async Task Faulted_TaskOfInt_WithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<int>(new InvalidOperationException());
+            var completedTask = Task.Factory.GetFaulted<int>(new DivideByZeroException());
 
             completedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]
@@ -688,12 +688,12 @@ namespace ExRam.Extensions.Tests
                 .Should()
                 .ThrowExactly<TimeoutException>();
 
-            tcs.SetException(new InvalidOperationException());
+            tcs.SetException(new DivideByZeroException());
 
             tcs
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]
@@ -734,12 +734,12 @@ namespace ExRam.Extensions.Tests
                 .Should()
                 .ThrowExactly<TimeoutException>();
 
-            tcs.SetException(new InvalidOperationException());
+            tcs.SetException(new DivideByZeroException());
 
             tcs
                 .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
                 .Should()
-                .ThrowExactly<InvalidOperationException>();
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]

@@ -9,8 +9,6 @@ using System.Diagnostics.Contracts;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
-using System.Runtime.CompilerServices;
-using System.Security;
 using System.Threading;
 using System.Threading.Tasks;
 using LanguageExt;
@@ -20,512 +18,162 @@ namespace System.Linq
 {
     public static class AsyncEnumerableExtensions
     {
-        internal class Yielder<T> : IYielder<T>, IAwaitable, IAwaiter, IAsyncEnumerator<T>
+        public static IAsyncEnumerable<TSource> Concat<TSource>(this IAsyncEnumerable<TSource> source, Func<Option<TSource>, IAsyncEnumerable<TSource>> continuationSelector)
         {
-            private struct MoveNextAwaitable : ICriticalNotifyCompletion
-            {
-                private readonly Yielder<T> _yielder;
+            return AsyncEnumerable.Create(Core);
 
-                public MoveNextAwaitable(Yielder<T> yielder)
+            async IAsyncEnumerator<TSource> Core(CancellationToken cancellationToken)
+            {
+                var last = default(Option<TSource>);
+
+                await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
                 {
-                    this._yielder = yielder;
+                    last = item;
+                    yield return item;
                 }
 
-                public MoveNextAwaitable GetAwaiter()
+                await foreach (var item in continuationSelector(last).WithCancellation(cancellationToken).ConfigureAwait(false))
                 {
-                    return this;
-                }
-
-                // ReSharper disable once MemberCanBeMadeStatic.Local
-                public void GetResult()
-                {
-
-                }
-
-                public void OnCompleted(Action continuation)
-                {
-                    lock (this._yielder)
-                    {
-                        if (this._yielder._state != YielderState.InFlight)
-                            continuation();
-                        else
-                            this._yielder._moveNextContinuation = continuation;
-                    }
-                }
-
-                public void UnsafeOnCompleted(Action continuation)
-                {
-                    this.OnCompleted(continuation);
-                }
-
-                public bool IsCompleted
-                {
-                    get
-                    {
-                        lock (this._yielder)
-                        {
-                            return this._yielder._state != YielderState.InFlight;
-                        }
-                    }
-                }
-            }
-
-            private enum YielderState : byte
-            {
-                NotStarted,
-                Idle,
-                InFlight,
-                HasValue,
-                Stopped
-            }
-
-            private readonly MoveNextAwaitable _moveNextAwaitable;
-            private readonly Func<CancellationToken, Yielder<T>, Task> _createAction;
-            private readonly CancellationTokenSource _cts = new CancellationTokenSource();
-
-            private Exception _exception;
-            private Action _yieldContinuation;
-            private Action _moveNextContinuation;
-            private YielderState _state = YielderState.NotStarted;
-
-            public Yielder(Func<CancellationToken, Yielder<T>, Task> create)
-            {
-                this._createAction = create;
-                this._moveNextAwaitable = new MoveNextAwaitable(this);
-            }
-
-            public IAwaiter GetAwaiter()
-            {
-                return this;
-            }
-
-            public void GetResult()
-            {
-                lock (this)
-                {
-                    if (this._state == YielderState.Stopped)
-                        throw new OperationCanceledException();
-                }
-            }
-
-            [SecurityCritical]
-            public void UnsafeOnCompleted(Action continuation)
-            {
-                this.OnCompleted(continuation);
-            }
-
-            public void OnCompleted(Action continuation)
-            {
-                lock (this)
-                {
-                    if (this._state == YielderState.InFlight || this._state == YielderState.Stopped)
-                        continuation();
-                    else
-                        this._yieldContinuation = continuation;
-                }
-            }
-
-            public IAwaitable Return(T value)
-            {
-                return this.Yield(YielderState.HasValue, value);
-            }
-
-            public IAwaitable Break()
-            {
-                return this.Yield(YielderState.Stopped);
-            }
-
-            private IAwaitable Yield(YielderState newState, T current = default(T))
-            {
-                lock (this)
-                {
-                    if (this._state == YielderState.InFlight)
-                    {
-                        this._state = newState;
-                        this.Current = current;
-                        this._yieldContinuation = null;
-                        this._moveNextContinuation?.Invoke();
-                    }
-                }
-
-                return this;
-            }
-
-            public async Task<bool> MoveNext(CancellationToken cancellationToken)
-            {
-                using (cancellationToken.Register(this._cts.Cancel))
-                {
-                    lock (this)
-                    {
-                        if (this._state == YielderState.InFlight || this._state == YielderState.HasValue)
-                            throw new InvalidOperationException();
-
-                        if (this._state == YielderState.Stopped)
-                            return false;
-
-                        this._moveNextContinuation = null;
-
-                        if (this._state == YielderState.Idle)
-                        {
-                            this._state = YielderState.InFlight;
-                            this._yieldContinuation?.Invoke();
-                        }
-                        else
-                        {
-                            this._state = YielderState.InFlight;
-
-                            #pragma warning disable 4014
-                            this._createAction(this._cts.Token, this)
-                                // ReSharper disable once MethodSupportsCancellation
-                                .ContinueWith(
-                                    t =>
-                                    {
-                                        lock (this)
-                                        {
-                                            if (t.IsFaulted)
-                                                this._exception = t.Exception;
-
-                                            if (!t.IsCanceled)
-                                                this.Break();
-                                        }
-                                    },
-                                    TaskContinuationOptions.ExecuteSynchronously);
-                            #pragma warning restore 4014
-                        }
-                    }
-
-                    await this._moveNextAwaitable;
-
-                    lock (this)
-                    {
-                        if (this._exception != null)
-                            throw this._exception;
-
-                        var ret = this._state == YielderState.HasValue;
-                        if (ret)
-                            this._state = YielderState.Idle;
-
-                        return ret;
-                    }
-                }
-            }
-
-            public void Reset()
-            {
-                throw new NotSupportedException();
-            }
-
-            public void Dispose()
-            {
-                lock (this)
-                {
-                    this._cts.Cancel();
-                    this._state = YielderState.Stopped;
-
-                    this._yieldContinuation?.Invoke();
-                }
-            }
-
-            public T Current
-            {
-                get;
-                private set;
-            }
-
-            public bool IsCompleted
-            {
-                get
-                {
-                    lock (this)
-                    {
-                        return this._state == YielderState.InFlight;
-                    }
+                    yield return item;
                 }
             }
         }
-        
-        public static IAsyncEnumerable<T> Append<T>(this IAsyncEnumerable<T> enumerable, T value)
+
+        public static IAsyncEnumerable<TSource> DefaultIfEmpty<TSource>(this IAsyncEnumerable<TSource> source, IAsyncEnumerable<TSource> defaultObservable)
         {
-            Contract.Requires(enumerable != null);
-
-            return enumerable.Concat(AsyncEnumerable.Return(value));
-        }
-
-        public static IAsyncEnumerable<T> Concat<T>(this IAsyncEnumerable<T> source, Func<Option<T>, IAsyncEnumerable<T>> continuationSelector)
-        {
-            Contract.Requires(source != null);
-            Contract.Requires(continuationSelector != null);
-
-            return source
-                .Materialize()
-                .Scan(
-                    (Previous: (Notification<T>)null, Current: (Notification<T>)null),
-                    (tuple, current) => (Previous: tuple.Current, Current: current))
-                .SelectMany(tuple =>
-                {
-                    if (tuple.Current.HasValue)
-                        return AsyncEnumerable.Return(tuple.Current.Value);
-
-                    if (tuple.Current.Exception != null)
-                        return AsyncEnumerable.Throw<T>(tuple.Current.Exception);
-
-                    return tuple.Previous != null
-                        ? continuationSelector(tuple.Previous.Value)
-                        : continuationSelector(Option<T>.None);
-                });
-        }
-
-        public static IAsyncEnumerable<T> Create<T>(Func<CancellationToken, IYielder<T>, Task> create)
-        {
-            if (create == null)
-                throw new ArgumentNullException(nameof(create));
-
-            //Wrapping in CreateEnumerable muss sein, da Yielder nur IAsyncEnumerator implementiert und immer neu erzeugt werden muss.
-            return AsyncEnumerable.CreateEnumerable(() => new Yielder<T>(create));
-        }
-
-        public static IAsyncEnumerable<T> DefaultIfEmpty<T>(this IAsyncEnumerable<T> source, IAsyncEnumerable<T> defaultObservable)
-        {
-            Contract.Requires(source != null);
-            Contract.Requires(defaultObservable != null);
-
-            return source.Concat(maybe => !maybe.IsSome ? defaultObservable : AsyncEnumerable.Empty<T>());
-        }
-
-        public static IAsyncEnumerable<TSource> Defer<TSource>(Func<CancellationToken, Task<IAsyncEnumerable<TSource>>> asyncFactory)
-        {
-            if (asyncFactory == null)
-                throw new ArgumentNullException(nameof(asyncFactory));
-
-            return AsyncEnumerable.CreateEnumerable(() =>
-            {
-                var baseEnumerator = default(IAsyncEnumerator<TSource>);
-
-                return AsyncEnumerable.CreateEnumerator(
-                    async ct =>
-                    {
-                        if (baseEnumerator == null)
-                            baseEnumerator = (await asyncFactory(ct).ConfigureAwait(false)).GetEnumerator();
-
-                        return await baseEnumerator.MoveNext(ct).ConfigureAwait(false);
-                    },
-                    () =>
-                    {
-                        if (baseEnumerator == null)
-                            throw new InvalidOperationException();
-
-                        return baseEnumerator.Current;
-                    },
-                    () => baseEnumerator?.Dispose());
-            });
+            return source.Concat(maybe => !maybe.IsSome ? defaultObservable : AsyncEnumerable.Empty<TSource>());
         }
 
         public static IAsyncEnumerable<TSource> Dematerialize<TSource>(this IAsyncEnumerable<Notification<TSource>> enumerable)
         {
-            Contract.Requires(enumerable != null);
+            return AsyncEnumerable.Create(Core);
 
-            return AsyncEnumerable.CreateEnumerable(
-                () =>
-                {
-                    var e = enumerable.GetEnumerator();
-                    var current = default(TSource);
-
-                    return AsyncEnumerable.CreateEnumerator(
-                        ct =>
-                        {
-                            return e
-                                .MoveNext(ct)
-                                .Then(result =>
-                                {
-                                    if (result)
-                                    {
-                                        if (e.Current.HasValue)
-                                        {
-                                            current = e.Current.Value;
-                                            return true;
-                                        }
-
-                                        if (e.Current.Exception != null)
-                                            throw e.Current.Exception;
-                                    }
-
-                                    return false;
-                                });
-                        },
-                        () => current,
-                        e.Dispose);
-                });
-        }
-
-        public static IAsyncEnumerable<T> Empty<T>(TimeSpan delay)
-        {
-            return AsyncEnumerable.CreateEnumerable(
-                () => AsyncEnumerable.CreateEnumerator<T>(
-                    ct => Task
-                        .Delay(delay, ct)
-                        .Then(() => false),
-                    () => { throw new InvalidOperationException(); },
-                    null));
-        }
-
-        public static IAsyncEnumerable<T> Gate<T>(this IAsyncEnumerable<T> enumerable, Func<CancellationToken, Task> gateTaskFunction)
-        {
-            Contract.Requires(enumerable != null);
-            Contract.Requires(gateTaskFunction != null);
-
-            return AsyncEnumerable
-                .CreateEnumerable(() =>
-                {
-                    var e = enumerable.GetEnumerator();
-
-                    return AsyncEnumerable.CreateEnumerator(
-                        ct => gateTaskFunction(ct)
-                            .Then(() => e.MoveNext(ct)),
-                        () => e.Current,
-                        e.Dispose);
-                });
-        }
-
-        public static IAsyncEnumerable<T> KeepOpen<T>(this IAsyncEnumerable<T> enumerable)
-        {
-            Contract.Requires(enumerable != null);
-
-            return AsyncEnumerable.CreateEnumerable(() =>
+            async IAsyncEnumerator<TSource> Core(CancellationToken cancellationToken)
             {
-                var e = enumerable.GetEnumerator();
+                await foreach (var notification in enumerable.WithCancellation(cancellationToken).ConfigureAwait(false))
+                {
+                    if (notification.HasValue)
+                        yield return notification.Value;
+                    else if (notification.Exception != null)
+                        throw notification.Exception;
+                    else
+                        yield break;
+                }
+            }
+        }
 
-                return AsyncEnumerable.CreateEnumerator(
-                    ct => e
-                        .MoveNext(ct)
-                        .Then(result =>
-                        {
-                            if (result)
-                                return Task.FromResult(true);
+        public static IAsyncEnumerable<TSource> DelayedEmpty<TSource>(TimeSpan delay)
+        {
+            return AsyncEnumerable.Create(Core);
 
-                            e.Dispose();
-                            return Task.Factory.GetUncompleted<bool>();
-                        }),
-                    () => e.Current,
-                    e.Dispose);
-            });
+            async IAsyncEnumerator<TSource> Core(CancellationToken cancellationToken)
+            {
+                await Task.Delay(delay, cancellationToken);
+
+                yield break;
+            }
+        }
+
+        public static IAsyncEnumerable<TSource> Gate<TSource>(this IAsyncEnumerable<TSource> enumerable, Func<CancellationToken, Task> gateTaskFunction)
+        {
+            return AsyncEnumerable.Create(Core);
+
+            async IAsyncEnumerator<TSource> Core(CancellationToken cancellationToken)
+            {
+                await gateTaskFunction(cancellationToken);
+
+                await foreach (var item in enumerable.WithCancellation(cancellationToken).ConfigureAwait(false))
+                {
+                    yield return item;
+                    await gateTaskFunction(cancellationToken);
+                }
+            }
+        }
+
+        public static IAsyncEnumerable<TSource> KeepOpen<TSource>(this IAsyncEnumerable<TSource> enumerable)
+        {
+            return AsyncEnumerable.Create(Core);
+
+            async IAsyncEnumerator<TSource> Core(CancellationToken cancellationToken)
+            {
+                await foreach (var item in enumerable.WithCancellation(cancellationToken).ConfigureAwait(false))
+                {
+                    yield return item;
+                }
+
+                if (cancellationToken.CanBeCanceled)
+                {
+                    var tcs = new TaskCompletionSource<object>();
+
+                    using (var registration = cancellationToken.Register(() => tcs.SetCanceled()))
+                    {
+                        await tcs.Task;
+                    }
+                }
+                else
+                {
+                    await new TaskCompletionSource<object>().Task;
+                }
+            }
         }
 
         public static IAsyncEnumerable<Notification<TSource>> Materialize<TSource>(this IAsyncEnumerable<TSource> enumerable)
         {
-            Contract.Requires(enumerable != null);
+            return AsyncEnumerable.Create(Core);
 
-            return AsyncEnumerable.CreateEnumerable(
-                () =>
+            async IAsyncEnumerator<Notification<TSource>> Core(CancellationToken cancellationToken)
+            {
+                await using (var enumerator = enumerable.GetAsyncEnumerator(cancellationToken))
                 {
-                    var completed = false;
-                    var e = enumerable.GetEnumerator();
-                    var current = default(Notification<TSource>);
+                    Notification<TSource> notification;
 
-                    return AsyncEnumerable.CreateEnumerator(
-                        ct => e
-                            .MoveNext(ct)
-                            .ContinueWith(task =>
-                            {
-                                if (completed)
-                                    return false;
+                    do
+                    {
 
-                                if (task.IsFaulted)
-                                {
-                                    completed = true;
-                                    current = Notification.CreateOnError<TSource>(task.Exception.InnerException);
-                                }
-                                else if (task.Result)
-                                    current = Notification.CreateOnNext(e.Current);
-                                else
-                                {
-                                    completed = true;
-                                    current = Notification.CreateOnCompleted<TSource>();
-                                }
+                        try
+                        {
+                            notification = await enumerator.MoveNextAsync()
+                                ? Notification.CreateOnNext(enumerator.Current)
+                                : Notification.CreateOnCompleted<TSource>();
+                        }
+                        catch (Exception ex)
+                        {
+                            notification = Notification.CreateOnError<TSource>(ex);
+                        }
 
-                                return true;
-                            }, TaskContinuationOptions.NotOnCanceled),
-                        () => current,
-                        e.Dispose);
-                });
+                        yield return notification;
+                    } while (notification.Kind == NotificationKind.OnNext);
+                }
+            }
         }
 
         public static IAsyncEnumerable<TAccumulate> ScanAsync<TSource, TAccumulate>(this IAsyncEnumerable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, CancellationToken, Task<TAccumulate>> accumulator)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(accumulator != null);
+            return AsyncEnumerable.Create(Core);
 
-            return AsyncEnumerable.CreateEnumerable(
-                () =>
+            async IAsyncEnumerator<TAccumulate> Core(CancellationToken cancellationToken)
+            {
+                var acc = seed;
+
+                await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
                 {
-                    var acc = seed;
-                    var e = source.GetEnumerator();
+                    acc = await accumulator(acc, item, cancellationToken);
+                    yield return acc;
+                }
+            }
+        }
 
-                    return AsyncEnumerable.CreateEnumerator(
-                        ct => e
-                            .MoveNext(ct)
-                            .Then(result => result
-                                ? accumulator(acc, e.Current, ct)
-                                    .Then(newAcc =>
-                                    {
-                                        acc = newAcc;
-
-                                        return true;
-                                    })
-                                : Task.FromResult(false)),
-                        () => acc,
-                        e.Dispose);
+        public static IAsyncEnumerable<Unit> SelectAwaitWithCancellation<TSource>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, CancellationToken, ValueTask> selector)
+        {
+            return enumerable
+                .SelectAwaitWithCancellation(async (x, ct) =>
+                {
+                    await selector(x, ct);
+                    return Unit.Default;
                 });
         }
 
-        public static IAsyncEnumerable<TResult> SelectMany<TSource, TResult>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, CancellationToken, Task<TResult>> selector)
-        {
-            return AsyncEnumerable.CreateEnumerable(
-                () =>
-                {
-                    var current = default(TResult);
-                    var e = enumerable.GetEnumerator();
-
-                    return AsyncEnumerable.CreateEnumerator(
-                        async ct =>
-                        {
-                            if (await e.MoveNext(ct))
-                            {
-                                current = await selector(e.Current, ct);
-                                return true;
-                            }
-
-                            return false;
-                        },
-                        () => current,
-                        e.Dispose);
-                });
-        }
-
-        public static IAsyncEnumerable<Unit> SelectMany<TSource>(this IAsyncEnumerable<TSource> enumerable, Func<TSource, CancellationToken, Task> selector)
-        {
-            return enumerable
-                .SelectMany((x, ct) => selector(x, ct).AsUnitTask());
-        }
-
-        public static IAsyncEnumerable<T> SelectValueWhereAvailable<T>(this IAsyncEnumerable<Option<T>> enumerable)
-        {
-            return enumerable
-                .SelectMany(maybe => maybe.ToAsyncEnumerable());
-        }
-
-        public static IAsyncEnumerable<TSource> StateScan<TSource, TState>(this IAsyncEnumerable<TSource> source, TState seed, Func<TState, TSource, TState> stateFunction)
-        {
-            Contract.Requires(source != null);
-            Contract.Requires(stateFunction != null);
-
-            return source
-                .Scan(
-                    Tuple.Create(seed, default(TSource)),
-                    (stateTuple, value) => Tuple.Create(stateFunction(stateTuple.Item1, value), value))
-                .Select(stateTuple => stateTuple.Item2);
-        }
-
-        #region ByteInterfaceStream
+        #region JoinStream
         private sealed class JoinStream : Stream
         {
             private readonly IAsyncEnumerator<ArraySegment<byte>> _arraySegmentEnumerator;
@@ -577,7 +225,7 @@ namespace System.Linq
                 {
                     try
                     {
-                        if (await this._arraySegmentEnumerator.MoveNext(CancellationToken.None).ConfigureAwait(false))
+                        if (await this._arraySegmentEnumerator.MoveNextAsync(cancellationToken).ConfigureAwait(false))
                             currentInputSegment = this._arraySegmentEnumerator.Current;
                         else
                             return 0;
@@ -602,7 +250,7 @@ namespace System.Linq
             protected override void Dispose(bool disposing)
             {
                 if (disposing)
-                    this._arraySegmentEnumerator.Dispose();
+                    this._arraySegmentEnumerator.DisposeAsync();
 
                 base.Dispose(disposing);
             }
@@ -613,25 +261,12 @@ namespace System.Linq
 
             public override bool CanWrite => false;
 
-            public override long Length
-            {
-                get
-                {
-                    throw new NotSupportedException();
-                }
-            }
+            public override long Length => throw new NotSupportedException();
 
             public override long Position
             {
-                get
-                {
-                    throw new NotSupportedException();
-                }
-
-                set
-                {
-                    throw new NotSupportedException();
-                }
+                get => throw new NotSupportedException();
+                set => throw new NotSupportedException();
             }
         }
         #endregion
@@ -640,59 +275,54 @@ namespace System.Linq
         {
             Contract.Requires(byteSegmentAsyncEnumerable != null);
 
-            return new JoinStream(byteSegmentAsyncEnumerable.GetEnumerator());
+            return new JoinStream(byteSegmentAsyncEnumerable.GetAsyncEnumerator());
         }
 
-        public static Task<Option<T>> TryFirst<T>(this IAsyncEnumerable<T> enumerable)
+        public static Task<Option<T>> HeadOrNone<T>(this IAsyncEnumerable<T> enumerable)
         {
-            return enumerable.TryFirst(CancellationToken.None);
+            return enumerable.HeadOrNone(CancellationToken.None);
         }
 
-        public static async Task<Option<T>> TryFirst<T>(this IAsyncEnumerable<T> enumerable, CancellationToken token)
+        public static async Task<Option<TSource>> HeadOrNone<TSource>(this IAsyncEnumerable<TSource> source, CancellationToken token)
         {
-            using (var enumerator = enumerable.GetEnumerator())
+            await foreach (var item in source.WithCancellation(token).ConfigureAwait(false))
             {
-                if (await enumerator.MoveNext(token).ConfigureAwait(false))
-                    return enumerator.Current;
-
-                return Option<T>.None;
+                return item;
             }
+
+            return default;
         }
 
-        public static IAsyncEnumerable<T> TryWithTimeout<T>(this IAsyncEnumerable<T> enumerable, TimeSpan timeout)
+        public static IAsyncEnumerable<TSource> TryWithTimeout<TSource>(this IAsyncEnumerable<TSource> enumerable, TimeSpan timeout)
         {
-            Contract.Requires(enumerable != null);
+            return AsyncEnumerable.Create(Core);
 
-            return AsyncEnumerable.CreateEnumerable(
-                () =>
+            async IAsyncEnumerator<TSource> Core(CancellationToken cancellationToken)
+            {
+                await using (var enumerator = enumerable.GetAsyncEnumerator(cancellationToken))
                 {
-                    var e = enumerable.GetEnumerator();
+                    using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+                    {
+                        var option = await enumerator
+                            .MoveNextAsync(cts.Token)
+                            .AsTask()
+                            .TryWithTimeout(timeout)
+                            .ConfigureAwait(false);
 
-                    return AsyncEnumerable.CreateEnumerator(
-                        async ct =>
+                        if (option.IsNone)
                         {
-                            using (var cts = CancellationTokenSource.CreateLinkedTokenSource(ct))
-                            {
-                                var option = await e
-                                    .MoveNext(cts.Token)
-                                    .TryWithTimeout(timeout)
-                                    .ConfigureAwait(false);
+                            cts.Cancel();
+                            yield break;
+                        }
 
-                                if (option.IsNone)
-                                    cts.Cancel();
-
-                                return option.IfNone(false);
-                            }
-                        },
-                        () => e.Current,
-                        e.Dispose);
-                });
+                        yield return enumerator.Current;
+                    }
+                }
+            }
         }
 
         public static IAsyncEnumerable<T> WhereNotNull<T>(this IAsyncEnumerable<T> source)
         {
-            Contract.Requires(source != null);
-
             return source.Where(t => !object.Equals(t, default(T)));
         }
 
@@ -700,7 +330,7 @@ namespace System.Linq
         {
             Contract.Requires(enumerableFactory != null);
 
-            return AsyncEnumerable
+            return AsyncEnumerableEx
                 .Using(
                     () => new CancellationDisposable(),
                     cts => enumerableFactory(cts.Token));
