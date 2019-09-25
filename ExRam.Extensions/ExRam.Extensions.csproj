@@ -2,14 +2,14 @@
 
   <PropertyGroup>
     <Copyright>ExRam EDV GmbH &amp; Co. KG</Copyright>
-    <TargetFrameworks>netstandard20</TargetFrameworks>
+    <TargetFrameworks>netstandard20;netstandard21</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="LanguageExt.Core" Version="3.1.24" />
     <PackageReference Include="System.Interactive" Version="3.2.0" />
-    <PackageReference Include="System.Interactive.Async" Version="4.0.0-preview.1.build.745" />
+    <PackageReference Include="System.Interactive.Async" Version="4.0.0-preview.8.build.9" />
     <PackageReference Include="System.Reactive" Version="4.1.5" />
   </ItemGroup>
 
