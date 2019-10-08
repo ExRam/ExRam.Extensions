@@ -4,6 +4,7 @@
     <Copyright>ExRam EDV GmbH &amp; Co. KG</Copyright>
     <TargetFrameworks>netstandard20;netstandard21</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>

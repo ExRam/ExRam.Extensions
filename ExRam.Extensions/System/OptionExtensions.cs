@@ -23,5 +23,10 @@ namespace LanguageExt
                 .MatchAsync(x => Task.FromResult((Option<T>)x), none)
                 .ConfigureAwait(false);
         }
+
+        public static TValue? ToNullable<TValue>(this Option<TValue> value) where TValue : class
+        {
+            return value.IfNoneUnsafe(default(TValue)!);
+        }
     }
 }
