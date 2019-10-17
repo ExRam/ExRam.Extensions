@@ -2,6 +2,7 @@
 using System.Reactive.Threading.Tasks;
 using System.Threading;
 using System.Threading.Tasks;
+using FluentAssertions;
 using Xunit;
 
 namespace ExRam.Extensions.Tests
@@ -32,6 +33,52 @@ namespace ExRam.Extensions.Tests
             var unitTask = cts.Token.ToObservable().FirstAsync().ToTask();
 
             await unitTask;
+        }
+
+        [Fact]
+        public async Task ToTask_different_CancellationTokens_1()
+        {
+            var cts1 = new CancellationTokenSource();
+            var cts2 = new CancellationTokenSource();
+
+            var task = cts1.Token.ToTask(cts2.Token);
+            cts1.Cancel();
+            cts2.Cancel();
+
+            task
+                .Awaiting(x => x)
+                .Should()
+                .NotThrow();
+        }
+
+        [Fact]
+        public async Task ToTask_different_CancellationTokens_2()
+        {
+            var cts1 = new CancellationTokenSource();
+            var cts2 = new CancellationTokenSource();
+
+            var task = cts1.Token.ToTask(cts2.Token);
+            cts2.Cancel();
+            cts1.Cancel();
+
+            task
+                .Awaiting(x => x)
+                .Should()
+                .Throw<TaskCanceledException>();
+        }
+
+        [Fact]
+        public async Task ToTask_same_CancellationTokens_2()
+        {
+            var cts1 = new CancellationTokenSource();
+
+            var task = cts1.Token.ToTask(cts1.Token);
+            cts1.Cancel();
+
+            task
+                .Awaiting(x => x)
+                .Should()
+                .NotThrow();
         }
     }
 }
