@@ -335,5 +335,21 @@ namespace System.Linq
                     () => new CancellationDisposable(),
                     cts => enumerableFactory(cts.Token));
         }
+
+        public static IAsyncEnumerable<TTarget> SelectMany<TSource, TTarget>(this IAsyncEnumerable<TSource> source, Func<TSource, IEnumerable<TTarget>> selector)
+        {
+            return AsyncEnumerable.Create(Core);
+
+            async IAsyncEnumerator<TTarget> Core(CancellationToken cancellationToken)
+            {
+                await foreach(var item in source)
+                {
+                    foreach(var subItem in selector(item))
+                    {
+                        yield return subItem;
+                    }
+                }
+            }
+        }
     }
 }
