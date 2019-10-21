@@ -13,15 +13,22 @@ namespace System.Threading
 
             using (ct.Register(() => tcs.TrySetResult(Unit.Default)))
             {
-                var innerRegistration = differentCt.Register(() =>
+                if (differentCt.CanBeCanceled)
                 {
-                    if (!ct.IsCancellationRequested)
-                        tcs.TrySetCanceled();
-                });
+                    var innerRegistration = differentCt.Register(() =>
+                    {
+                        if (!ct.IsCancellationRequested)
+                            tcs.TrySetCanceled();
+                    });
 
-                using (innerRegistration)
+                    using (innerRegistration)
+                    {
+                        await tcs.Task.ConfigureAwait(false);
+                    }
+                }
+                else
                 {
-                    await tcs.Task;
+                    await tcs.Task.ConfigureAwait(false);
                 }
             }
         }
