@@ -174,7 +174,6 @@ namespace System.Linq
                 });
         }
 
-        #region JoinStream
         private sealed class JoinStream : Stream
         {
             private readonly IAsyncEnumerator<ArraySegment<byte>> _arraySegmentEnumerator;
@@ -186,12 +185,10 @@ namespace System.Linq
                 _arraySegmentEnumerator = factory;
             }
 
-            #region Read
             public override int Read(byte[] buffer, int offset, int count)
             {
                 return ReadAsync(buffer, offset, count, CancellationToken.None).Result;
             }
-            #endregion
 
             public override long Seek(long offset, SeekOrigin origin)
             {
@@ -241,7 +238,7 @@ namespace System.Linq
                 Buffer.BlockCopy(currentInputSegment.Array, currentInputSegment.Offset, buffer, offset, minToRead);
 
                 currentInputSegment = new ArraySegment<byte>(currentInputSegment.Array, currentInputSegment.Offset + minToRead, currentInputSegment.Count - minToRead);
-                _currentInputSegment = ((currentInputSegment.Count > 0) ? ((ArraySegment<byte>?)currentInputSegment) : (null));
+                _currentInputSegment = currentInputSegment.Count > 0 ? (ArraySegment<byte>?)currentInputSegment : null;
 
                 return minToRead;
             }
@@ -268,7 +265,6 @@ namespace System.Linq
                 set => throw new NotSupportedException();
             }
         }
-        #endregion
 
         public static Stream ToStream(this IAsyncEnumerable<ArraySegment<byte>> byteSegmentAsyncEnumerable)
         {

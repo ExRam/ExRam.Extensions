@@ -30,13 +30,7 @@ namespace System.Reactive
 
         public override bool Equals(object obj)
         {
-            if (obj is Counting<T>)
-            {
-                var counting2 = (Counting<T>)obj;
-                return ((Number == counting2.Number) && (Equals(Value, counting2.Value)));
-            }
-
-            return false;
+            return obj is Counting<T> counting2 && Number == counting2.Number && Equals(Value, counting2.Value);
         }
 
         public override int GetHashCode()

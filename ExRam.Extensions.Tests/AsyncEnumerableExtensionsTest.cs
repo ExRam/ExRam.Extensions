@@ -119,7 +119,7 @@ namespace ExRam.Extensions.Tests
         {
             var i = 0;
             var tcs = Enumerable.Range(1, 10).Select(x => new TaskCompletionSource<object>()).ToArray();
-            var ae = (new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }).ToAsyncEnumerable();
+            var ae = new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }.ToAsyncEnumerable();
 
             var only = ae.Gate((ct) => tcs[i++].Task);
 
@@ -132,7 +132,7 @@ namespace ExRam.Extensions.Tests
 
                 Assert.False(task.IsCompleted);
 
-                tcs[(j - 1)].SetResult(null);
+                tcs[j - 1].SetResult(null);
 
                 Assert.True(await task);
                 Assert.Equal(j, enumerator.Current);

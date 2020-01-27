@@ -6,7 +6,6 @@ namespace LanguageExt
 {
     public static class OptionExtensions
     {
-        #region OptionAssertions<T>
         public sealed class OptionAssertions<T>
         {
             public OptionAssertions(Option<T> option)
@@ -57,7 +56,6 @@ namespace LanguageExt
                 return new AndConstraint<OptionAssertions<T>>(this);
             }
         }
-        #endregion
 
         public static OptionAssertions<T> Should<T>(this Option<T> option)
         {

@@ -151,19 +151,19 @@ namespace System.Reactive.Linq
             return source.Select(x => (object)x);
         }
 
-        public static IObservable<Tuple<TSource1, TSource2>> CombineLatest<TSource1, TSource2>(this IObservable<TSource1> first, IObservable<TSource2> second)
+        public static IObservable<(TSource1, TSource2)> CombineLatest<TSource1, TSource2>(this IObservable<TSource1> first, IObservable<TSource2> second)
         {
-            return first.CombineLatest(second, Tuple.Create);
+            return first.CombineLatest(second, ValueTuple.Create);
         }
 
-        public static IObservable<Tuple<TSource1, TSource2, TSource3>> CombineLatest<TSource1, TSource2, TSource3>(this IObservable<TSource1> source1, IObservable<TSource2> source2, IObservable<TSource3> source3)
+        public static IObservable<(TSource1, TSource2, TSource3)> CombineLatest<TSource1, TSource2, TSource3>(this IObservable<TSource1> source1, IObservable<TSource2> source2, IObservable<TSource3> source3)
         {
-            return source1.CombineLatest(source2, source3, Tuple.Create);
+            return source1.CombineLatest(source2, source3, ValueTuple.Create);
         }
 
-        public static IObservable<Tuple<TSource1, TSource2, TSource3, TSource4>> CombineLatest<TSource1, TSource2, TSource3, TSource4>(this IObservable<TSource1> source1, IObservable<TSource2> source2, IObservable<TSource3> source3, IObservable<TSource4> source4)
+        public static IObservable<(TSource1, TSource2, TSource3, TSource4)> CombineLatest<TSource1, TSource2, TSource3, TSource4>(this IObservable<TSource1> source1, IObservable<TSource2> source2, IObservable<TSource3> source3, IObservable<TSource4> source4)
         {
-            return source1.CombineLatest(source2, source3, source4, Tuple.Create);
+            return source1.CombineLatest(source2, source3, source4, ValueTuple.Create);
         }
 
         public static IObservable<T> Concat<T>(this IObservable<T> source, Func<Option<T>, IObservable<T>> continuationSelector)
@@ -349,7 +349,7 @@ namespace System.Reactive.Linq
         {
             var syncRoot = new object();
             var serial = new SerialDisposable();
-            IDisposable currentConnection = null;
+            IDisposable? currentConnection = null;
 
             var innerObservable = ConnectableObservable
                 .Create<T>(
@@ -445,7 +445,7 @@ namespace System.Reactive.Linq
 
         private static IObservable<T> RepeatWhileEmpty<T>(this IObservable<T> source, int? repeatCount)
         {
-            if ((repeatCount.HasValue) && (repeatCount.Value == 0))
+            if (repeatCount.HasValue && repeatCount.Value == 0)
                 return Observable.Empty<T>();
 
             return source
@@ -564,7 +564,6 @@ namespace System.Reactive.Linq
             return source.Select((x, i) => new Counting<T>((ulong)i, x));
         }
 
-        #region GroupedObservableImpl
         private sealed class GroupedObservableImpl<TKey, TSource> : IGroupedObservable<TKey, TSource>
         {
             private readonly IObservable<TSource> _baseObservable;
@@ -582,14 +581,12 @@ namespace System.Reactive.Linq
 
             public TKey Key { get; }
         }
-        #endregion
 
         public static IGroupedObservable<TKey, TSource> ToGroup<TKey, TSource>(this IObservable<TSource> source, TKey key)
         {
             return new GroupedObservableImpl<TKey, TSource>(source, key);
         }
 
-        #region NotifyCollectionChangedEventPatternSource
         private sealed class NotifyCollectionChangedEventPatternSource : EventPatternSourceBase<object, NotifyCollectionChangedEventArgs>, INotifyCollectionChanged
         {
             public NotifyCollectionChangedEventPatternSource(IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
@@ -609,9 +606,7 @@ namespace System.Reactive.Linq
                 }
             }
         }
-        #endregion
 
-        #region NotifyPropertyChangedEventPatternSource
         private sealed class NotifyPropertyChangedEventPatternSource : EventPatternSourceBase<object, PropertyChangedEventArgs>, INotifyPropertyChanged
         {
             public NotifyPropertyChangedEventPatternSource(IObservable<EventPattern<object, PropertyChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
@@ -631,7 +626,6 @@ namespace System.Reactive.Linq
                 }
             }
         }
-        #endregion
 
         public static INotifyCollectionChanged ToNotifyCollectionChangedEventPattern(this IObservable<NotifyCollectionChangedEventArgs> source, object sender)
         {

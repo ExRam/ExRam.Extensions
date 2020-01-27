@@ -11,7 +11,7 @@ namespace System.IO
             while (count > 0)
             {
                 var read = await stream
-                    .ReadAsync(buffer, (buffer.Length - count), count)
+                    .ReadAsync(buffer, buffer.Length - count, count)
                     .ConfigureAwait(false);
 
                 if (read == 0)

@@ -2,7 +2,6 @@
 {
     public static partial class ConnectableObservable
     {
-        #region FuncConnectableObservable
         private sealed class FuncConnectableObservable<T> : IConnectableObservable<T>
         {
             private readonly Func<IDisposable> _connectFunction;
@@ -24,7 +23,6 @@
                 return _subscribeFuntion(observer);
             }
         }
-        #endregion
 
         public static IConnectableObservable<T> Create<T>(Func<IDisposable> connectFunction, Func<IObserver<T>, IDisposable> subscribeFuntion)
         {

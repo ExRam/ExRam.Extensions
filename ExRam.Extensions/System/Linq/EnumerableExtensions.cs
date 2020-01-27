@@ -8,7 +8,7 @@ namespace System.Linq
 
         public static T RandomElement<T>(this IEnumerable<T> source)
         {
-            var array = ((source as T[]) ?? (source.ToArray()));
+            var array = source as T[] ?? source.ToArray();
             var count = array.Length;
 
             if (count == 0)
