@@ -4,8 +4,6 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
-
 namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
@@ -13,9 +11,6 @@ namespace System.Threading.Tasks
         public static async Task<T> Using<T, TResource>(Func<TResource> resourceFactory, Func<TResource, Task<T>> taskFactory)
             where TResource : IDisposable
         {
-            Contract.Requires(resourceFactory != null);
-            Contract.Requires(taskFactory != null);
-
             using (var res = resourceFactory())
             {
                 return await taskFactory(res).ConfigureAwait(false);

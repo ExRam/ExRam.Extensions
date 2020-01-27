@@ -4,17 +4,12 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
-
 namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
     {
         public static Task<T2> Then<T1, T2>(this Task<T1> firstTask, Func<T1, T2> resultSelector)
         {
-            Contract.Requires(firstTask != null);
-            Contract.Requires(resultSelector != null);
-
             var tcs = new TaskCompletionSource<T2>();
 
             firstTask
@@ -42,9 +37,6 @@ namespace System.Threading.Tasks
 
         public static Task<T> Then<T>(this Task firstTask, Func<T> resultSelector)
         {
-            Contract.Requires(firstTask != null);
-            Contract.Requires(resultSelector != null);
-
             var tcs = new TaskCompletionSource<T>();
 
             firstTask
@@ -72,9 +64,6 @@ namespace System.Threading.Tasks
 
         public static Task<T2> Then<T1, T2>(this Task<T1> firstTask, Func<T1, Task<T2>> nextTaskSelector)
         {
-            Contract.Requires(firstTask != null);
-            Contract.Requires(nextTaskSelector != null);
-
             var tcs = new TaskCompletionSource<T2>();
 
             firstTask
@@ -117,9 +106,6 @@ namespace System.Threading.Tasks
 
         public static Task<T> Then<T>(this Task firstTask, Func<Task<T>> nextTaskSelector)
         {
-            Contract.Requires(firstTask != null);
-            Contract.Requires(nextTaskSelector != null);
-
             var tcs = new TaskCompletionSource<T>();
 
             firstTask

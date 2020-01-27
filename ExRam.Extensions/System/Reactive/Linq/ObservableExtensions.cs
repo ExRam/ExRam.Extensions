@@ -7,7 +7,6 @@
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
@@ -150,43 +149,26 @@ namespace System.Reactive.Linq
 
         public static IObservable<object> Box<T>(this IObservable<T> source) where T : struct
         {
-            Contract.Requires(source != null);
-
             return source.Select(x => (object)x);
         }
 
         public static IObservable<Tuple<TSource1, TSource2>> CombineLatest<TSource1, TSource2>(this IObservable<TSource1> first, IObservable<TSource2> second)
         {
-            Contract.Requires(first != null);
-            Contract.Requires(second != null);
-
             return first.CombineLatest(second, Tuple.Create);
         }
 
         public static IObservable<Tuple<TSource1, TSource2, TSource3>> CombineLatest<TSource1, TSource2, TSource3>(this IObservable<TSource1> source1, IObservable<TSource2> source2, IObservable<TSource3> source3)
         {
-            Contract.Requires(source1 != null);
-            Contract.Requires(source2 != null);
-            Contract.Requires(source3 != null);
-
             return source1.CombineLatest(source2, source3, Tuple.Create);
         }
 
         public static IObservable<Tuple<TSource1, TSource2, TSource3, TSource4>> CombineLatest<TSource1, TSource2, TSource3, TSource4>(this IObservable<TSource1> source1, IObservable<TSource2> source2, IObservable<TSource3> source3, IObservable<TSource4> source4)
         {
-            Contract.Requires(source1 != null);
-            Contract.Requires(source2 != null);
-            Contract.Requires(source3 != null);
-            Contract.Requires(source4 != null);
-
             return source1.CombineLatest(source2, source3, source4, Tuple.Create);
         }
 
         public static IObservable<T> Concat<T>(this IObservable<T> source, Func<Option<T>, IObservable<T>> continuationSelector)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(continuationSelector != null);
-
             return Observable.Create<T>(obs =>
             {
                 var lastValue = Option<T>.None;
@@ -245,29 +227,21 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> Debounce<T>(this IObservable<T> source, TimeSpan debounceInterval) where T : struct
         {
-            Contract.Requires(source != null);
-
             return source.Debounce(debounceInterval, false, Scheduler.Default);
         }
 
         public static IObservable<T> Debounce<T>(this IObservable<T> source, TimeSpan debounceInterval, IScheduler scheduler) where T : struct
         {
-            Contract.Requires(source != null);
-
             return source.Debounce(debounceInterval, false, scheduler);
         }
 
         public static IObservable<T> Debounce<T>(this IObservable<T> source, TimeSpan debounceInterval, bool emitLatestValue) where T : struct
         {
-            Contract.Requires(source != null);
-
             return source.Debounce(debounceInterval, emitLatestValue, Scheduler.Default);
         }
 
         public static IObservable<T> Debounce<T>(this IObservable<T> source, TimeSpan debounceInterval, bool emitLatestValue, IScheduler scheduler) where T : struct
         {
-            Contract.Requires(source != null);
-
             return Observable
                 .Using(
                     () => new SerialDisposable(),
@@ -330,17 +304,11 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> DefaultIfEmpty<T>(this IObservable<T> source, IObservable<T> defaultObservable)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(defaultObservable != null);
-
             return source.Concat(maybe => !maybe.IsSome ? defaultObservable : Observable.Empty<T>());
         }
 
         public static IObservable<T> EachUsing<T>(this IObservable<T> source, Func<T, IDisposable> resourceFactory)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(resourceFactory != null);
-
             return Observable.Create<T>(obs =>
             {
                 var eachUsingObserver = new ResourceEachUsingObserver<T>(obs, resourceFactory);
@@ -351,9 +319,6 @@ namespace System.Reactive.Linq
 
         public static IObservable<TSource> EachUsing<TSource, TOther>(this IObservable<TSource> source, Func<TSource, IObservable<TOther>> observableFactory)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(observableFactory != null);
-
             return Observable.Create<TSource>(obs =>
             {
                 var eachUsingObserver = new ObservableEachUsingObserver<TSource, TOther>(obs, observableFactory);
@@ -373,22 +338,16 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> KeepOpen<T>(this IObservable<T> source)
         {
-            Contract.Requires(source != null);
-
             return source.Concat(Observable.Never<T>());
         }
 
         public static IObservable<T> LazyRefCount<T>(this IConnectableObservable<T> source, TimeSpan delay)
         {
-            Contract.Requires(source != null);
-
             return source.LazyRefCount(delay, Scheduler.Default);
         }
 
         public static IObservable<T> LazyRefCount<T>(this IConnectableObservable<T> source, TimeSpan delay, IScheduler scheduler)
         {
-            Contract.Requires(source != null);
-
             var syncRoot = new object();
             var serial = new SerialDisposable();
             IDisposable currentConnection = null;
@@ -448,8 +407,6 @@ namespace System.Reactive.Linq
 
         public static IObservable<Unit> OnCompletion<T>(this IObservable<T> source)
         {
-            Contract.Requires(source != null);
-
             return Observable.Create<Unit>(observer => source.Subscribe(
                 x =>
                 {
@@ -464,8 +421,6 @@ namespace System.Reactive.Linq
 
         public static IObservable<Exception> OnCompletionOrError<T>(this IObservable<T> source)
         {
-            Contract.Requires(source != null);
-
             return source
                 .Materialize()
                 .Where(x => !x.HasValue)
@@ -474,8 +429,6 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> Prioritize<T>(this IObservable<T> source, IObservable<T> other)
         {
-            Contract.Requires(source != null);
-
             return source
                 .Publish(publishedSource => publishedSource
                     .Merge(other.TakeUntil(publishedSource)));
@@ -483,23 +436,16 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> RepeatWhileEmpty<T>(this IObservable<T> source)
         {
-            Contract.Requires(source != null);
-
             return source.RepeatWhileEmpty(null);
         }
 
         public static IObservable<T> RepeatWhileEmpty<T>(this IObservable<T> source, int repeatCount)
         {
-            Contract.Requires(source != null);
-
             return source.RepeatWhileEmpty((int?)repeatCount);
         }
 
         private static IObservable<T> RepeatWhileEmpty<T>(this IObservable<T> source, int? repeatCount)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(!repeatCount.HasValue || repeatCount.Value >= 0);
-
             if ((repeatCount.HasValue) && (repeatCount.Value == 0))
                 return Observable.Empty<T>();
 
@@ -509,9 +455,6 @@ namespace System.Reactive.Linq
 
         public static IObservable<TAccumulate> ScanAsync<TSource, TAccumulate>(this IObservable<TSource> source, TAccumulate seed, Func<TAccumulate, TSource, Task<TAccumulate>> accumulator)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(accumulator != null);
-
             return source
                 .Scan(Task.FromResult(seed), async (currentTask, value) => await accumulator(await currentTask.ConfigureAwait(false), value).ConfigureAwait(false))
                 .SelectMany(x => x);
@@ -519,18 +462,12 @@ namespace System.Reactive.Linq
 
         public static IObservable<Unit> SelectMany<TSource>(this IObservable<TSource> source, Func<TSource, CancellationToken, Task> taskSelector)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(taskSelector != null);
-
             return source
                 .SelectMany((x, ct) => taskSelector(x, ct).AsUnitTask());
         }
 
         public static IObservable<TSource> StateScan<TSource, TState>(this IObservable<TSource> source, TState seed, Func<TState, TSource, TState> stateFunction)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(stateFunction != null);
-
             return source
                 .Scan(
                     Tuple.Create(seed, default(TSource)),
@@ -540,10 +477,6 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> SubscribeConcurrentlyAtMost<T>(this IObservable<T> source, int count, IObservable<T> continuation)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(count >= 0);
-            Contract.Requires(continuation != null);
-
             var subscriptionCount = 0;
 
             return Observable.Create<T>(observer =>
@@ -570,10 +503,6 @@ namespace System.Reactive.Linq
         
         public static IObservable<T> SubscribeTotallyAtMost<T>(this IObservable<T> source, int count, IObservable<T> continuation)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(count >= 0);
-            Contract.Requires(continuation != null);
-
             var subscriptionCount = 0;
 
             return Observable.Create<T>(observer =>
@@ -625,8 +554,6 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> ThrowOnCancellation<T>(this IObservable<T> source, CancellationToken ct)
         {
-            Contract.Requires(source != null);
-
             return source.TakeUntil(ct)
                 .Concat(Observable.If(
                     () => ct.IsCancellationRequested,
@@ -635,8 +562,6 @@ namespace System.Reactive.Linq
 
         public static IObservable<Counting<T>> ToCounting<T>(this IObservable<T> source)
         {
-            Contract.Requires(source != null);
-
             return source.Select((x, i) => new Counting<T>((ulong)i, x));
         }
 
@@ -647,8 +572,6 @@ namespace System.Reactive.Linq
 
             public GroupedObservableImpl(IObservable<TSource> baseObservable, TKey key)
             {
-                Contract.Requires(baseObservable != null);
-
                 this.Key = key;
                 this._baseObservable = baseObservable;
             }
@@ -664,8 +587,6 @@ namespace System.Reactive.Linq
 
         public static IGroupedObservable<TKey, TSource> ToGroup<TKey, TSource>(this IObservable<TSource> source, TKey key)
         {
-            Contract.Requires(source != null);
-
             return new GroupedObservableImpl<TKey, TSource>(source, key);
         }
 
@@ -674,7 +595,6 @@ namespace System.Reactive.Linq
         {
             public NotifyCollectionChangedEventPatternSource(IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
             {
-                Contract.Requires(source != null);
             }
 
             public event NotifyCollectionChangedEventHandler CollectionChanged
@@ -697,7 +617,6 @@ namespace System.Reactive.Linq
         {
             public NotifyPropertyChangedEventPatternSource(IObservable<EventPattern<object, PropertyChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
             {
-                Contract.Requires(source != null);
             }
 
             public event PropertyChangedEventHandler PropertyChanged
@@ -717,17 +636,11 @@ namespace System.Reactive.Linq
 
         public static INotifyCollectionChanged ToNotifyCollectionChangedEventPattern(this IObservable<NotifyCollectionChangedEventArgs> source, object sender)
         {
-            Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<INotifyCollectionChanged>() != null);
-
             return new NotifyCollectionChangedEventPatternSource(source.Select(x => new EventPattern<NotifyCollectionChangedEventArgs>(sender, x)));
         }
 
         public static INotifyPropertyChanged ToNotifyPropertyChangedEventPattern(this IObservable<PropertyChangedEventArgs> source, object sender)
         {
-            Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<INotifyPropertyChanged>() != null);
-
             return new NotifyPropertyChangedEventPatternSource(source.Select(x => new EventPattern<PropertyChangedEventArgs>(sender, x)));
         }
 
@@ -743,8 +656,6 @@ namespace System.Reactive.Linq
             [MethodImpl(MethodImplOptions.NoOptimization)]
             public StrongReferenceDisposable(IDisposable innerDisposable, object reference)
             {
-                Contract.Requires(innerDisposable != null);
-
                 this._innerDisposable = innerDisposable;
                 this._reference = reference;
             }
@@ -765,8 +676,6 @@ namespace System.Reactive.Linq
 
             public WeakObserver(IObservable<T> observable, IObserver<T> observer)
             {
-                Contract.Requires(observable != null);
-
                 this._weakObserverReference = new WeakReference(observer);
                 this.BaseSubscription = observable.Subscribe(this);
             }
@@ -817,8 +726,6 @@ namespace System.Reactive.Linq
 
         public static IObservable<Option<T>> TryFirstAsync<T>(this IObservable<T> source)
         {
-            Contract.Requires(source != null);
-
             return source
                 .Select(x => (Option<T>)x)
                 .FirstOrDefaultAsync();
@@ -826,9 +733,6 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> Where<T>(this IObservable<T> source, Func<T, CancellationToken, Task<bool>> predicate)
         {
-            Contract.Requires(source != null);
-            Contract.Requires(predicate != null);
-
             return source
                 .SelectMany(x => ObservableExtensions
                     .WithCancellation(
@@ -840,15 +744,11 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> WhereNotNull<T>(this IObservable<T> source) where T : class
         {
-            Contract.Requires(source != null);
-
             return source.Where(t => !object.Equals(t, default(T)));
         }
 
         public static IObservable<T> WithCancellation<T>(Func<CancellationToken, IObservable<T>> observableFactory)
         {
-            Contract.Requires(observableFactory != null);
-
             return Observable
                 .Using(
                     () => new CancellationDisposable(),

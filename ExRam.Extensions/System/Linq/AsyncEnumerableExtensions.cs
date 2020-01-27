@@ -5,7 +5,6 @@
 // file.
 
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 using System.IO;
 using System.Reactive;
 using System.Reactive.Disposables;
@@ -182,8 +181,6 @@ namespace System.Linq
 
             public JoinStream(IAsyncEnumerator<ArraySegment<byte>> factory)
             {
-                Contract.Requires(factory != null);
-
                 this._arraySegmentEnumerator = factory;
             }
 
@@ -273,8 +270,6 @@ namespace System.Linq
 
         public static Stream ToStream(this IAsyncEnumerable<ArraySegment<byte>> byteSegmentAsyncEnumerable)
         {
-            Contract.Requires(byteSegmentAsyncEnumerable != null);
-
             return new JoinStream(byteSegmentAsyncEnumerable.GetAsyncEnumerator());
         }
 
@@ -328,8 +323,6 @@ namespace System.Linq
 
         public static IAsyncEnumerable<T> WithCancellation<T>(Func<CancellationToken, IAsyncEnumerable<T>> enumerableFactory)
         {
-            Contract.Requires(enumerableFactory != null);
-
             return AsyncEnumerableEx
                 .Using(
                     () => new CancellationDisposable(),

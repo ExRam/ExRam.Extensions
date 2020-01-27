@@ -4,7 +4,6 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
 using LanguageExt;
 
 namespace System.Threading.Tasks
@@ -14,8 +13,6 @@ namespace System.Threading.Tasks
         #region Swallow<TException>(Task)
         public static async Task Swallow<TException>(this Task task) where TException : Exception
         {
-            Contract.Requires(task != null);
-
             try
             {
                 await task.ConfigureAwait(false);
@@ -31,8 +28,6 @@ namespace System.Threading.Tasks
         #region Swallow<TException>(Task<Result>)
         public static async Task<Option<TResult>> Swallow<TException, TResult>(this Task<Option<TResult>> task) where TException : Exception
         {
-            Contract.Requires(task != null);
-
             try
             {
                 return await task.ConfigureAwait(false);
@@ -47,8 +42,6 @@ namespace System.Threading.Tasks
 
         public static async Task<Option<TResult>> Swallow<TException, TResult>(this Task<TResult> task) where TException : Exception
         {
-            Contract.Requires(task != null);
-
             try
             {
                 return await task.ConfigureAwait(false);
@@ -65,8 +58,6 @@ namespace System.Threading.Tasks
         #region Swallow(Task<TResult>)
         public static async Task<Option<TResult>> Swallow<TResult>(this Task<Option<TResult>> task)
         {
-            Contract.Requires(task != null);
-
             try
             {
                 return await task.ConfigureAwait(false);
@@ -79,8 +70,6 @@ namespace System.Threading.Tasks
 
         public static async Task<Option<TResult>> Swallow<TResult>(this Task<TResult> task)
         {
-            Contract.Requires(task != null);
-
             try
             {
                 return await task.ConfigureAwait(false);
@@ -95,8 +84,6 @@ namespace System.Threading.Tasks
         #region Swallow(Task)
         public static async Task Swallow(this Task task)
         {
-            Contract.Requires(task != null);
-
             try
             {
                 await task.ConfigureAwait(false);

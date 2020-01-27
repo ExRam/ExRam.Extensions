@@ -5,7 +5,6 @@
 // file.
 
 using System.Reactive.Linq;
-using System.Diagnostics.Contracts;
 
 namespace System.Reactive.Subjects
 {
@@ -13,9 +12,6 @@ namespace System.Reactive.Subjects
     {
         public static IObservable<T> Warm<T>(this IConnectableObservable<T> source)
         {
-            Contract.Requires(source != null);
-            Contract.Ensures(Contract.Result<IObservable<T>>() != null);
-
             var isConnected = false;
             var syncRoot = new object();
 

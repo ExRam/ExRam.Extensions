@@ -4,7 +4,6 @@
 // Full License description can be found in the LICENSE
 // file.
 
-using System.Diagnostics.Contracts;
 using LanguageExt;
 
 namespace System.Threading.Tasks
@@ -14,8 +13,6 @@ namespace System.Threading.Tasks
         #region TryWithCancellation(Task, CancellationToken)
         public static async Task<bool> TryWithCancellation(this Task task, CancellationToken ct)
         {
-            Contract.Requires(task != null);
-
             bool ret;
             var tcs = new TaskCompletionSource<bool>();
 
@@ -34,8 +31,6 @@ namespace System.Threading.Tasks
         #region TryWithCancellation(Task<TResult>, CancellationToken)
         public static async Task<Option<TResult>> TryWithCancellation<TResult>(this Task<TResult> task, CancellationToken ct)
         {
-            Contract.Requires(task != null);
-
             bool ret;
             var tcs = new TaskCompletionSource<bool>();
 

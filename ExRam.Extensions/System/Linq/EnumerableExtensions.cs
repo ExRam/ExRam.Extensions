@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics.Contracts;
 
 namespace System.Linq
 {
@@ -18,22 +17,14 @@ namespace System.Linq
             return array[EnumerableExtensions.Rnd.Next(count)];
         }
 
-        #region Append
         public static IEnumerable<T> Append<T>(this IEnumerable<T> source, T appendElement)
         {
-            Contract.Requires(source != null);
-
             return source.Concat(new[] { appendElement });
         }
-        #endregion
 
-        #region WhereNotNull
         public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> source) where T : class
         {
-            Contract.Requires(source != null);
-
             return source.Where(t => !object.ReferenceEquals(t, default(T)));
         }
-        #endregion
     }
 }

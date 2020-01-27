@@ -1,6 +1,4 @@
-﻿using System.Diagnostics.Contracts;
-
-namespace System.Reactive.Subjects
+﻿namespace System.Reactive.Subjects
 {
     public static partial class ConnectableObservable
     {
@@ -12,9 +10,6 @@ namespace System.Reactive.Subjects
 
             public FuncConnectableObservable(Func<IDisposable> connectFunction, Func<IObserver<T>, IDisposable> subscribeFuntion)
             {
-                Contract.Requires(connectFunction != null);
-                Contract.Requires(subscribeFuntion != null);
-
                 this._connectFunction = connectFunction;
                 this._subscribeFuntion = subscribeFuntion;
             }
@@ -33,9 +28,6 @@ namespace System.Reactive.Subjects
 
         public static IConnectableObservable<T> Create<T>(Func<IDisposable> connectFunction, Func<IObserver<T>, IDisposable> subscribeFuntion)
         {
-            Contract.Requires(connectFunction != null);
-            Contract.Requires(subscribeFuntion != null);
-
             return new FuncConnectableObservable<T>(connectFunction, subscribeFuntion);
         }
     }
