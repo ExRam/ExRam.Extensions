@@ -10,8 +10,8 @@ namespace System.Reactive
     {
         public Counting(ulong number, T value)
         {
-            this.Value = value;
-            this.Number = number;
+            Value = value;
+            Number = number;
         }
 
         public T Value { get; }
@@ -33,7 +33,7 @@ namespace System.Reactive
             if (obj is Counting<T>)
             {
                 var counting2 = (Counting<T>)obj;
-                return ((this.Number == counting2.Number) && (object.Equals(this.Value, counting2.Value)));
+                return ((Number == counting2.Number) && (Equals(Value, counting2.Value)));
             }
 
             return false;
@@ -43,7 +43,7 @@ namespace System.Reactive
         {
             unchecked
             {
-                return (int)Math.Pow(2, this.Number) * (int)Math.Pow(3, this.Value.GetHashCode());
+                return (int)Math.Pow(2, Number) * (int)Math.Pow(3, Value.GetHashCode());
             }
         }
     }

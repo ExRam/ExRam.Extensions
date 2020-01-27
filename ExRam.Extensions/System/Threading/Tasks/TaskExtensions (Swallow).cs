@@ -10,7 +10,6 @@ namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
     {
-        #region Swallow<TException>(Task)
         public static async Task Swallow<TException>(this Task task) where TException : Exception
         {
             try
@@ -23,9 +22,7 @@ namespace System.Threading.Tasks
             {
             }
         }
-        #endregion
-
-        #region Swallow<TException>(Task<Result>)
+        
         public static async Task<Option<TResult>> Swallow<TException, TResult>(this Task<Option<TResult>> task) where TException : Exception
         {
             try
@@ -53,9 +50,7 @@ namespace System.Threading.Tasks
                 return Option<TResult>.None;
             }
         }
-        #endregion
-
-        #region Swallow(Task<TResult>)
+        
         public static async Task<Option<TResult>> Swallow<TResult>(this Task<Option<TResult>> task)
         {
             try
@@ -79,9 +74,7 @@ namespace System.Threading.Tasks
                 return Option<TResult>.None;
             }
         }
-        #endregion
-
-        #region Swallow(Task)
+        
         public static async Task Swallow(this Task task)
         {
             try
@@ -94,6 +87,5 @@ namespace System.Threading.Tasks
             {
             }
         }
-        #endregion
     }
 }

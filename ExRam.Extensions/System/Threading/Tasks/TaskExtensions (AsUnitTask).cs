@@ -10,9 +10,11 @@ namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
     {
-        public static Task<Unit> AsUnitTask(this Task task)
+        public static async Task<Unit> AsUnitTask(this Task task)
         {
-            return task.Then(() => Unit.Default);
+            await task;
+
+            return Unit.Default;
         }
     }
 }

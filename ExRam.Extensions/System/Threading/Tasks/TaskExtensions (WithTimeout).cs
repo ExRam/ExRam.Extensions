@@ -8,24 +8,19 @@ namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
     {
-        #region WithTimeout(Task, TimeSpan)
         public static async Task WithTimeout(this Task task, TimeSpan timeout)
         {
-            if (!(await task.TryWithTimeout(timeout).ConfigureAwait(false)))
+            if (!await task.TryWithTimeout(timeout).ConfigureAwait(false))
                 throw new TimeoutException();
 
             await task.ConfigureAwait(false);
         }
-        #endregion
 
-        #region WithTimeout(Task<TResult>, TimeSpan)
         public static async Task<TResult> WithTimeout<TResult>(this Task<TResult> task, TimeSpan timeout)
         {
-            if (!(await task.TryWithTimeout(timeout).ConfigureAwait(false)).IsSome)
-                throw new TimeoutException();
-
-            return await task.ConfigureAwait(false);
+            return !(await task.TryWithTimeout(timeout).ConfigureAwait(false)).IsSome 
+                ? throw new TimeoutException()
+                : await task.ConfigureAwait(false);
         }
-        #endregion 
     }
 }

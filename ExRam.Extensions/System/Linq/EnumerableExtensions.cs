@@ -14,7 +14,7 @@ namespace System.Linq
             if (count == 0)
                 throw new InvalidOperationException();
 
-            return array[EnumerableExtensions.Rnd.Next(count)];
+            return array[Rnd.Next(count)];
         }
 
         public static IEnumerable<T> Append<T>(this IEnumerable<T> source, T appendElement)
@@ -24,7 +24,7 @@ namespace System.Linq
 
         public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> source) where T : class
         {
-            return source.Where(t => !object.ReferenceEquals(t, default(T)));
+            return source.Where(t => !ReferenceEquals(t, default(T)));
         }
     }
 }

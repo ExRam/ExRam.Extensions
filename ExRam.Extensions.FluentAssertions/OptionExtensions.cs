@@ -11,7 +11,7 @@ namespace LanguageExt
         {
             public OptionAssertions(Option<T> option)
             {
-                this.Subject = option;
+                Subject = option;
             }
 
             public Option<T> Subject { get; }
@@ -25,12 +25,12 @@ namespace LanguageExt
 
             public AndConstraint<OptionAssertions<T>> BeSome(string because = "", params object[] becauseArgs)
             {
-                return this.BeSome(value => { });
+                return BeSome(value => { });
             }
 
             public AndConstraint<OptionAssertions<T>> BeSome(T expected, string because = "", params object[] becauseArgs)
             {
-                return this.BeSome(value => value.Should().Be(expected));
+                return BeSome(value => value.Should().Be(expected));
             }
 
             public AndConstraint<OptionAssertions<T>> BeSome(Action<T> someAction, string because = "", params object[] becauseArgs)

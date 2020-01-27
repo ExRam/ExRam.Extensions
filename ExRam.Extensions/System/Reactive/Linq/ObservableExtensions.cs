@@ -12,7 +12,6 @@ using System.Reactive.Concurrency;
 using System.Reactive.Disposables;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
-using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using LanguageExt;
@@ -32,39 +31,39 @@ namespace System.Reactive.Linq
            
             public ResourceEachUsingObserver(IObserver<T> baseObserver, Func<T, IDisposable> resourceFactory)
             {
-                this._baseObserver = baseObserver;
-                this._resourceFactory = resourceFactory;
+                _baseObserver = baseObserver;
+                _resourceFactory = resourceFactory;
             }
 
             public void OnCompleted()
             {
-                this.Dispose();
-                this._baseObserver.OnCompleted();
+                Dispose();
+                _baseObserver.OnCompleted();
             }
 
             public void OnError(Exception error)
             {
-                this.Dispose();
-                this._baseObserver.OnError(error);
+                Dispose();
+                _baseObserver.OnError(error);
             }
 
             public void OnNext(T value)
             {
-                lock (this._syncRoot)
+                lock (_syncRoot)
                 {
-                    this._resource?.Dispose();
-                    this._resource = this._resourceFactory(value);
+                    _resource?.Dispose();
+                    _resource = _resourceFactory(value);
                 }
 
-                this._baseObserver.OnNext(value);
+                _baseObserver.OnNext(value);
             }
 
             public void Dispose()
             {
-                lock (this._syncRoot)
+                lock (_syncRoot)
                 {
-                    this._resource?.Dispose();
-                    this._resource = null;
+                    _resource?.Dispose();
+                    _resource = null;
                 }
             }
         }
@@ -78,18 +77,18 @@ namespace System.Reactive.Linq
 
                 public InnerObserver(ObservableEachUsingObserver<TSource, TOther> parentObserver, IDisposable subscription)
                 {
-                    this._parentObserver = parentObserver;
-                    this._subscription = subscription;
+                    _parentObserver = parentObserver;
+                    _subscription = subscription;
                 }
 
                 public void OnCompleted()
                 {
-                    this._subscription.Dispose();
+                    _subscription.Dispose();
                 }
 
                 public void OnError(Exception error)
                 {
-                    this._parentObserver.OnError(error);
+                    _parentObserver.OnError(error);
                 }
 
                 public void OnNext(TOther value)
@@ -105,44 +104,44 @@ namespace System.Reactive.Linq
 
             public ObservableEachUsingObserver(IObserver<TSource> baseObserver, Func<TSource, IObservable<TOther>> observableFactory)
             {
-                this._baseObserver = baseObserver;
-                this._observableFactory = observableFactory;
+                _baseObserver = baseObserver;
+                _observableFactory = observableFactory;
             }
 
             public void OnCompleted()
             {
-                this.Dispose();
-                this._baseObserver.OnCompleted();
+                Dispose();
+                _baseObserver.OnCompleted();
             }
 
             public void OnError(Exception error)
             {
-                this.Dispose();
-                this._baseObserver.OnError(error);
+                Dispose();
+                _baseObserver.OnError(error);
             }
 
             public void OnNext(TSource value)
             {
-                lock (this._syncRoot)
+                lock (_syncRoot)
                 {
                     var subscription = new SingleAssignmentDisposable();
 
-                    this._resource?.Dispose();
-                    this._resource = subscription;
+                    _resource?.Dispose();
+                    _resource = subscription;
 
-                    subscription.Disposable = this._observableFactory(value)
+                    subscription.Disposable = _observableFactory(value)
                         .Subscribe(new InnerObserver(this, subscription));
                 }
 
-                this._baseObserver.OnNext(value);
+                _baseObserver.OnNext(value);
             }
             
             public void Dispose()
             {
-                lock (this._syncRoot)
+                lock (_syncRoot)
                 {
-                    this._resource?.Dispose();
-                    this._resource = null;
+                    _resource?.Dispose();
+                    _resource = null;
                 }
             }
         }
@@ -375,7 +374,7 @@ namespace System.Reactive.Linq
                                     {
                                         lock (syncRoot)
                                         {
-                                            if (object.ReferenceEquals(serial.Disposable, state))
+                                            if (ReferenceEquals(serial.Disposable, state))
                                             {
                                                 currentConnection.Dispose();
                                                 currentConnection = null;
@@ -419,7 +418,7 @@ namespace System.Reactive.Linq
                 }));
         }
 
-        public static IObservable<Exception> OnCompletionOrError<T>(this IObservable<T> source)
+        public static IObservable<Exception?> OnCompletionOrError<T>(this IObservable<T> source)
         {
             return source
                 .Materialize()
@@ -491,7 +490,7 @@ namespace System.Reactive.Linq
                     {
                         var subscription = source.Subscribe(observer);
 
-                        return Disposables.Disposable.Create(() =>
+                        return Disposable.Create(() =>
                         {
                             Interlocked.Decrement(ref subscriptionCount);
                             subscription.Dispose();
@@ -572,13 +571,13 @@ namespace System.Reactive.Linq
 
             public GroupedObservableImpl(IObservable<TSource> baseObservable, TKey key)
             {
-                this.Key = key;
-                this._baseObservable = baseObservable;
+                Key = key;
+                _baseObservable = baseObservable;
             }
 
             public IDisposable Subscribe(IObserver<TSource> observer)
             {
-                return this._baseObservable.Subscribe(observer);
+                return _baseObservable.Subscribe(observer);
             }
 
             public TKey Key { get; }
@@ -601,12 +600,12 @@ namespace System.Reactive.Linq
             {
                 add
                 {
-                    base.Add(value, (o, e) => value(o, e));
+                    Add(value, (o, e) => value(o, e));
                 }
 
                 remove
                 {
-                    base.Remove(value);
+                    Remove(value);
                 }
             }
         }
@@ -623,12 +622,12 @@ namespace System.Reactive.Linq
             {
                 add
                 {
-                    base.Add(value, (o, e) => value(o, e));
+                    Add(value, (o, e) => value(o, e));
                 }
 
                 remove
                 {
-                    base.Remove(value);
+                    Remove(value);
                 }
             }
         }
@@ -644,86 +643,6 @@ namespace System.Reactive.Linq
             return new NotifyPropertyChangedEventPatternSource(source.Select(x => new EventPattern<PropertyChangedEventArgs>(sender, x)));
         }
 
-        #region StrongReferenceDisposable
-        private sealed class StrongReferenceDisposable : IDisposable
-        {
-            private readonly IDisposable _innerDisposable;
-
-            // ReSharper disable NotAccessedField.Local
-            private object _reference;
-            // ReSharper restore NotAccessedField.Local
-
-            [MethodImpl(MethodImplOptions.NoOptimization)]
-            public StrongReferenceDisposable(IDisposable innerDisposable, object reference)
-            {
-                this._innerDisposable = innerDisposable;
-                this._reference = reference;
-            }
-
-            [MethodImpl(MethodImplOptions.NoOptimization)]
-            public void Dispose()
-            {
-                this._innerDisposable.Dispose();
-                this._reference = null;
-            }
-        }
-        #endregion
-
-        #region WeakObserver
-        private class WeakObserver<T> : IObserver<T>
-        {
-            private readonly WeakReference _weakObserverReference;
-
-            public WeakObserver(IObservable<T> observable, IObserver<T> observer)
-            {
-                this._weakObserverReference = new WeakReference(observer);
-                this.BaseSubscription = observable.Subscribe(this);
-            }
-
-            public void OnCompleted()
-            {
-                var observer = this._weakObserverReference.Target as IObserver<T>;
-
-                if (observer != null)
-                    observer.OnCompleted();
-                else
-                    this.BaseSubscription.Dispose();
-            }
-
-            public void OnError(Exception error)
-            {
-                var observer = this._weakObserverReference.Target as IObserver<T>;
-
-                if (observer != null)
-                    observer.OnError(error);
-                else
-                    this.BaseSubscription.Dispose();
-            }
-
-            public void OnNext(T value)
-            {
-                var observer = this._weakObserverReference.Target as IObserver<T>;
-
-                if (observer != null)
-                    observer.OnNext(value);
-                else
-                    this.BaseSubscription.Dispose();
-            }
-
-            public IDisposable BaseSubscription { get; }
-        }
-        #endregion
-
-        public static IObservable<T> ToWeakObservable<T>(this IObservable<T> observable)
-        {
-            return Observable.Create<T>(baseObserver =>
-            {
-                var weakObserver = new WeakObserver<T>(observable, baseObserver);
-
-                return new StrongReferenceDisposable(weakObserver.BaseSubscription, baseObserver);
-            });
-        }
-
         public static IObservable<Option<T>> TryFirstAsync<T>(this IObservable<T> source)
         {
             return source
@@ -734,8 +653,7 @@ namespace System.Reactive.Linq
         public static IObservable<T> Where<T>(this IObservable<T> source, Func<T, CancellationToken, Task<bool>> predicate)
         {
             return source
-                .SelectMany(x => ObservableExtensions
-                    .WithCancellation(
+                .SelectMany(x => WithCancellation(
                         ct => predicate(x, ct)
                             .ToObservable()
                             .Where(b => b)
@@ -744,7 +662,7 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> WhereNotNull<T>(this IObservable<T> source) where T : class
         {
-            return source.Where(t => !object.Equals(t, default(T)));
+            return source.Where(t => !Equals(t, default(T)));
         }
 
         public static IObservable<T> WithCancellation<T>(Func<CancellationToken, IObservable<T>> observableFactory)

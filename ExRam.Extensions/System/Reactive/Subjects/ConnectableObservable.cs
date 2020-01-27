@@ -10,18 +10,18 @@
 
             public FuncConnectableObservable(Func<IDisposable> connectFunction, Func<IObserver<T>, IDisposable> subscribeFuntion)
             {
-                this._connectFunction = connectFunction;
-                this._subscribeFuntion = subscribeFuntion;
+                _connectFunction = connectFunction;
+                _subscribeFuntion = subscribeFuntion;
             }
 
             public IDisposable Connect()
             {
-                return this._connectFunction();
+                return _connectFunction();
             }
 
             public IDisposable Subscribe(IObserver<T> observer)
             {
-                return this._subscribeFuntion(observer);
+                return _subscribeFuntion(observer);
             }
         }
         #endregion

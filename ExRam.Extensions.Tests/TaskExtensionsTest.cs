@@ -17,6 +17,16 @@ namespace ExRam.Extensions.Tests
 {
     public class TaskExtensionsTest
     {
+        public static readonly CancellationToken CancelledCt;
+
+        static TaskExtensionsTest()
+        {
+            var cts = new CancellationTokenSource();
+            CancelledCt = cts.Token;
+
+            cts.Cancel();
+        }
+
         [Fact]
         public async Task ToAsyncEnumerable_completes()
         {
@@ -154,30 +164,10 @@ namespace ExRam.Extensions.Tests
         }
 
         [Fact]
-        public async Task TryWithCancellation_with_TaskOfMaybe_returns_correct_Maybe_value_if_not_cancelled()
-        {
-            var task = Task.Factory.StartNew(() =>
-            {
-                Thread.Sleep(100);
-                return (Option<int>)36;
-            });
-
-            var cts = new CancellationTokenSource();
-
-            var maybeInt = await task.TryWithCancellation(cts.Token);
-
-            maybeInt.IsSome.Should().BeTrue();
-            maybeInt.IfSome(val =>
-            {
-                val.Should().Be(36);
-            });
-        }
-
-        [Fact]
         public async Task TryWithCancellation_throws_if_called_on_cancelled_task()
         {
             var cts = new CancellationTokenSource();
-            var longRunningTask = Task.Factory.GetCanceled<Unit>();
+            var longRunningTask = Task.FromCanceled(CancelledCt);
             var cancellationTask = longRunningTask.TryWithCancellation(cts.Token);
 
             cancellationTask
@@ -248,7 +238,7 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Faulted_Task_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<Unit>(new DivideByZeroException());
+            var completedTask = Task.FromException(new DivideByZeroException());
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
@@ -259,7 +249,7 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Faulted_TaskOfInt_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<int>(new DivideByZeroException());
+            var completedTask = Task.FromException(new DivideByZeroException());
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
@@ -270,7 +260,7 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Faulted_TaskOfMaybeOfInt_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<Option<int>>(new DivideByZeroException());
+            var completedTask = Task.FromException(new DivideByZeroException());
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
@@ -281,7 +271,7 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Canceled_Task_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetCanceled<Unit>();
+            var completedTask = Task.FromCanceled(CancelledCt);
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
@@ -292,7 +282,7 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Canceled_TaskOfInt_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetCanceled<int>();
+            var completedTask = Task.FromCanceled(CancelledCt);
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
@@ -303,7 +293,7 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Canceled_TaskOfMaybeOfInt_TryWithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetCanceled<Option<int>>();
+            var completedTask = Task.FromCanceled(CancelledCt);
 
             completedTask
                 .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
@@ -603,7 +593,7 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Faulted_Task_WithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<Unit>(new DivideByZeroException());
+            var completedTask = Task.FromException(new DivideByZeroException());
 
             completedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
@@ -614,7 +604,7 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Faulted_TaskOfInt_WithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetFaulted<int>(new DivideByZeroException());
+            var completedTask = Task.FromException(new DivideByZeroException());
 
             completedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
@@ -625,7 +615,7 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Canceled_Task_WithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetCanceled<Unit>();
+            var completedTask = Task.FromCanceled(CancelledCt);
 
             completedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
@@ -636,7 +626,7 @@ namespace ExRam.Extensions.Tests
         [Fact]
         public async Task Canceled_TaskOfInt_WithTimeout_Faults()
         {
-            var completedTask = Task.Factory.GetCanceled<int>();
+            var completedTask = Task.FromCanceled(CancelledCt);
 
             completedTask
                 .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))

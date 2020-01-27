@@ -6,6 +6,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using LanguageExt.ClassInstances.Const;
 
 namespace System.Threading.Tasks
 {
@@ -13,9 +14,16 @@ namespace System.Threading.Tasks
     {
         public static IAsyncEnumerable<T> AsAsyncEnumerable<T>(this Task<IEnumerable<T>> enumerableTask)
         {
-            return enumerableTask
-                .ToAsyncEnumerable<IEnumerable<T>>()
-                .SelectMany(x => x.ToAsyncEnumerable());
+            return AsyncEnumerable.Create(Core);
+
+            async IAsyncEnumerator<T> Core(CancellationToken ct)
+            {
+                foreach (var t in await enumerableTask)
+                {
+                    ct.ThrowIfCancellationRequested();
+                    yield return t;
+                }
+            }
         }
     }
 }

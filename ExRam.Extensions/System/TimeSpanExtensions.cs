@@ -7,7 +7,9 @@ namespace System
     {
         public static TaskAwaiter GetAwaiter(this TimeSpan timeSpan)
         {
-            return Task.Delay(((timeSpan >= TimeSpan.Zero) ? (timeSpan) : (TimeSpan.Zero))).GetAwaiter();
+            return Task
+                .Delay(timeSpan >= TimeSpan.Zero ? timeSpan : TimeSpan.Zero)
+                .GetAwaiter();
         }
     }
 }

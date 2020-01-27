@@ -157,6 +157,7 @@ namespace System.Linq
                 await foreach (var item in source.WithCancellation(cancellationToken).ConfigureAwait(false))
                 {
                     acc = await accumulator(acc, item, cancellationToken);
+
                     yield return acc;
                 }
             }
@@ -168,6 +169,7 @@ namespace System.Linq
                 .SelectAwaitWithCancellation(async (x, ct) =>
                 {
                     await selector(x, ct);
+
                     return Unit.Default;
                 });
         }
@@ -181,13 +183,13 @@ namespace System.Linq
 
             public JoinStream(IAsyncEnumerator<ArraySegment<byte>> factory)
             {
-                this._arraySegmentEnumerator = factory;
+                _arraySegmentEnumerator = factory;
             }
 
             #region Read
             public override int Read(byte[] buffer, int offset, int count)
             {
-                return this.ReadAsync(buffer, offset, count, CancellationToken.None).Result;
+                return ReadAsync(buffer, offset, count, CancellationToken.None).Result;
             }
             #endregion
 
@@ -216,14 +218,14 @@ namespace System.Linq
                     return 0;
 
                 ArraySegment<byte> currentInputSegment;
-                var currentNullableInputSegment = this._currentInputSegment;
+                var currentNullableInputSegment = _currentInputSegment;
 
                 if (currentNullableInputSegment == null)
                 {
                     try
                     {
-                        if (await this._arraySegmentEnumerator.MoveNextAsync(cancellationToken).ConfigureAwait(false))
-                            currentInputSegment = this._arraySegmentEnumerator.Current;
+                        if (await _arraySegmentEnumerator.MoveNextAsync(cancellationToken).ConfigureAwait(false))
+                            currentInputSegment = _arraySegmentEnumerator.Current;
                         else
                             return 0;
                     }
@@ -239,7 +241,7 @@ namespace System.Linq
                 Buffer.BlockCopy(currentInputSegment.Array, currentInputSegment.Offset, buffer, offset, minToRead);
 
                 currentInputSegment = new ArraySegment<byte>(currentInputSegment.Array, currentInputSegment.Offset + minToRead, currentInputSegment.Count - minToRead);
-                this._currentInputSegment = ((currentInputSegment.Count > 0) ? ((ArraySegment<byte>?)currentInputSegment) : (null));
+                _currentInputSegment = ((currentInputSegment.Count > 0) ? ((ArraySegment<byte>?)currentInputSegment) : (null));
 
                 return minToRead;
             }
@@ -247,7 +249,7 @@ namespace System.Linq
             protected override void Dispose(bool disposing)
             {
                 if (disposing)
-                    this._arraySegmentEnumerator.DisposeAsync();
+                    _arraySegmentEnumerator.DisposeAsync();
 
                 base.Dispose(disposing);
             }
@@ -318,7 +320,7 @@ namespace System.Linq
 
         public static IAsyncEnumerable<T> WhereNotNull<T>(this IAsyncEnumerable<T> source)
         {
-            return source.Where(t => !object.Equals(t, default(T)));
+            return source.Where(t => !Equals(t, default(T)));
         }
 
         public static IAsyncEnumerable<T> WithCancellation<T>(Func<CancellationToken, IAsyncEnumerable<T>> enumerableFactory)

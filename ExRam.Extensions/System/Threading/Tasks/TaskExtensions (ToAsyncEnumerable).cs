@@ -14,6 +14,7 @@ namespace System.Threading.Tasks
         public static async IAsyncEnumerable<Unit> ToAsyncEnumerable(this Task task)
         {
             await task;
+
             yield return Unit.Default;
         }
     }
