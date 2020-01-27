@@ -114,8 +114,7 @@ namespace ExRam.Extensions.Tests
                 asyncEnumerator
                     .Awaiting(_ => _.MoveNextAsync().AsTask())
                     .Should()
-                    .ThrowExactly<AggregateException>()
-                    .Where(ex => ex.GetBaseException() is DivideByZeroException);
+                    .ThrowExactly<DivideByZeroException>();
             }
         }
 

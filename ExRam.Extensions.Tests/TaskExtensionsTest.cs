@@ -45,8 +45,7 @@ namespace ExRam.Extensions.Tests
             task
                 .Awaiting(_ => _.AsTask())
                 .Should()
-                .ThrowExactly<AggregateException>()
-                .Where(ex => ex.GetBaseException() is DivideByZeroException);
+                .ThrowExactly<DivideByZeroException>();
         }
 
         [Fact]

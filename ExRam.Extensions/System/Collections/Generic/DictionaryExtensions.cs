@@ -9,7 +9,7 @@ namespace System.Collections.Generic
             Contract.Requires(dictionary != null);
             Contract.Requires(!object.ReferenceEquals(key, null));
 
-            return dictionary.GetValueOrDefault(key, default(TValue));
+            return dictionary.GetValueOrDefault(key, default);
         }
 
         public static TValue GetValueOrDefault<TKey, TValue>(this IDictionary<TKey, TValue> dictionary, TKey key, TValue defaultValue)
