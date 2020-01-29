@@ -17,12 +17,8 @@ namespace System.Linq
             return array[Rnd.Next(count)];
         }
 
-        public static IEnumerable<T> Append<T>(this IEnumerable<T> source, T appendElement)
-        {
-            return source.Concat(new[] { appendElement });
-        }
-
-        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> source) where T : class
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> source)
+            where T : class
         {
             return source.Where(t => !ReferenceEquals(t, default(T)));
         }

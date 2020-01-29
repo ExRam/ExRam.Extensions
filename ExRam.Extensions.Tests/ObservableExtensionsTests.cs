@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Reactive;
-using System.Reactive.Concurrency;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
 using System.Reactive.Threading.Tasks;
@@ -9,29 +7,12 @@ using System.Threading;
 using System.Threading.Tasks;
 using FluentAssertions;
 using Microsoft.Reactive.Testing;
-using Moq;
 using Xunit;
 
 namespace ExRam.Extensions.Tests
 {
     public class ObservableExtensionsTests
     {
-        [Fact]
-        public void SubscribeTotallyAtMostTest()
-        {
-            var observableMock = new Mock<IObservable<object>>();
-            observableMock.Setup(x => x.Subscribe(It.IsAny<IObserver<object>>())).Returns(Disposable.Empty);
-
-            var subscribeAtMostObservable = observableMock.Object.SubscribeTotallyAtMost(3, Observable.Empty<object>());
-
-            for (var i = 0; i < 6; i++)
-            {
-                subscribeAtMostObservable.Subscribe();
-            }
-
-            observableMock.Verify(x => x.Subscribe(It.IsAny<IObserver<object>>()), Times.Exactly(3));
-        }
-
         [Fact]
         public async Task Observable_Current_blocks_if_no_current_element_is_present()
         {
@@ -314,173 +295,6 @@ namespace ExRam.Extensions.Tests
             filtered
                 .Should()
                 .BeEquivalentTo(new[] { 2, 4, 6, 8, 0 });
-        }
-
-        [Fact]
-        public void LazyRefCount_connects()
-        {
-            var connectionMock = new Mock<IDisposable>();
-            var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
-
-            connectableObservableMock
-                .Setup(x => x.Connect())
-                .Returns(connectionMock.Object);
-
-            connectableObservableMock
-                .Setup(x => x.Subscribe(It.IsAny<IObserver<Unit>>()))
-                .Returns(Disposable.Empty);
-
-            var subscription = connectableObservableMock
-                .Object
-                .LazyRefCount(TimeSpan.FromSeconds(10), Scheduler.Default)
-                .Subscribe();
-
-            using (subscription)
-            {
-                connectableObservableMock
-                    .Verify(x => x.Connect(), Times.Once());
-
-                connectionMock
-                    .Verify(x => x.Dispose(), Times.Never());
-            }
-        }
-
-        [Fact]
-        public async Task LazyRefCount_does_not_disconnect_within_lazy_time()
-        {
-            var testScheduler = new TestScheduler();
-
-            var connectionMock = new Mock<IDisposable>();
-            var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
-
-            connectableObservableMock
-                .Setup(x => x.Connect())
-                .Returns(connectionMock.Object);
-
-            connectableObservableMock
-                .Setup(x => x.Subscribe(It.IsAny<IObserver<Unit>>()))
-                .Returns(Disposable.Empty);
-
-            var subscription = connectableObservableMock
-                .Object
-                .LazyRefCount(TimeSpan.FromTicks(2), testScheduler)
-                .Subscribe();
-
-            using (subscription)
-            {
-                connectableObservableMock
-                    .Verify(x => x.Connect(), Times.Once());
-            }
-
-            connectionMock
-                .Verify(x => x.Dispose(), Times.Never());
-
-            testScheduler.AdvanceBy(2);
-
-            connectionMock
-                .Verify(x => x.Dispose(), Times.Once());
-        }
-
-        [Fact]
-        public async Task LazyRefCount_does_not_disconnect_after_lazy_time_when_new_connection_is_made()
-        {
-            var testScheduler = new TestScheduler();
-
-            var connectionMock = new Mock<IDisposable>();
-            var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
-
-            connectableObservableMock
-                .Setup(x => x.Connect())
-                .Returns(connectionMock.Object);
-
-            connectableObservableMock
-                .Setup(x => x.Subscribe(It.IsAny<IObserver<Unit>>()))
-                .Returns(Disposable.Empty);
-
-            var refCount = connectableObservableMock
-                .Object
-                .LazyRefCount(TimeSpan.FromTicks(20), testScheduler);
-
-            using (refCount.Subscribe())
-            {
-                connectableObservableMock
-                    .Verify(x => x.Connect(), Times.Once());
-            }
-
-            connectionMock
-                .Verify(x => x.Dispose(), Times.Never());
-
-            testScheduler.AdvanceBy(19);
-
-            connectionMock
-                .Verify(x => x.Dispose(), Times.Never());
-
-            using (refCount.Subscribe())
-            {
-                testScheduler.AdvanceBy(2);
-
-                connectionMock
-                    .Verify(x => x.Dispose(), Times.Never());
-            }
-        }
-
-        [Fact]
-        public async Task LazyRefCount_disconnects_after_all_when_second_subscription_is_disposed()
-        {
-            var testScheduler = new TestScheduler();
-
-            var connectionMock = new Mock<IDisposable>();
-            var connectableObservableMock = new Mock<IConnectableObservable<Unit>>();
-
-            connectableObservableMock
-                .Setup(x => x.Connect())
-                .Returns(connectionMock.Object);
-
-            connectableObservableMock
-                .Setup(x => x.Subscribe(It.IsAny<IObserver<Unit>>()))
-                .Returns(Disposable.Empty);
-
-            var refCount = connectableObservableMock
-                .Object
-                .LazyRefCount(TimeSpan.FromTicks(20), testScheduler);
-
-            refCount.Subscribe().Dispose();
-
-            testScheduler.AdvanceBy(19);
-
-            using (refCount.Subscribe())
-            {
-                testScheduler.AdvanceBy(2);
-            }
-
-            testScheduler.AdvanceBy(20);
-
-            connectionMock
-                .Verify(x => x.Dispose(), Times.Once());
-        }
-
-        [Fact]
-        public async Task LazyRefCount_does_not_observe_values_after_unsubscription()
-        {
-            var value = 0;
-            var subject = new Subject<int>();
-
-            var subscription = subject
-                .Publish()
-                .LazyRefCount(TimeSpan.FromSeconds(2), Scheduler.Default)
-                .Subscribe(Observer.Create<int>(x =>
-                {
-                    value = x;
-                }));
-
-            using (subscription)
-            {
-                subject.OnNext(1);
-                Assert.Equal(1, value);
-            }
-
-            subject.OnNext(2);
-            Assert.Equal(1, value);
         }
 
         [Fact]

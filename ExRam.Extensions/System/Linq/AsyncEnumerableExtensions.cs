@@ -17,6 +17,105 @@ namespace System.Linq
 {
     public static class AsyncEnumerableExtensions
     {
+        private sealed class JoinStream : Stream
+        {
+            private readonly CancellationTokenSource _cts = new CancellationTokenSource();
+            private readonly IAsyncEnumerator<ArraySegment<byte>> _arraySegmentEnumerator;
+
+            private ArraySegment<byte>? _currentInputSegment;
+
+            public JoinStream(IAsyncEnumerable<ArraySegment<byte>> segmentEnumerable)
+            {
+                _arraySegmentEnumerator = segmentEnumerable.GetAsyncEnumerator(_cts.Token);
+            }
+
+            public override int Read(byte[] buffer, int offset, int count)
+            {
+                return ReadAsync(buffer, offset, count, CancellationToken.None).Result;
+            }
+
+            public override long Seek(long offset, SeekOrigin origin)
+            {
+                throw new NotSupportedException();
+            }
+
+            public override void SetLength(long value)
+            {
+                throw new NotSupportedException();
+            }
+
+            public override void Write(byte[] buffer, int offset, int count)
+            {
+                throw new NotSupportedException();
+            }
+
+            public override void Flush()
+            {
+            }
+
+            public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
+            {
+                if (count == 0)
+                    return 0;
+
+                using (cancellationToken.CanBeCanceled ? cancellationToken.Register(() => _cts.Cancel()) : Disposable.Empty)
+                {
+                    ArraySegment<byte> currentInputSegment;
+                    var currentNullableInputSegment = _currentInputSegment;
+
+                    if (currentNullableInputSegment == null)
+                    {
+                        try
+                        {
+                            if (await _arraySegmentEnumerator.MoveNextAsync().ConfigureAwait(false))
+                                currentInputSegment = _arraySegmentEnumerator.Current;
+                            else
+                                return 0;
+                        }
+                        catch (AggregateException ex)
+                        {
+                            throw ex.GetBaseException();
+                        }
+                    }
+                    else
+                        currentInputSegment = currentNullableInputSegment.Value;
+
+                    var minToRead = Math.Min(currentInputSegment.Count, count);
+                    Buffer.BlockCopy(currentInputSegment.Array, currentInputSegment.Offset, buffer, offset, minToRead);
+
+                    currentInputSegment = new ArraySegment<byte>(currentInputSegment.Array, currentInputSegment.Offset + minToRead, currentInputSegment.Count - minToRead);
+                    _currentInputSegment = currentInputSegment.Count > 0 ? (ArraySegment<byte>?)currentInputSegment : null;
+
+                    return minToRead;
+                }
+            }
+
+            protected override void Dispose(bool disposing)
+            {
+                if (disposing)
+                {
+                    _cts.Cancel();
+                    _arraySegmentEnumerator.DisposeAsync();
+                }
+
+                base.Dispose(disposing);
+            }
+
+            public override bool CanRead => true;
+
+            public override bool CanSeek => false;
+
+            public override bool CanWrite => false;
+
+            public override long Length => throw new NotSupportedException();
+
+            public override long Position
+            {
+                get => throw new NotSupportedException();
+                set => throw new NotSupportedException();
+            }
+        }
+
         public static IAsyncEnumerable<TSource> Concat<TSource>(this IAsyncEnumerable<TSource> source, Func<Option<TSource>, IAsyncEnumerable<TSource>> continuationSelector)
         {
             return AsyncEnumerable.Create(Core);
@@ -104,7 +203,7 @@ namespace System.Linq
                 {
                     var tcs = new TaskCompletionSource<object>();
 
-                    using (var registration = cancellationToken.Register(() => tcs.SetCanceled()))
+                    using (cancellationToken.Register(() => tcs.SetCanceled()))
                     {
                         await tcs.Task;
                     }
@@ -174,102 +273,7 @@ namespace System.Linq
                 });
         }
 
-        private sealed class JoinStream : Stream
-        {
-            private readonly IAsyncEnumerator<ArraySegment<byte>> _arraySegmentEnumerator;
-
-            private ArraySegment<byte>? _currentInputSegment;
-
-            public JoinStream(IAsyncEnumerator<ArraySegment<byte>> factory)
-            {
-                _arraySegmentEnumerator = factory;
-            }
-
-            public override int Read(byte[] buffer, int offset, int count)
-            {
-                return ReadAsync(buffer, offset, count, CancellationToken.None).Result;
-            }
-
-            public override long Seek(long offset, SeekOrigin origin)
-            {
-                throw new NotSupportedException();
-            }
-
-            public override void SetLength(long value)
-            {
-                throw new NotSupportedException();
-            }
-
-            public override void Write(byte[] buffer, int offset, int count)
-            {
-                throw new NotSupportedException();
-            }
-
-            public override void Flush()
-            {
-            }
-
-            public override async Task<int> ReadAsync(byte[] buffer, int offset, int count, CancellationToken cancellationToken)
-            {
-                if (count == 0)
-                    return 0;
-
-                ArraySegment<byte> currentInputSegment;
-                var currentNullableInputSegment = _currentInputSegment;
-
-                if (currentNullableInputSegment == null)
-                {
-                    try
-                    {
-                        if (await _arraySegmentEnumerator.MoveNextAsync(cancellationToken).ConfigureAwait(false))
-                            currentInputSegment = _arraySegmentEnumerator.Current;
-                        else
-                            return 0;
-                    }
-                    catch (AggregateException ex)
-                    {
-                        throw ex.GetBaseException();
-                    }
-                }
-                else
-                    currentInputSegment = currentNullableInputSegment.Value;
-
-                var minToRead = Math.Min(currentInputSegment.Count, count);
-                Buffer.BlockCopy(currentInputSegment.Array, currentInputSegment.Offset, buffer, offset, minToRead);
-
-                currentInputSegment = new ArraySegment<byte>(currentInputSegment.Array, currentInputSegment.Offset + minToRead, currentInputSegment.Count - minToRead);
-                _currentInputSegment = currentInputSegment.Count > 0 ? (ArraySegment<byte>?)currentInputSegment : null;
-
-                return minToRead;
-            }
-
-            protected override void Dispose(bool disposing)
-            {
-                if (disposing)
-                    _arraySegmentEnumerator.DisposeAsync();
-
-                base.Dispose(disposing);
-            }
-
-            public override bool CanRead => true;
-
-            public override bool CanSeek => false;
-
-            public override bool CanWrite => false;
-
-            public override long Length => throw new NotSupportedException();
-
-            public override long Position
-            {
-                get => throw new NotSupportedException();
-                set => throw new NotSupportedException();
-            }
-        }
-
-        public static Stream ToStream(this IAsyncEnumerable<ArraySegment<byte>> byteSegmentAsyncEnumerable)
-        {
-            return new JoinStream(byteSegmentAsyncEnumerable.GetAsyncEnumerator());
-        }
+        public static Stream ToStream(this IAsyncEnumerable<ArraySegment<byte>> byteSegmentAsyncEnumerable) => new JoinStream(byteSegmentAsyncEnumerable);
 
         public static Task<Option<T>> HeadOrNone<T>(this IAsyncEnumerable<T> enumerable)
         {
@@ -292,12 +296,12 @@ namespace System.Linq
 
             async IAsyncEnumerator<TSource> Core(CancellationToken cancellationToken)
             {
-                await using (var enumerator = enumerable.GetAsyncEnumerator(cancellationToken))
+                using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
                 {
-                    using (var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken))
+                    await using (var enumerator = enumerable.GetAsyncEnumerator(cts.Token))
                     {
                         var option = await enumerator
-                            .MoveNextAsync(cts.Token)
+                            .MoveNextAsync()
                             .AsTask()
                             .TryWithTimeout(timeout)
                             .ConfigureAwait(false);
@@ -305,6 +309,7 @@ namespace System.Linq
                         if (option.IsNone)
                         {
                             cts.Cancel();
+
                             yield break;
                         }
 
@@ -315,16 +320,9 @@ namespace System.Linq
         }
 
         public static IAsyncEnumerable<T> WhereNotNull<T>(this IAsyncEnumerable<T> source)
+            where T : class
         {
-            return source.Where(t => !Equals(t, default(T)));
-        }
-
-        public static IAsyncEnumerable<T> WithCancellation<T>(Func<CancellationToken, IAsyncEnumerable<T>> enumerableFactory)
-        {
-            return AsyncEnumerableEx
-                .Using(
-                    () => new CancellationDisposable(),
-                    cts => enumerableFactory(cts.Token));
+            return source.Where(t => !ReferenceEquals(t, default(T)));
         }
 
         public static IAsyncEnumerable<TTarget> SelectMany<TSource, TTarget>(this IAsyncEnumerable<TSource> source, Func<TSource, IEnumerable<TTarget>> selector)
@@ -333,10 +331,12 @@ namespace System.Linq
 
             async IAsyncEnumerator<TTarget> Core(CancellationToken cancellationToken)
             {
-                await foreach(var item in source)
+                await foreach(var item in source.WithCancellation(cancellationToken))
                 {
                     foreach(var subItem in selector(item))
                     {
+                        cancellationToken.ThrowIfCancellationRequested();
+
                         yield return subItem;
                     }
                 }

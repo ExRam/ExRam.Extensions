@@ -146,9 +146,62 @@ namespace System.Reactive.Linq
             }
         }
 
-        public static IObservable<object> Box<T>(this IObservable<T> source) where T : struct
+        private sealed class GroupedObservableImpl<TKey, TSource> : IGroupedObservable<TKey, TSource>
         {
-            return source.Select(x => (object)x);
+            private readonly IObservable<TSource> _baseObservable;
+
+            public GroupedObservableImpl(IObservable<TSource> baseObservable, TKey key)
+            {
+                Key = key;
+                _baseObservable = baseObservable;
+            }
+
+            public IDisposable Subscribe(IObserver<TSource> observer)
+            {
+                return _baseObservable.Subscribe(observer);
+            }
+
+            public TKey Key { get; }
+        }
+
+        private sealed class NotifyCollectionChangedEventPatternSource : EventPatternSourceBase<object, NotifyCollectionChangedEventArgs>, INotifyCollectionChanged
+        {
+            public NotifyCollectionChangedEventPatternSource(IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
+            {
+            }
+
+            public event NotifyCollectionChangedEventHandler CollectionChanged
+            {
+                add
+                {
+                    Add(value, (o, e) => value(o, e));
+                }
+
+                remove
+                {
+                    Remove(value);
+                }
+            }
+        }
+
+        private sealed class NotifyPropertyChangedEventPatternSource : EventPatternSourceBase<object, PropertyChangedEventArgs>, INotifyPropertyChanged
+        {
+            public NotifyPropertyChangedEventPatternSource(IObservable<EventPattern<object, PropertyChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
+            {
+            }
+
+            public event PropertyChangedEventHandler PropertyChanged
+            {
+                add
+                {
+                    Add(value, (o, e) => value(o, e));
+                }
+
+                remove
+                {
+                    Remove(value);
+                }
+            }
         }
 
         public static IObservable<(TSource1, TSource2)> CombineLatest<TSource1, TSource2>(this IObservable<TSource1> first, IObservable<TSource2> second)
@@ -340,70 +393,6 @@ namespace System.Reactive.Linq
             return source.Concat(Observable.Never<T>());
         }
 
-        public static IObservable<T> LazyRefCount<T>(this IConnectableObservable<T> source, TimeSpan delay)
-        {
-            return source.LazyRefCount(delay, Scheduler.Default);
-        }
-
-        public static IObservable<T> LazyRefCount<T>(this IConnectableObservable<T> source, TimeSpan delay, IScheduler scheduler)
-        {
-            var syncRoot = new object();
-            var serial = new SerialDisposable();
-            IDisposable? currentConnection = null;
-
-            var innerObservable = ConnectableObservable
-                .Create<T>(
-                    () =>
-                    {
-                        lock (syncRoot)
-                        {
-                            if (currentConnection == null)
-                                currentConnection = source.Connect();
-
-                            serial.Disposable = new SingleAssignmentDisposable();
-                        }
-
-                        return Disposable
-                            .Create(() =>
-                            {
-                                lock (syncRoot)
-                                {
-                                    var cancelable = (SingleAssignmentDisposable)serial.Disposable;
-
-                                    cancelable.Disposable = scheduler.Schedule(cancelable, delay, (self, state) =>
-                                    {
-                                        lock (syncRoot)
-                                        {
-                                            if (ReferenceEquals(serial.Disposable, state))
-                                            {
-                                                currentConnection.Dispose();
-                                                currentConnection = null;
-                                            }
-                                        }
-
-                                        return Disposable.Empty;
-                                    });
-                                }
-                            });
-                    },
-                    source.Subscribe)
-                .RefCount();
-
-            return Observable.Create<T>(
-                outerObserver =>
-                {
-                    var anonymousObserver = new AnonymousObserver<T>(
-                        outerObserver.OnNext,
-                        outerObserver.OnError,
-                        outerObserver.OnCompleted);
-
-                    return StableCompositeDisposable.Create(
-                        anonymousObserver,
-                        innerObservable
-                            .Subscribe(anonymousObserver));
-                });
-        }
-
         public static IObservable<Unit> OnCompletion<T>(this IObservable<T> source)
         {
             return Observable.Create<Unit>(observer => source.Subscribe(
@@ -420,17 +409,20 @@ namespace System.Reactive.Linq
 
         public static IObservable<Exception?> OnCompletionOrError<T>(this IObservable<T> source)
         {
-            return source
-                .Materialize()
-                .Where(x => !x.HasValue)
-                .Select(x => x.Exception);
-        }
-
-        public static IObservable<T> Prioritize<T>(this IObservable<T> source, IObservable<T> other)
-        {
-            return source
-                .Publish(publishedSource => publishedSource
-                    .Merge(other.TakeUntil(publishedSource)));
+            return Observable.Create<Exception?>(observer => source.Subscribe(
+                x =>
+                {
+                },
+                ex =>
+                {
+                    observer.OnNext(ex);
+                    observer.OnCompleted();
+                },
+                () =>
+                {
+                    observer.OnNext(default);
+                    observer.OnCompleted();
+                }));
         }
 
         public static IObservable<T> RepeatWhileEmpty<T>(this IObservable<T> source)
@@ -469,53 +461,9 @@ namespace System.Reactive.Linq
         {
             return source
                 .Scan(
-                    Tuple.Create(seed, default(TSource)),
-                    (stateTuple, value) => Tuple.Create(stateFunction(stateTuple.Item1, value), value))
+                    (seed, default(TSource)),
+                    (stateTuple, value) => (stateFunction(stateTuple.Item1, value), value))
                 .Select(stateTuple => stateTuple.Item2);
-        }
-
-        public static IObservable<T> SubscribeConcurrentlyAtMost<T>(this IObservable<T> source, int count, IObservable<T> continuation)
-        {
-            var subscriptionCount = 0;
-
-            return Observable.Create<T>(observer =>
-            {
-                while (true)
-                {
-                    var localSubscriptionCount = subscriptionCount;
-                    if (localSubscriptionCount >= count)
-                        return continuation.Subscribe(observer);
-
-                    if (Interlocked.CompareExchange(ref subscriptionCount, localSubscriptionCount + 1, localSubscriptionCount) == localSubscriptionCount)
-                    {
-                        var subscription = source.Subscribe(observer);
-
-                        return Disposable.Create(() =>
-                        {
-                            Interlocked.Decrement(ref subscriptionCount);
-                            subscription.Dispose();
-                        });
-                    }
-                }
-            });
-        }
-        
-        public static IObservable<T> SubscribeTotallyAtMost<T>(this IObservable<T> source, int count, IObservable<T> continuation)
-        {
-            var subscriptionCount = 0;
-
-            return Observable.Create<T>(observer =>
-            {
-                while (true)
-                {
-                    var localSubscriptionCount = subscriptionCount;
-                    if (localSubscriptionCount >= count)
-                        return continuation.Subscribe(observer);
-
-                    if (Interlocked.CompareExchange(ref subscriptionCount, localSubscriptionCount + 1, localSubscriptionCount) == localSubscriptionCount)
-                        return source.Subscribe(observer);
-                }
-            });
         }
 
         public static IObservable<T> TakeUntil<T>(this IObservable<T> source, CancellationToken ct)
@@ -564,67 +512,9 @@ namespace System.Reactive.Linq
             return source.Select((x, i) => new Counting<T>((ulong)i, x));
         }
 
-        private sealed class GroupedObservableImpl<TKey, TSource> : IGroupedObservable<TKey, TSource>
-        {
-            private readonly IObservable<TSource> _baseObservable;
-
-            public GroupedObservableImpl(IObservable<TSource> baseObservable, TKey key)
-            {
-                Key = key;
-                _baseObservable = baseObservable;
-            }
-
-            public IDisposable Subscribe(IObserver<TSource> observer)
-            {
-                return _baseObservable.Subscribe(observer);
-            }
-
-            public TKey Key { get; }
-        }
-
         public static IGroupedObservable<TKey, TSource> ToGroup<TKey, TSource>(this IObservable<TSource> source, TKey key)
         {
             return new GroupedObservableImpl<TKey, TSource>(source, key);
-        }
-
-        private sealed class NotifyCollectionChangedEventPatternSource : EventPatternSourceBase<object, NotifyCollectionChangedEventArgs>, INotifyCollectionChanged
-        {
-            public NotifyCollectionChangedEventPatternSource(IObservable<EventPattern<object, NotifyCollectionChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
-            {
-            }
-
-            public event NotifyCollectionChangedEventHandler CollectionChanged
-            {
-                add
-                {
-                    Add(value, (o, e) => value(o, e));
-                }
-
-                remove
-                {
-                    Remove(value);
-                }
-            }
-        }
-
-        private sealed class NotifyPropertyChangedEventPatternSource : EventPatternSourceBase<object, PropertyChangedEventArgs>, INotifyPropertyChanged
-        {
-            public NotifyPropertyChangedEventPatternSource(IObservable<EventPattern<object, PropertyChangedEventArgs>> source) : base(source, (invokeAction, eventPattern) => invokeAction(eventPattern.Sender, eventPattern.EventArgs))
-            {
-            }
-
-            public event PropertyChangedEventHandler PropertyChanged
-            {
-                add
-                {
-                    Add(value, (o, e) => value(o, e));
-                }
-
-                remove
-                {
-                    Remove(value);
-                }
-            }
         }
 
         public static INotifyCollectionChanged ToNotifyCollectionChangedEventPattern(this IObservable<NotifyCollectionChangedEventArgs> source, object sender)
@@ -648,10 +538,10 @@ namespace System.Reactive.Linq
         {
             return source
                 .SelectMany(x => WithCancellation(
-                        ct => predicate(x, ct)
-                            .ToObservable()
-                            .Where(b => b)
-                            .Select(b => x)));
+                    ct => predicate(x, ct)
+                        .ToObservable()
+                        .Where(b => b)
+                        .Select(b => x)));
         }
 
         public static IObservable<T> WhereNotNull<T>(this IObservable<T> source) where T : class
