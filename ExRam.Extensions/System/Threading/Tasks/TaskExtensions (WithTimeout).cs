@@ -8,17 +8,17 @@ namespace System.Threading.Tasks
 {
     public static partial class TaskExtensions
     {
-        public static async Task WithTimeout(this Task task, TimeSpan timeout)
+        public static async Task WithTimeout(this Task task, TimeSpan timeout, CancellationToken ct)
         {
-            if (!await task.TryWithTimeout(timeout).ConfigureAwait(false))
+            if (!await task.TryWithTimeout(timeout, ct).ConfigureAwait(false))
                 throw new TimeoutException();
 
             await task.ConfigureAwait(false);
         }
 
-        public static async Task<TResult> WithTimeout<TResult>(this Task<TResult> task, TimeSpan timeout)
+        public static async Task<TResult> WithTimeout<TResult>(this Task<TResult> task, TimeSpan timeout, CancellationToken ct)
         {
-            return !(await task.TryWithTimeout(timeout).ConfigureAwait(false)).IsSome 
+            return !(await task.TryWithTimeout(timeout, ct).ConfigureAwait(false)).IsSome 
                 ? throw new TimeoutException()
                 : await task.ConfigureAwait(false);
         }

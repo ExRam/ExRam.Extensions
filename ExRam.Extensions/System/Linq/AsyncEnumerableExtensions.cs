@@ -305,7 +305,7 @@ namespace System.Linq
                             var option = await enumerator
                                 .MoveNextAsync()
                                 .AsTask()
-                                .TryWithTimeout(timeout)
+                                .TryWithTimeout(timeout, cts.Token)
                                 .ConfigureAwait(false);
 
                             if (option.IfNone(false))

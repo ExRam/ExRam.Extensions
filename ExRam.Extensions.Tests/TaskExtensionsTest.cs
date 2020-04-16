@@ -214,14 +214,14 @@ namespace ExRam.Extensions.Tests
         public async Task Completed_Task_TryWithTimeout_Completes()
         {
             var completedTask = Task.FromResult(0);
-            await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+            await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500), default);
         }
 
         [Fact]
         public async Task Completed_TaskOfInt_TryWithTimeout_Completes()
         {
             var completedTask = Task.FromResult(36);
-            Assert.Equal(36, await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500)));
+            Assert.Equal(36, await completedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500), default));
         }
 
         [Fact]
@@ -229,7 +229,7 @@ namespace ExRam.Extensions.Tests
         {
             var maybeValue = await Task
                 .FromResult<Option<int>>(36)
-                .TryWithTimeout(TimeSpan.FromMilliseconds(500));
+                .TryWithTimeout(TimeSpan.FromMilliseconds(500), default);
 
             maybeValue.IsSome.Should().BeTrue();
             maybeValue.IfSome(val => val.Should().Be(36));
@@ -241,7 +241,7 @@ namespace ExRam.Extensions.Tests
             var completedTask = Task.FromException(new DivideByZeroException());
 
             completedTask
-                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<DivideByZeroException>();
         }
@@ -252,7 +252,7 @@ namespace ExRam.Extensions.Tests
             var completedTask = Task.FromException(new DivideByZeroException());
 
             completedTask
-                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<DivideByZeroException>();
         }
@@ -263,7 +263,7 @@ namespace ExRam.Extensions.Tests
             var completedTask = Task.FromException(new DivideByZeroException());
 
             completedTask
-                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<DivideByZeroException>();
         }
@@ -274,7 +274,7 @@ namespace ExRam.Extensions.Tests
             var completedTask = Task.FromCanceled(CancelledCt);
 
             completedTask
-                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TaskCanceledException>();
         }
@@ -285,7 +285,7 @@ namespace ExRam.Extensions.Tests
             var completedTask = Task.FromCanceled(CancelledCt);
 
             completedTask
-                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TaskCanceledException>();
         }
@@ -296,7 +296,7 @@ namespace ExRam.Extensions.Tests
             var completedTask = Task.FromCanceled(CancelledCt);
 
             completedTask
-                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TaskCanceledException>();
         }
@@ -305,21 +305,21 @@ namespace ExRam.Extensions.Tests
         public async Task Uncompleted_Task_TryWithTimeout_returns_unset_Maybe()
         {
             var uncompletedTask = Task.Factory.GetUncompleted<Unit>();
-            Assert.False((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.False((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
         }
 
         [Fact]
         public async Task Uncompleted_TaskOfInt_TryWithTimeout_returns_unset_Maybe()
         {
             var uncompletedTask = Task.Factory.GetUncompleted<int>();
-            Assert.False((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.False((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
         }
 
         [Fact]
         public async Task Uncompleted_TaskOfMaybeOfInt_TryWithTimeout_returns_unset_Maybe()
         {
             var uncompletedTask = Task.Factory.GetUncompleted<Option<int>>();
-            Assert.False((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.False((await uncompletedTask.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
         }
 
         [Fact]
@@ -327,11 +327,11 @@ namespace ExRam.Extensions.Tests
         {
             var tcs = new TaskCompletionSource<object>();
 
-            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
             tcs.SetResult(new object());
 
-            var next = await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
-            Assert.True((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            var next = await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default);
+            Assert.True((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
         }
 
         [Fact]
@@ -339,11 +339,11 @@ namespace ExRam.Extensions.Tests
         {
             var tcs = new TaskCompletionSource<object>();
 
-            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
             tcs.SetException(new DivideByZeroException());
 
             tcs
-                .Awaiting(_ => _.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<DivideByZeroException>();
         }
@@ -353,11 +353,11 @@ namespace ExRam.Extensions.Tests
         {
             var tcs = new TaskCompletionSource<object>();
 
-            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
             tcs.SetCanceled();
 
             tcs.Task
-                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TaskCanceledException>();
         }
@@ -367,9 +367,9 @@ namespace ExRam.Extensions.Tests
         {
             var tcs = new TaskCompletionSource<int>();
 
-            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
             tcs.SetResult(36);
-            Assert.True((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.True((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
         }
 
         [Fact]
@@ -377,9 +377,9 @@ namespace ExRam.Extensions.Tests
         {
             var tcs = new TaskCompletionSource<Option<int>>();
 
-            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
             tcs.SetResult(36);
-            Assert.True((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.True((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
         }
 
         [Fact]
@@ -387,11 +387,11 @@ namespace ExRam.Extensions.Tests
         {
             var tcs = new TaskCompletionSource<int>();
 
-            await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+            await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default);
             tcs.SetException(new DivideByZeroException());
 
             tcs.Task
-                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<DivideByZeroException>();
         }
@@ -401,11 +401,11 @@ namespace ExRam.Extensions.Tests
         {
             var tcs = new TaskCompletionSource<Option<int>>();
 
-            await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500));
+            await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default);
             tcs.SetException(new DivideByZeroException());
 
             tcs.Task
-                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<DivideByZeroException>();
         }
@@ -415,11 +415,11 @@ namespace ExRam.Extensions.Tests
         {
             var tcs = new TaskCompletionSource<int>();
 
-            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
             tcs.SetCanceled();
 
             tcs.Task
-               .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+               .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                .Should()
                 .ThrowExactly<TaskCanceledException>();
         }
@@ -429,11 +429,11 @@ namespace ExRam.Extensions.Tests
         {
             var tcs = new TaskCompletionSource<Option<int>>();
 
-            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500))).IsSome);
+            Assert.False((await tcs.Task.TryWithTimeout(TimeSpan.FromMilliseconds(500), default)).IsSome);
             tcs.SetCanceled();
 
             tcs.Task
-               .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500)))
+               .Awaiting(_ => _.TryWithTimeout(TimeSpan.FromMilliseconds(500), default))
                .Should()
                 .ThrowExactly<TaskCanceledException>();
         }
@@ -580,14 +580,14 @@ namespace ExRam.Extensions.Tests
         public async Task Completed_Task_WithTimeout_Completes()
         {
             var completedTask = Task.FromResult(0);
-            await completedTask.WithTimeout(TimeSpan.FromMilliseconds(500));
+            await completedTask.WithTimeout(TimeSpan.FromMilliseconds(500), default);
         }
 
         [Fact]
         public async Task Completed_TaskOfInt_WithTimeout_Completes()
         {
             var completedTask = Task.FromResult(36);
-            Assert.Equal(36, await completedTask.WithTimeout(TimeSpan.FromMilliseconds(500)));
+            Assert.Equal(36, await completedTask.WithTimeout(TimeSpan.FromMilliseconds(500), default));
         }
 
         [Fact]
@@ -596,7 +596,7 @@ namespace ExRam.Extensions.Tests
             var completedTask = Task.FromException(new DivideByZeroException());
 
             completedTask
-                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<DivideByZeroException>();
         }
@@ -607,7 +607,7 @@ namespace ExRam.Extensions.Tests
             var completedTask = Task.FromException(new DivideByZeroException());
 
             completedTask
-                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<DivideByZeroException>();
         }
@@ -618,7 +618,7 @@ namespace ExRam.Extensions.Tests
             var completedTask = Task.FromCanceled(CancelledCt);
 
             completedTask
-                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TaskCanceledException>();
         }
@@ -629,7 +629,7 @@ namespace ExRam.Extensions.Tests
             var completedTask = Task.FromCanceled(CancelledCt);
 
             completedTask
-                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TaskCanceledException>();
         }
@@ -640,7 +640,7 @@ namespace ExRam.Extensions.Tests
             var uncompletedTask = Task.Factory.GetUncompleted<Unit>();
 
             uncompletedTask
-               .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
+               .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                .Should()
                 .ThrowExactly<TimeoutException>();
         }
@@ -651,7 +651,7 @@ namespace ExRam.Extensions.Tests
             var uncompletedTask = Task.Factory.GetUncompleted<int>();
 
             uncompletedTask
-                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TimeoutException>();
         }
@@ -662,7 +662,7 @@ namespace ExRam.Extensions.Tests
             var tcs = new TaskCompletionSource<object>();
 
             tcs
-                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TimeoutException>();
         }
@@ -673,14 +673,14 @@ namespace ExRam.Extensions.Tests
             var tcs = new TaskCompletionSource<object>();
 
             tcs
-                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TimeoutException>();
 
             tcs.SetException(new DivideByZeroException());
 
             tcs
-                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<DivideByZeroException>();
         }
@@ -691,7 +691,7 @@ namespace ExRam.Extensions.Tests
             var tcs = new TaskCompletionSource<object>();
 
             tcs
-                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TimeoutException>();
         }
@@ -702,13 +702,13 @@ namespace ExRam.Extensions.Tests
             var tcs = new TaskCompletionSource<int>();
 
             tcs
-                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TimeoutException>();
 
             tcs.SetResult(36);
 
-            (await tcs.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
+            (await tcs.Task.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .Be(36);
         }
@@ -719,14 +719,14 @@ namespace ExRam.Extensions.Tests
             var tcs = new TaskCompletionSource<int>();
 
             tcs
-                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TimeoutException>();
 
             tcs.SetException(new DivideByZeroException());
 
             tcs
-                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<DivideByZeroException>();
         }
@@ -737,7 +737,7 @@ namespace ExRam.Extensions.Tests
             var tcs = new TaskCompletionSource<int>();
 
             tcs
-                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500)))
+                .Awaiting(_ => _.Task.WithTimeout(TimeSpan.FromMilliseconds(500), default))
                 .Should()
                 .ThrowExactly<TimeoutException>();
         }
