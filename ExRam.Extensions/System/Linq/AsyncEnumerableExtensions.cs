@@ -300,20 +300,23 @@ namespace System.Linq
                 {
                     await using (var enumerator = enumerable.GetAsyncEnumerator(cts.Token))
                     {
-                        var option = await enumerator
-                            .MoveNextAsync()
-                            .AsTask()
-                            .TryWithTimeout(timeout)
-                            .ConfigureAwait(false);
-
-                        if (option.IsNone)
+                        while (true)
                         {
-                            cts.Cancel();
+                            var option = await enumerator
+                                .MoveNextAsync()
+                                .AsTask()
+                                .TryWithTimeout(timeout)
+                                .ConfigureAwait(false);
 
-                            yield break;
+                            if (option.IfNone(false))
+                                yield return enumerator.Current;
+                            else
+                            {
+                                cts.Cancel();
+
+                                break;
+                            }
                         }
-
-                        yield return enumerator.Current;
                     }
                 }
             }

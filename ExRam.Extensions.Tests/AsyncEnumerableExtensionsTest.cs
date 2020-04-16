@@ -307,5 +307,18 @@ namespace ExRam.Extensions.Tests
                 .Should()
                 .ThrowExactly<IOException>();
         }
+
+        [Fact]
+        public async Task TryWithTimeout_yield_all_elements()
+        {
+            var array = await new[] { 1, 2, 3, 4 }
+                .ToAsyncEnumerable()
+                .TryWithTimeout(TimeSpan.FromSeconds(3))
+                .ToArrayAsync();
+
+            array
+                .Should()
+                .BeEquivalentTo(1, 2, 3, 4);
+        }
     }
 }
