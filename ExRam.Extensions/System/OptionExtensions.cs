@@ -28,5 +28,25 @@ namespace LanguageExt
         {
             return value.IfNoneUnsafe(default(TValue)!);
         }
+
+        public static OptionAsync<T> IfNoneAsync<T>(this OptionAsync<T> option, OptionAsync<T> fallback)
+        {
+            return option
+                .ToOption()
+                .IfNoneAsync(fallback.ToOption)
+                .ToAsync();
+        }
+
+        public static OptionAsync<B> BindAsync<A, B>(this Option<A> self, Func<A, Task<Option<B>>> f)
+        {
+            return self
+                .BindAsync(_ => f(_).ToAsync());
+        }
+
+        public static OptionAsync<B> BindAsync<A, B>(this OptionAsync<A> self, Func<A, Task<Option<B>>> f)
+        {
+            return self
+                .BindAsync(async _ => f(_).ToAsync());
+        }
     }
 }
