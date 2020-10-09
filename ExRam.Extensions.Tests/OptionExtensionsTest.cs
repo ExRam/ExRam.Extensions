@@ -40,5 +40,11 @@ namespace ExRam.Extensions.Tests
             (await ((Option<int>)36).IfSomeAsync(async _ => { }))
                 .Should().Be(Unit.Default);
         }
+
+        [Fact]
+        public void ToNullable()
+        {
+            default(Option<string>).ToNullable();
+        }
     }
 }

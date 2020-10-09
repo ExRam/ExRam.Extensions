@@ -48,5 +48,15 @@ namespace LanguageExt
             return self
                 .BindAsync(async _ => f(_).ToAsync());
         }
+
+        public static Option<T> TryCast<T>(this IOptional option) where T : class
+        {
+            return option
+                .MatchUntyped(
+                    x => x is T t
+                        ? t
+                        : default(Option<T>),
+                    () => default);
+        }
     }
 }

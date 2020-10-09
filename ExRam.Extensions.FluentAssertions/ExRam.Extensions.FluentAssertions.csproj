@@ -7,7 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="LanguageExt.Core" Version="3.3.49" />
+    <PackageReference Include="LanguageExt.Core" Version="3.5.20-beta" />
     <PackageReference Include="FluentAssertions" Version="5.10.0" />
   </ItemGroup>
   
