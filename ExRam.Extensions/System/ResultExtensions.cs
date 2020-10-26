@@ -73,5 +73,33 @@ namespace LanguageExt
         {
             return (await resultTask).Handle(handler);
         }
+
+        public static Either<Exception, T> ToEither<T>(this Result<T> result)
+        {
+            return result.Match(
+                Prelude.Right<Exception, T>,
+                Prelude.Left<Exception, T>);
+        }
+
+        public static EitherAsync<Exception, T> ToEither<T>(this Task<Result<T>> result)
+        {
+            return result
+                .Map(r => r.Match(
+                    Prelude.Right<Exception, T>,
+                    Prelude.Left<Exception, T>))
+                .ToAsync();
+        }
+
+        public static Either<L, R> ForceLeft<L, R>(this Either<L, R> either, Func<R, L> force)
+        {
+            return either.Bind(
+                _ => Prelude.Left<L, R>(force(_)));
+        }
+
+        public static Either<L, R> ForceRight<L, R>(this Either<L, R> either, Func<L, R> force)
+        {
+            return either.BindLeft(
+                _ => Prelude.Right<L, R>(force(_)));
+        }
     }
 }
