@@ -17,10 +17,11 @@ namespace System.Linq
             return array[Rnd.Next(count)];
         }
 
-        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T> source)
-            where T : class
+        public static IEnumerable<T> WhereNotNull<T>(this IEnumerable<T?> source)
         {
-            return source.Where(t => !ReferenceEquals(t, default(T)));
+            return source
+                .Where(t => t != null)
+                .Select(x => x!);
         }
     }
 }

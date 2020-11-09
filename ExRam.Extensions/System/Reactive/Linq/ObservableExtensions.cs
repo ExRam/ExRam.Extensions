@@ -546,7 +546,9 @@ namespace System.Reactive.Linq
 
         public static IObservable<T> WhereNotNull<T>(this IObservable<T> source) where T : class
         {
-            return source.Where(t => !Equals(t, default(T)));
+            return source
+                .Where(x => x != null)
+                .Select(x => x!);
         }
 
         public static IObservable<T> WithCancellation<T>(Func<CancellationToken, IObservable<T>> observableFactory)

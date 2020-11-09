@@ -322,10 +322,11 @@ namespace System.Linq
             }
         }
 
-        public static IAsyncEnumerable<T> WhereNotNull<T>(this IAsyncEnumerable<T> source)
-            where T : class
+        public static IAsyncEnumerable<T> WhereNotNull<T>(this IAsyncEnumerable<T?> source)
         {
-            return source.Where(t => !ReferenceEquals(t, default(T)));
+            return source
+                .Where(x => x != null)
+                .Select(x => x!);
         }
 
         public static IAsyncEnumerable<TTarget> SelectMany<TSource, TTarget>(this IAsyncEnumerable<TSource> source, Func<TSource, IEnumerable<TTarget>> selector)
