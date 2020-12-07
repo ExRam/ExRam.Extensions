@@ -81,9 +81,9 @@ namespace System.Linq
                         currentInputSegment = currentNullableInputSegment.Value;
 
                     var minToRead = Math.Min(currentInputSegment.Count, count);
-                    Buffer.BlockCopy(currentInputSegment.Array, currentInputSegment.Offset, buffer, offset, minToRead);
+                    Buffer.BlockCopy(currentInputSegment.Array!, currentInputSegment.Offset, buffer, offset, minToRead);
 
-                    currentInputSegment = new ArraySegment<byte>(currentInputSegment.Array, currentInputSegment.Offset + minToRead, currentInputSegment.Count - minToRead);
+                    currentInputSegment = new ArraySegment<byte>(currentInputSegment.Array!, currentInputSegment.Offset + minToRead, currentInputSegment.Count - minToRead);
                     _currentInputSegment = currentInputSegment.Count > 0 ? (ArraySegment<byte>?)currentInputSegment : null;
 
                     return minToRead;

@@ -15,7 +15,7 @@ namespace System.Threading.Tasks
             bool ret;
             var tcs = new TaskCompletionSource<bool>();
 
-            using (ct.Register(state => ((TaskCompletionSource<bool>)state).TrySetResult(true), tcs))
+            await using (ct.Register(state => ((TaskCompletionSource<bool>)state!).TrySetResult(true), tcs))
             {
                 ret = task == await Task
                     .WhenAny(task, tcs.Task)
@@ -33,7 +33,7 @@ namespace System.Threading.Tasks
             bool ret;
             var tcs = new TaskCompletionSource<bool>();
 
-            using (ct.Register(state => ((TaskCompletionSource<bool>)state).TrySetResult(true), tcs))
+            await using (ct.Register(state => ((TaskCompletionSource<bool>)state!).TrySetResult(true), tcs))
             {
                 ret = task == await Task
                     .WhenAny(task, tcs.Task)

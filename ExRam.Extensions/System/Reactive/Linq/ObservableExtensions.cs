@@ -27,7 +27,7 @@ namespace System.Reactive.Linq
             private readonly object _syncRoot = new object();
             private readonly Func<T, IDisposable> _resourceFactory;
 
-            private IDisposable _resource;
+            private IDisposable? _resource;
            
             public ResourceEachUsingObserver(IObserver<T> baseObserver, Func<T, IDisposable> resourceFactory)
             {
@@ -100,7 +100,7 @@ namespace System.Reactive.Linq
             private readonly IObserver<TSource> _baseObserver;
             private readonly Func<TSource, IObservable<TOther>> _observableFactory;
 
-            private IDisposable _resource;
+            private IDisposable? _resource;
 
             public ObservableEachUsingObserver(IObserver<TSource> baseObserver, Func<TSource, IObservable<TOther>> observableFactory)
             {
@@ -170,17 +170,10 @@ namespace System.Reactive.Linq
             {
             }
 
-            public event NotifyCollectionChangedEventHandler CollectionChanged
+            public event NotifyCollectionChangedEventHandler? CollectionChanged
             {
-                add
-                {
-                    Add(value, (o, e) => value(o, e));
-                }
-
-                remove
-                {
-                    Remove(value);
-                }
+                add => Add(value, (o, e) => value?.Invoke(o, e));
+                remove => Remove(value);
             }
         }
 
@@ -190,17 +183,10 @@ namespace System.Reactive.Linq
             {
             }
 
-            public event PropertyChangedEventHandler PropertyChanged
+            public event PropertyChangedEventHandler? PropertyChanged
             {
-                add
-                {
-                    Add(value, (o, e) => value(o, e));
-                }
-
-                remove
-                {
-                    Remove(value);
-                }
+                add => Add(value, (o, e) => value?.Invoke(o, e));
+                remove => Remove(value);
             }
         }
 
@@ -461,9 +447,9 @@ namespace System.Reactive.Linq
         {
             return source
                 .Scan(
-                    (seed, default(TSource)),
-                    (stateTuple, value) => (stateFunction(stateTuple.Item1, value), value))
-                .Select(stateTuple => stateTuple.Item2);
+                    (seed, default(TSource?)),
+                    (stateTuple, value) => (stateFunction(stateTuple.seed, value), value))
+                .Select(stateTuple => stateTuple.Item2!);
         }
 
         public static IObservable<T> TakeUntil<T>(this IObservable<T> source, CancellationToken ct)
