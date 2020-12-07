@@ -172,8 +172,20 @@ namespace System.Reactive.Linq
 
             public event NotifyCollectionChangedEventHandler? CollectionChanged
             {
-                add => Add(value, (o, e) => value?.Invoke(o, e));
-                remove => Remove(value);
+                add
+                {
+                    if (value is null)
+                        throw new ArgumentNullException(nameof(value));
+                    
+                    Add(value, (o, e) => value?.Invoke(o, e));
+                }
+                remove
+                {
+                    if (value is null)
+                        throw new ArgumentNullException(nameof(value));
+                    
+                    Remove(value);
+                }
             }
         }
 
@@ -185,8 +197,20 @@ namespace System.Reactive.Linq
 
             public event PropertyChangedEventHandler? PropertyChanged
             {
-                add => Add(value, (o, e) => value?.Invoke(o, e));
-                remove => Remove(value);
+                add
+                {
+                    if (value is null)
+                        throw new ArgumentNullException(nameof(value));
+                    
+                    Add(value, (o, e) => value?.Invoke(o, e));
+                }
+                remove
+                {
+                    if (value is null)
+                        throw new ArgumentNullException(nameof(value));
+                    
+                    Remove(value);
+                }
             }
         }
 
