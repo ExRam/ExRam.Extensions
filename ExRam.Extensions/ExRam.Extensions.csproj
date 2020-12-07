@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <Copyright>ExRam EDV GmbH &amp; Co. KG</Copyright>
-    <TargetFrameworks>netstandard2.0;netstandard2.1;net5.0</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;net5.0</TargetFrameworks>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Nullable>enable</Nullable>
 	<LangVersion>9.0</LangVersion>
