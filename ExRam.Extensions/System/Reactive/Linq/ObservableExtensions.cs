@@ -507,11 +507,6 @@ namespace System.Reactive.Linq
                     Observable.Throw<T>(new OperationCanceledException())));
         }
 
-        public static IObservable<Counting<T>> ToCounting<T>(this IObservable<T> source)
-        {
-            return source.Select((x, i) => new Counting<T>((ulong)i, x));
-        }
-
         public static IGroupedObservable<TKey, TSource> ToGroup<TKey, TSource>(this IObservable<TSource> source, TKey key)
         {
             return new GroupedObservableImpl<TKey, TSource>(source, key);
